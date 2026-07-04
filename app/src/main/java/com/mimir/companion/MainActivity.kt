@@ -322,9 +322,7 @@ private fun MimirScreen(
                     item {
                         AboutSection(
                             onOpenYoutube = { openUrl(YOUTUBE_CHANNEL_URL) },
-                            onOpenGithub = {
-                                GITHUB_PAGE_URL?.let(openUrl)
-                            },
+                            onOpenGithub = { openUrl(GITHUB_PAGE_URL) },
                         )
                     }
                 } else {
@@ -476,9 +474,9 @@ private fun AboutSection(
                 Label("LINKS")
                 AboutLinkCard(
                     title = "GitHub Page",
-                    body = GITHUB_PAGE_URL ?: "Project page coming soon. Add the final URL in MainActivity.kt.",
-                    buttonLabel = if (GITHUB_PAGE_URL == null) "COMING SOON" else "OPEN GITHUB",
-                    enabled = GITHUB_PAGE_URL != null,
+                    body = GITHUB_PAGE_URL,
+                    buttonLabel = "OPEN GITHUB",
+                    enabled = true,
                     icon = Icons.Outlined.GridView,
                     onClick = onOpenGithub,
                 )
@@ -969,5 +967,5 @@ private fun FileOperation.describe(): String = when (this) {
     is FileOperation.ZipFile -> "Zip $sourcePath -> $targetPath"
 }
 
+private const val GITHUB_PAGE_URL = "https://github.com/ItsRetroPup/Mimir"
 private const val YOUTUBE_CHANNEL_URL = "https://youtube.com/@ItsRetroPup"
-private val GITHUB_PAGE_URL: String? = null
