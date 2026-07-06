@@ -49,6 +49,16 @@ Zip naming behaviour:
 - strips the original file extension before creating the archive
 - example: `Pokemon.gba` becomes `Pokemon.zip`
 
+### PS Vita Shortcuts
+Mimir includes a built-in searchable PS Vita shortcut database based on `.psvita` shortcut mappings.
+
+Current behaviour:
+- search by game title or app ID
+- select an output directory on-device
+- create shortcuts directly from search results
+- detect existing `.psvita` files already present in the selected output folder
+- allow mistaken additions to be removed immediately from the same screen
+
 ## Design Goals
 
 - local-first
@@ -97,11 +107,13 @@ Current scope:
 - multi-disc normalisation
 - frontend preset output generation
 - ROM zip conversion
+- PS Vita shortcut database and on-device shortcut creation
 - Android-native UI for safe local operations
 
 Planned later work may include:
 - more frontend-specific rule validation
 - broader file format support
+- richer Vita shortcut filtering and metadata options
 - UI polish and workflow refinement
 - GitHub release workflow
 - screenshots and user documentation
