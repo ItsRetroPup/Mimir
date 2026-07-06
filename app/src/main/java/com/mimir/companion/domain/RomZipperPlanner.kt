@@ -2,22 +2,62 @@ package com.mimir.companion.domain
 
 object RomZipperPlanner {
     val supportedExtensions = setOf(
-        "nds",
+        // Nintendo handheld
         "gb",
         "gbc",
         "gba",
-        "nes",
+        "nds",
+
+        // Nintendo home consoles
         "fds",
+        "fig",
+        "nes",
         "sfc",
         "smc",
-        "z64",
+        "swc",
+
+        // Nintendo 64
         "n64",
         "v64",
+        "z64",
+
+        // Atari systems
         "a26",
-        "sms",
-        "gg",
-        "md",
+        "a52",
+        "a78",
+        "lnx",
+
+        // Sega home consoles
+        "32x",
         "gen",
+        "md",
+        "smd",
+
+        // Sega 8-bit and portable systems
+        "gg",
+        "sc",
+        "sg",
+        "sms",
+
+        // NEC / other Japanese systems
+        "ngc",
+        "ngp",
+        "pce",
+        "sgx",
+        "ws",
+        "wsc",
+
+        // Computer / miscellaneous formats
+        "col",
+        "cv",
+        "d64",
+        "mx1",
+        "mx2",
+        "rom",
+        "sna",
+        "tap",
+        "tzx",
+        "z80"
     )
 
     fun buildPlan(entries: List<RomEntry>): OperationPlan {

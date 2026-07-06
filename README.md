@@ -36,13 +36,14 @@ Current preset behaviour:
 RomZipper scans ROM subfolders and converts supported ROM formats into `.zip` archives.
 
 Current supported extensions:
-- `.nds`
-- `.gb`
-- `.gba`
-- `.gbc`
-- `.z64`
-- `.nes`
-- `.sfc`
+- Nintendo handheld: `.gb`, `.gbc`, `.gba`, `.nds`
+- Nintendo home console: `.nes`, `.fds`, `.fig`, `.sfc`, `.smc`, `.swc`
+- Nintendo 64: `.n64`, `.v64`, `.z64`
+- Atari: `.a26`, `.a52`, `.a78`, `.lnx`
+- Sega home consoles: `.md`, `.gen`, `.smd`, `.32x`
+- Sega 8-bit / portable: `.sms`, `.gg`, `.sg`, `.sc`
+- NEC / other Japanese systems: `.pce`, `.sgx`, `.ws`, `.wsc`, `.ngp`, `.ngc`
+- Computer / miscellaneous: `.col`, `.cv`, `.d64`, `.tap`, `.tzx`, `.z80`, `.sna`, `.rom`, `.mx1`, `.mx2`
 
 Zip naming behaviour:
 - strips the original file extension before creating the archive
