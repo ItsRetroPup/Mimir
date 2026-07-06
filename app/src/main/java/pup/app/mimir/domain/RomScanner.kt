@@ -1,4 +1,4 @@
-package com.mimir.companion.domain
+package pup.app.mimir.domain
 
 object RomScanner {
     private val patterns = listOf(

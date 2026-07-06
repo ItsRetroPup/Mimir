@@ -1,4 +1,4 @@
-package com.mimir.companion
+package pup.app.mimir
 
 import android.content.Intent
 import android.os.Bundle
@@ -30,6 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderZip
 import androidx.compose.material.icons.outlined.GridView
@@ -45,6 +46,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -71,17 +73,18 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.mimir.companion.domain.FileOperation
-import com.mimir.companion.domain.FrontendPreset
-import com.mimir.companion.domain.OperationPlan
-import com.mimir.companion.domain.ToolMode
-import com.mimir.companion.ui.MimirViewModel
+import pup.app.mimir.domain.FileOperation
+import pup.app.mimir.domain.FrontendPreset
+import pup.app.mimir.domain.OperationPlan
+import pup.app.mimir.domain.ToolMode
+import pup.app.mimir.ui.MimirViewModel
 import pup.app.mimir.R
 
 private enum class AppSection {
     Home,
     Zipper,
     Organizer,
+    Vita,
     About,
 }
 
@@ -102,15 +105,29 @@ class MainActivity : ComponentActivity() {
                 )
                 viewModel.onFolderSelected(uri)
             }
+            val vitaOutputLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.OpenDocumentTree(),
+            ) { uri ->
+                uri ?: return@rememberLauncherForActivityResult
+                contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+                )
+                viewModel.onVitaOutputSelected(uri)
+            }
 
             MimirTheme(useDarkMode = uiState.useDarkMode) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     MimirScreen(
                         uiState = uiState,
                         onSelectFolder = { folderLauncher.launch(null) },
+                        onSelectVitaOutput = { vitaOutputLauncher.launch(null) },
                         onModeSelected = viewModel::updateMode,
                         onPresetSelected = viewModel::updatePreset,
                         onDarkModeToggled = viewModel::updateDarkMode,
+                        onVitaQueryChanged = viewModel::updateVitaQuery,
+                        onVitaShortcutAdd = viewModel::addVitaShortcut,
+                        onVitaShortcutRemove = viewModel::removeVitaShortcut,
                         onStart = viewModel::scan,
                         onApply = viewModel::applyChanges,
                         onUndo = viewModel::undoLastApply,
@@ -221,11 +238,15 @@ private fun MimirTheme(
 
 @Composable
 private fun MimirScreen(
-    uiState: com.mimir.companion.ui.MimirUiState,
+    uiState: pup.app.mimir.ui.MimirUiState,
     onSelectFolder: () -> Unit,
+    onSelectVitaOutput: () -> Unit,
     onModeSelected: (ToolMode) -> Unit,
     onPresetSelected: (FrontendPreset) -> Unit,
     onDarkModeToggled: (Boolean) -> Unit,
+    onVitaQueryChanged: (String) -> Unit,
+    onVitaShortcutAdd: (pup.app.mimir.domain.VitaApp) -> Unit,
+    onVitaShortcutRemove: (pup.app.mimir.domain.VitaApp) -> Unit,
     onStart: () -> Unit,
     onApply: () -> Unit,
     onUndo: () -> Unit,
@@ -338,23 +359,38 @@ private fun MimirScreen(
                                 selectedMode = uiState.selectedMode,
                                 onModeSelected = {
                                     onModeSelected(it)
-                                    currentSection = if (it == ToolMode.RomZipper) {
-                                        AppSection.Zipper
-                                    } else {
-                                        AppSection.Organizer
+                                    currentSection = when (it) {
+                                        ToolMode.RomZipper -> AppSection.Zipper
+                                        ToolMode.MultiDiscOrganizer -> AppSection.Organizer
+                                        ToolMode.VitaAppIds -> AppSection.Vita
                                     }
                                 },
                             )
                         }
                     } else {
                         item {
-                            ControlCard(
-                                folderName = uiState.selectedFolderName,
-                                onSelectFolder = onSelectFolder,
-                            )
+                            if (uiState.selectedMode == ToolMode.VitaAppIds) {
+                                VitaControlCard(
+                                    outputFolderName = uiState.vitaOutputName,
+                                    onSelectVitaOutput = onSelectVitaOutput,
+                                    vitaQuery = uiState.vitaQuery,
+                                    databaseSize = uiState.vitaDatabaseSize,
+                                    searchResults = uiState.vitaSearchResults,
+                                    addedShortcuts = uiState.addedVitaShortcuts,
+                                    isBusy = uiState.isBusy,
+                                    onVitaQueryChanged = onVitaQueryChanged,
+                                    onVitaShortcutAdd = onVitaShortcutAdd,
+                                    onVitaShortcutRemove = onVitaShortcutRemove,
+                                )
+                            } else {
+                                ControlCard(
+                                    folderName = uiState.selectedFolderName,
+                                    onSelectFolder = onSelectFolder,
+                                )
+                            }
                         }
 
-                        if (currentSection == AppSection.Organizer) {
+                        if (currentSection == AppSection.Organizer && uiState.selectedMode == ToolMode.MultiDiscOrganizer) {
                             item {
                                 OrganizerPresetCard(
                                     selectedPreset = uiState.selectedPreset,
@@ -364,17 +400,19 @@ private fun MimirScreen(
                             }
                         }
 
-                        item {
-                            StatusCard(uiState = uiState)
-                        }
+                        if (uiState.selectedMode != ToolMode.VitaAppIds) {
+                            item {
+                                StatusCard(uiState = uiState)
+                            }
 
-                        item {
-                            ActionCard(
-                                onStart = onStart,
-                                onApply = onApply,
-                                canStart = uiState.selectedFolderUri != null && !uiState.isBusy,
-                                canApply = uiState.previewPlan?.changes?.isNotEmpty() == true && !uiState.isBusy,
-                            )
+                            item {
+                                ActionCard(
+                                    onStart = onStart,
+                                    onApply = onApply,
+                                    canStart = uiState.selectedFolderUri != null && !uiState.isBusy,
+                                    canApply = uiState.previewPlan?.changes?.isNotEmpty() == true && !uiState.isBusy,
+                                )
+                            }
                         }
 
                         if (uiState.isBusy) {
@@ -398,7 +436,7 @@ private fun MimirScreen(
                             }
                         }
 
-                        uiState.previewPlan?.let { plan ->
+                        if (uiState.selectedMode != ToolMode.VitaAppIds) uiState.previewPlan?.let { plan ->
                             item {
                                 PreviewSummary(
                                     previewCount = uiState.previewCount,
@@ -432,6 +470,7 @@ private fun HeroSection(
         AppSection.Home -> "Welcome, Brother"
         AppSection.Organizer -> "Organizer"
         AppSection.Zipper -> "Zipper"
+        AppSection.Vita -> "Vita Shortcuts"
         AppSection.About -> "About"
     }
     val body = when (currentSection) {
@@ -441,6 +480,8 @@ private fun HeroSection(
             "Organises your multi-disc ROMs into the appropriate format for your chosen frontend"
         AppSection.Zipper ->
             "Compresses compatible ROM files to .zip to save some space"
+        AppSection.Vita ->
+            "Search the built-in Vita shortcut database, queue titles, and generate scraper-friendly .psvita files on-device"
         AppSection.About ->
             "Mimir is a simple tool utilty designed by RetroPup. Check out RetroPup on YouTube for guides, tips and tricks for the AYN Thor and other retro handhelds!"
     }
@@ -488,17 +529,6 @@ private fun AboutSection(
                     icon = Icons.Outlined.Subscriptions,
                     onClick = onOpenYoutube,
                 )
-                Button(
-                    onClick = onOpenYoutube,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Subscriptions,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 8.dp),
-                    )
-                    Text("SUBSCRIBE")
-                }
             }
         }
     }
@@ -573,6 +603,105 @@ private fun ControlCard(
 }
 
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
+private fun VitaControlCard(
+    outputFolderName: String,
+    onSelectVitaOutput: () -> Unit,
+    vitaQuery: String,
+    databaseSize: Int,
+    searchResults: List<pup.app.mimir.domain.VitaApp>,
+    addedShortcuts: Map<String, String>,
+    isBusy: Boolean,
+    onVitaQueryChanged: (String) -> Unit,
+    onVitaShortcutAdd: (pup.app.mimir.domain.VitaApp) -> Unit,
+    onVitaShortcutRemove: (pup.app.mimir.domain.VitaApp) -> Unit,
+) {
+    StyledCard {
+        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Label("VITA SHORTCUTS")
+            Text(
+                "Shortcut output directory",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.secondary,
+            )
+            Text(outputFolderName, style = MaterialTheme.typography.bodyLarge)
+            OutlinedButton(onClick = onSelectVitaOutput) {
+                Text("SELECT OUTPUT")
+            }
+            Text(
+                "Shortcut database",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Text("$databaseSize titles ready for search", style = MaterialTheme.typography.bodyLarge)
+            OutlinedTextField(
+                value = vitaQuery,
+                onValueChange = onVitaQueryChanged,
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Search title or app ID") },
+                singleLine = true,
+            )
+            if (vitaQuery.isNotBlank()) {
+                Text(
+                    "Search results",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    searchResults.forEach { app ->
+                        val added = addedShortcuts.containsKey(app.titleId)
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Column(
+                                    modifier = Modifier.weight(1f),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                                ) {
+                                    Text(app.title, style = MaterialTheme.typography.titleMedium)
+                                    Text(
+                                        app.titleId,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
+                                    )
+                                }
+                                if (added) {
+                                    IconButton(
+                                        onClick = { onVitaShortcutRemove(app) },
+                                        enabled = !isBusy,
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.Delete,
+                                            contentDescription = "Delete shortcut",
+                                        )
+                                    }
+                                } else {
+                                    OutlinedButton(
+                                        onClick = { onVitaShortcutAdd(app) },
+                                        enabled = !isBusy,
+                                    ) {
+                                        Text("QUICK ADD")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun ActionCard(
     onStart: () -> Unit,
     onApply: () -> Unit,
@@ -623,6 +752,14 @@ private fun ToolModeCards(
             selected = selectedMode == ToolMode.MultiDiscOrganizer,
             icon = Icons.Outlined.Archive,
             onClick = { onModeSelected(ToolMode.MultiDiscOrganizer) },
+        )
+        ToolCard(
+            title = "Vita Shortcuts",
+            body = "Search a built-in PSVita shortcut database and prepare title-based .psvita files in your chosen output directory.",
+            cta = "BUILD SHORTCUTS",
+            selected = selectedMode == ToolMode.VitaAppIds,
+            icon = Icons.Outlined.Home,
+            onClick = { onModeSelected(ToolMode.VitaAppIds) },
         )
     }
 }
@@ -714,10 +851,11 @@ private fun OrganizerPresetCard(
 }
 
 @Composable
-private fun StatusCard(uiState: com.mimir.companion.ui.MimirUiState) {
+private fun StatusCard(uiState: pup.app.mimir.ui.MimirUiState) {
     val metricLabel = when (uiState.selectedMode) {
         ToolMode.MultiDiscOrganizer -> "Detected sets"
         ToolMode.RomZipper -> "Zip candidates"
+        ToolMode.VitaAppIds -> "Queued shortcuts"
     }
     val accentRatio = (uiState.previewCount.coerceAtMost(20) / 20f).coerceAtLeast(0.08f)
     StyledCard {
@@ -800,11 +938,12 @@ private fun InfoPanel(
 @Composable
 private fun ChangeCard(
     plan: OperationPlan,
-    change: com.mimir.companion.domain.PlannedChange,
+    change: pup.app.mimir.domain.PlannedChange,
 ) {
     val chipText = when (plan.mode) {
         ToolMode.MultiDiscOrganizer -> "${change.sourceFiles.size} DISCS"
         ToolMode.RomZipper -> "ZIP"
+        ToolMode.VitaAppIds -> "VITA"
     }
     Card(
         colors = CardDefaults.cardColors(
@@ -828,8 +967,13 @@ private fun ChangeCard(
                         .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center,
                 ) {
+                    val icon = when (plan.mode) {
+                        ToolMode.RomZipper -> Icons.Outlined.FolderZip
+                        ToolMode.VitaAppIds -> Icons.Outlined.Home
+                        else -> Icons.Outlined.Folder
+                    }
                     Icon(
-                        imageVector = if (plan.mode == ToolMode.RomZipper) Icons.Outlined.FolderZip else Icons.Outlined.Folder,
+                        imageVector = icon,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                     )
@@ -928,6 +1072,7 @@ private fun PreviewSummary(
                 when (plan.mode) {
                     ToolMode.MultiDiscOrganizer -> "$previewCount multi-disc sets detected."
                     ToolMode.RomZipper -> "$previewCount ROMs matched the zip whitelist."
+                    ToolMode.VitaAppIds -> "$previewCount Vita shortcuts ready."
                 },
                 style = MaterialTheme.typography.headlineMedium,
             )

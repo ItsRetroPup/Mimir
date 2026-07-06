@@ -1,12 +1,12 @@
-package com.mimir.companion.data
+package pup.app.mimir.data
 
 import android.content.Context
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.documentfile.provider.DocumentFile
-import com.mimir.companion.domain.FileOperation
-import com.mimir.companion.domain.OperationPlan
-import com.mimir.companion.domain.RelativePaths
+import pup.app.mimir.domain.FileOperation
+import pup.app.mimir.domain.OperationPlan
+import pup.app.mimir.domain.RelativePaths
 import java.io.File
 import java.util.UUID
 import java.util.zip.ZipEntry
@@ -143,6 +143,13 @@ class PlanExecutor(private val context: Context) {
 
         backupManager.clearActiveManifest()
         backupManager.deleteSession(manifest.sessionId)
+    }
+
+    fun deleteOutputFile(rootUri: Uri, relativePath: String): Result<Unit> = runCatching {
+        val root = DocumentFile.fromTreeUri(context, rootUri)
+            ?: error("Unable to access selected output folder.")
+        val file = findFile(root, relativePath) ?: error("Missing shortcut: $relativePath")
+        require(file.delete()) { "Failed to delete shortcut: $relativePath" }
     }
 
     private fun ensureDirectory(root: DocumentFile, relativePath: String): DocumentFile {

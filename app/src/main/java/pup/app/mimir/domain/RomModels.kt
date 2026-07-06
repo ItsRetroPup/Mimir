@@ -1,13 +1,20 @@
-package com.mimir.companion.domain
+package pup.app.mimir.domain
 
 data class RomEntry(
     val relativePath: String,
     val fileName: String,
 )
 
+data class VitaApp(
+    val titleId: String,
+    val title: String,
+    val sourcePath: String,
+)
+
 enum class ToolMode(val displayName: String) {
     MultiDiscOrganizer("Multi-disc Organizer"),
     RomZipper("RomZipper"),
+    VitaAppIds("Vita App IDs"),
 }
 
 data class DiscMatch(

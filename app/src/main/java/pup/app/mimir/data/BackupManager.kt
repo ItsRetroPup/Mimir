@@ -1,4 +1,4 @@
-package com.mimir.companion.data
+package pup.app.mimir.data
 
 import android.content.Context
 import org.json.JSONArray

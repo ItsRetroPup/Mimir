@@ -1,4 +1,4 @@
-package com.mimir.companion.domain
+package pup.app.mimir.domain
 
 object RelativePaths {
     fun parentOf(path: String): String =

@@ -1,4 +1,4 @@
-package com.mimir.companion.domain
+package pup.app.mimir.domain
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
