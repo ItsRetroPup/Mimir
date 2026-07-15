@@ -132,6 +132,9 @@ I run the RetroPup YouTube channel, where you can subscribe for tips, tricks, an
 YouTube:
 https://youtube.com/@ItsRetroPup
 
+Support me on Ko-Fi:
+https://ko-fi.com/retropup84752
+
 ## License
 
 MIT. See [LICENSE](/Users/alex/Documents/Mimir/LICENSE).
