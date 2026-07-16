@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:inset="22%">
+    android:inset="28%">
     <bitmap
         android:antialias="true"
         android:gravity="center"

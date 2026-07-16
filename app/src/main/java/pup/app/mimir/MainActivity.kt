@@ -292,7 +292,7 @@ private fun MimirScreen(
                             }
                         }
                         Image(
-                            painter = painterResource(id = R.drawable.mimir_logo),
+                            painter = painterResource(id = R.drawable.mimir_launcher_m),
                             contentDescription = "Mimir logo",
                             modifier = Modifier
                                 .size(40.dp)
