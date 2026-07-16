@@ -25,10 +25,11 @@ object VitaAppIdPlanner {
                 }
             }
 
-            operations += FileOperation.WriteTextFile(
+            val operation = FileOperation.WriteTextFile(
                 relativePath = targetPath,
                 contents = app.titleId,
             )
+            operations += operation
             changes += PlannedChange(
                 title = app.title,
                 sourceFiles = listOf(
@@ -38,6 +39,7 @@ object VitaAppIdPlanner {
                 targetFiles = listOf(targetPath),
                 detailLabel = "Create",
                 detailPath = targetPath,
+                operations = listOf(operation),
             )
         }
 

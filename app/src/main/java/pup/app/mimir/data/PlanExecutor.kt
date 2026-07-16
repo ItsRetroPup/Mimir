@@ -7,48 +7,24 @@ import androidx.documentfile.provider.DocumentFile
 import pup.app.mimir.domain.FileOperation
 import pup.app.mimir.domain.OperationPlan
 import pup.app.mimir.domain.RelativePaths
-import java.io.File
-import java.util.UUID
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 class PlanExecutor(private val context: Context) {
-    private val backupManager = BackupManager(context)
-
-    fun apply(rootUri: Uri, plan: OperationPlan): Result<String> = runCatching {
+    fun apply(
+        rootUri: Uri,
+        plan: OperationPlan,
+        onProgress: ((completedOperations: Int, totalOperations: Int) -> Unit)? = null,
+    ): Result<Unit> = runCatching {
         require(plan.operations.isNotEmpty()) { "No valid changes to apply." }
         val root = DocumentFile.fromTreeUri(context, rootUri)
             ?: error("Unable to access selected ROM folder.")
-        val sessionId = UUID.randomUUID().toString()
-        val sourcePaths = plan.operations.flatMap { operation ->
-            when (operation) {
-                is FileOperation.MoveFile -> listOf(operation.sourcePath)
-                is FileOperation.ZipFile -> listOf(operation.sourcePath)
-                else -> emptyList()
-            }
-        }.distinct()
-        val sourceBackups = linkedMapOf<String, String>()
 
-        sourcePaths.forEach { sourcePath ->
-            val sourceFile = findFile(root, sourcePath) ?: error("Missing source file: $sourcePath")
-            val backupFile = backupManager.backupFile(sessionId, sourcePath)
-            backupFile.parentFile?.mkdirs()
-            context.contentResolver.openInputStream(sourceFile.uri).use { input ->
-                requireNotNull(input) { "Unable to read $sourcePath" }
-                backupFile.outputStream().use { output -> input.copyTo(output) }
-            }
-            sourceBackups[sourcePath] = backupFile.name
-        }
-
-        val createdDirectories = mutableListOf<String>()
-        val createdFiles = mutableListOf<String>()
-
-        plan.operations.forEach { operation ->
+        plan.operations.forEachIndexed { index, operation ->
             when (operation) {
                 is FileOperation.CreateDirectory -> {
                     if (findDirectory(root, operation.relativePath) == null) {
                         ensureDirectory(root, operation.relativePath)
-                        createdDirectories += operation.relativePath
                     }
                 }
 
@@ -66,7 +42,6 @@ class PlanExecutor(private val context: Context) {
                     if (!sourceFile.delete()) {
                         error("Failed to remove original file: ${operation.sourcePath}")
                     }
-                    createdFiles += operation.targetPath
                 }
 
                 is FileOperation.WriteTextFile -> {
@@ -75,7 +50,6 @@ class PlanExecutor(private val context: Context) {
                         requireNotNull(output) { "Unable to write ${operation.relativePath}" }
                         output.write(operation.contents.toByteArray())
                     }
-                    createdFiles += operation.relativePath
                 }
 
                 is FileOperation.ZipFile -> {
@@ -96,53 +70,10 @@ class PlanExecutor(private val context: Context) {
                     if (!sourceFile.delete()) {
                         error("Failed to remove original file: ${operation.sourcePath}")
                     }
-                    createdFiles += operation.targetPath
                 }
             }
+            onProgress?.invoke(index + 1, plan.operations.size)
         }
-
-        backupManager.saveActiveManifest(
-            BackupManifest(
-                sessionId = sessionId,
-                sourceBackups = sourceBackups,
-                createdFiles = createdFiles,
-                createdDirectories = createdDirectories,
-            )
-        )
-        sessionId
-    }
-
-    fun undo(rootUri: Uri): Result<Unit> = runCatching {
-        val manifest = backupManager.loadActiveManifest() ?: error("No backup session available.")
-        val root = DocumentFile.fromTreeUri(context, rootUri)
-            ?: error("Unable to access selected ROM folder.")
-
-        manifest.createdFiles
-            .distinct()
-            .sortedByDescending { it.length }
-            .forEach { deleteFile(root, it) }
-
-        manifest.sourceBackups.forEach { (originalPath, backupName) ->
-            val backupFile = File(backupManager.sessionDir(manifest.sessionId), backupName)
-            if (!backupFile.exists()) {
-                error("Missing backup for $originalPath")
-            }
-            val restored = createFile(root, originalPath)
-            backupFile.inputStream().use { input ->
-                context.contentResolver.openOutputStream(restored.uri, "w").use { output ->
-                    requireNotNull(output) { "Unable to restore $originalPath" }
-                    input.copyTo(output)
-                }
-            }
-        }
-
-        manifest.createdDirectories
-            .distinct()
-            .sortedByDescending { it.length }
-            .forEach { deleteDirectoryIfEmpty(root, it) }
-
-        backupManager.clearActiveManifest()
-        backupManager.deleteSession(manifest.sessionId)
     }
 
     fun deleteOutputFile(rootUri: Uri, relativePath: String): Result<Unit> = runCatching {
@@ -191,17 +122,6 @@ class PlanExecutor(private val context: Context) {
         parent.findFile(fileName)?.delete()
         return parent.createFile(mimeTypeFor(fileName), fileName)
             ?: error("Unable to create file: $relativePath")
-    }
-
-    private fun deleteFile(root: DocumentFile, relativePath: String) {
-        findFile(root, relativePath)?.delete()
-    }
-
-    private fun deleteDirectoryIfEmpty(root: DocumentFile, relativePath: String) {
-        val directory = findDirectory(root, relativePath) ?: return
-        if (directory.listFiles().isEmpty()) {
-            directory.delete()
-        }
     }
 
     private fun mimeTypeFor(fileName: String): String {

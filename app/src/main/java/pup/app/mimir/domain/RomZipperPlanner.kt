@@ -77,17 +77,19 @@ object RomZipperPlanner {
                     conflicts += "Skipped ${entry.fileName}: target already exists: $targetPath"
                     return@forEach
                 }
-                operations += FileOperation.ZipFile(
+                val operation = FileOperation.ZipFile(
                     sourcePath = entry.relativePath,
                     targetPath = targetPath,
                     archiveEntryName = entry.fileName,
                 )
+                operations += operation
                 changes += PlannedChange(
                     title = entry.fileName,
                     sourceFiles = listOf(entry.relativePath),
                     targetFiles = listOf(targetPath),
                     detailLabel = "Zip",
                     detailPath = targetPath,
+                    operations = listOf(operation),
                 )
             }
 

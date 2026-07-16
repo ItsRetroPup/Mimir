@@ -24,9 +24,12 @@ class RomTreeRepository(private val context: Context) {
             }.toList()
         }
 
-    fun scanTree(rootUri: Uri): List<RomEntry> {
+    fun scanTree(
+        rootUri: Uri,
+        onFileScanned: ((Int) -> Unit)? = null,
+    ): List<RomEntry> {
         val root = DocumentFile.fromTreeUri(context, rootUri) ?: return emptyList()
-        return buildList { walk(root, emptyList(), this) }
+        return buildList { walk(root, emptyList(), this, onFileScanned) }
     }
 
     fun loadExistingVitaShortcuts(rootUri: Uri): Map<String, String> {
@@ -105,18 +108,20 @@ class RomTreeRepository(private val context: Context) {
         node: DocumentFile,
         segments: List<String>,
         collector: MutableList<RomEntry>,
+        onFileScanned: ((Int) -> Unit)? = null,
     ) {
         node.listFiles()
             .sortedBy { it.name.orEmpty().lowercase() }
             .forEach { child ->
                 val childName = child.name ?: return@forEach
                 if (child.isDirectory) {
-                    walk(child, segments + childName, collector)
+                    walk(child, segments + childName, collector, onFileScanned)
                 } else if (child.isFile) {
                     collector += RomEntry(
                         relativePath = (segments + childName).joinToString("/"),
                         fileName = childName,
                     )
+                    onFileScanned?.invoke(collector.size)
                 }
             }
     }

@@ -46,13 +46,13 @@ class RomScannerTest {
     }
 
     @Test
-    fun buildsTemporaryDefaultPlaylistPlanWithoutMovingDiscs() {
+    fun buildsOtherFrontendPlaylistPlanWithoutMovingDiscs() {
         val entries = listOf(
             RomEntry("saturn/Panzer Dragoon Saga (Disc 1).cue", "Panzer Dragoon Saga (Disc 1).cue"),
             RomEntry("saturn/Panzer Dragoon Saga (Disc 2).cue", "Panzer Dragoon Saga (Disc 2).cue"),
         )
 
-        val plan = ChangePlanner.buildPlan(RomScanner.scan(entries), FrontendPreset.Daijisho)
+        val plan = ChangePlanner.buildPlan(RomScanner.scan(entries), FrontendPreset.Other)
 
         assertTrue(plan.conflicts.isEmpty())
         assertEquals("saturn/Panzer Dragoon Saga.m3u", plan.changes.first().detailPath)
@@ -64,13 +64,13 @@ class RomScannerTest {
     }
 
     @Test
-    fun buildsCocoonPlaylistWithoutMovingDiscs() {
+    fun buildsOtherFrontendPlaylistWithoutMovingDiscs() {
         val entries = listOf(
             RomEntry("dreamcast/Shenmue (Disc 1).chd", "Shenmue (Disc 1).chd"),
             RomEntry("dreamcast/Shenmue (Disc 2).chd", "Shenmue (Disc 2).chd"),
         )
 
-        val plan = ChangePlanner.buildPlan(RomScanner.scan(entries), FrontendPreset.Cocoon)
+        val plan = ChangePlanner.buildPlan(RomScanner.scan(entries), FrontendPreset.Other)
 
         assertTrue(plan.conflicts.isEmpty())
         assertEquals("dreamcast/Shenmue.m3u", plan.changes.first().detailPath)
@@ -92,7 +92,7 @@ class RomScannerTest {
             RomEntry("psx/Grandia (Disc 2).chd", "Grandia (Disc 2).chd"),
         )
 
-        val plan = ChangePlanner.buildPlan(RomScanner.scan(entries), FrontendPreset.Cocoon)
+        val plan = ChangePlanner.buildPlan(RomScanner.scan(entries), FrontendPreset.Other)
 
         assertEquals(1, plan.conflicts.size)
         assertEquals("Skipped Xenogears: target already exists: psx/Xenogears.m3u", plan.conflicts.single())

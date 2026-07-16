@@ -11,26 +11,18 @@ Scans a user-selected ROM folder and detects multi-disc games using common namin
 
 Current behaviour:
 - previews intended changes before applying them
-- creates backups before file operations
-- supports rollback and undo
+- requires confirmation before file operations
 - skips conflicts instead of blocking non-conflicting operations
 - applies deterministic frontend-specific output rules
 
 ### Frontend Presets
 Current preset support includes:
 - ES-DE
-- Cocoon
-- Retrohrai
-- Beacon
-- Console Launcher
-- NeoStation
-- Daijisho
-- iiSU
+- Other
 
 Current preset behaviour:
 - ES-DE groups multi-disc games into a per-game folder and generates an `.m3u`
-- all other presets currently use the Cocoon-style layout
-- Cocoon-style layout keeps discs in the platform folder and generates an `.m3u`
+- Other keeps discs in the platform folder and generates an `.m3u`
 
 ### RomZipper
 RomZipper scans ROM subfolders and converts supported ROM formats into `.zip` archives.

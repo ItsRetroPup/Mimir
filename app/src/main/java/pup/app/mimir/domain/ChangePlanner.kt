@@ -30,15 +30,19 @@ object ChangePlanner {
                 return@forEach
             }
 
-            operations += plan.createdDirectories.map(FileOperation::CreateDirectory)
-            operations += plan.moves.map { FileOperation.MoveFile(it.first, it.second) }
-            operations += FileOperation.WriteTextFile(plan.playlistPath, plan.playlistContents)
+            val changeOperations = buildList {
+                addAll(plan.createdDirectories.map(FileOperation::CreateDirectory))
+                addAll(plan.moves.map { FileOperation.MoveFile(it.first, it.second) })
+                add(FileOperation.WriteTextFile(plan.playlistPath, plan.playlistContents))
+            }
+            operations += changeOperations
             changes += PlannedChange(
                 title = discSet.title,
                 sourceFiles = discSet.entries.map { it.relativePath },
                 targetFiles = plan.targetFiles,
                 detailLabel = "Playlist",
                 detailPath = plan.playlistPath,
+                operations = changeOperations,
             )
         }
 

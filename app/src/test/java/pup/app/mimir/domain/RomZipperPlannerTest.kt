@@ -54,4 +54,23 @@ class RomZipperPlannerTest {
         assertEquals(1, plan.changes.size)
         assertEquals("nds/Mario Kart DS.zip", plan.changes.single().detailPath)
     }
+
+    @Test
+    fun retainsOperationsOnlyForSelectedChanges() {
+        val plan = RomZipperPlanner.buildPlan(
+            listOf(
+                RomEntry("gba/Metroid Fusion.gba", "Metroid Fusion.gba"),
+                RomEntry("nds/Mario Kart DS.nds", "Mario Kart DS.nds"),
+            )
+        )
+
+        val selectedPlan = plan.forSelectedChanges(setOf("nds/Mario Kart DS.zip"))
+
+        assertEquals(listOf("nds/Mario Kart DS.zip"), selectedPlan.changes.map { it.detailPath })
+        assertEquals(1, selectedPlan.operations.size)
+        assertEquals(
+            "nds/Mario Kart DS.nds",
+            (selectedPlan.operations.single() as FileOperation.ZipFile).sourcePath,
+        )
+    }
 }

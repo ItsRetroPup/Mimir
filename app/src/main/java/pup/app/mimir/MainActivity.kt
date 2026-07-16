@@ -41,9 +41,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -128,9 +131,9 @@ class MainActivity : ComponentActivity() {
                         onVitaQueryChanged = viewModel::updateVitaQuery,
                         onVitaShortcutAdd = viewModel::addVitaShortcut,
                         onVitaShortcutRemove = viewModel::removeVitaShortcut,
+                        onChangeSelection = viewModel::updateChangeSelection,
                         onStart = viewModel::scan,
                         onApply = viewModel::applyChanges,
-                        onUndo = viewModel::undoLastApply,
                     )
                 }
             }
@@ -247,9 +250,9 @@ private fun MimirScreen(
     onVitaQueryChanged: (String) -> Unit,
     onVitaShortcutAdd: (pup.app.mimir.domain.VitaApp) -> Unit,
     onVitaShortcutRemove: (pup.app.mimir.domain.VitaApp) -> Unit,
+    onChangeSelection: (String, Boolean) -> Unit,
     onStart: () -> Unit,
     onApply: () -> Unit,
-    onUndo: () -> Unit,
 ) {
     val context = LocalContext.current
     val backgroundBrush = remember(uiState.useDarkMode) {
@@ -260,6 +263,7 @@ private fun MimirScreen(
         }
     }
     var currentSection by rememberSaveable { mutableStateOf(AppSection.Home) }
+    var showApplyConfirmation by rememberSaveable { mutableStateOf(false) }
     val openUrl: (String) -> Unit = { url ->
         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     }
@@ -329,6 +333,7 @@ private fun MimirScreen(
                 .fillMaxSize()
                 .background(backgroundBrush)
         ) {
+            val progressLabel = uiState.operationProgressLabel ?: uiState.scanProgressLabel
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
@@ -402,20 +407,16 @@ private fun MimirScreen(
 
                         if (uiState.selectedMode != ToolMode.VitaAppIds) {
                             item {
-                                StatusCard(uiState = uiState)
-                            }
-
-                            item {
                                 ActionCard(
                                     onStart = onStart,
-                                    onApply = onApply,
+                                    onApply = { showApplyConfirmation = true },
                                     canStart = uiState.selectedFolderUri != null && !uiState.isBusy,
-                                    canApply = uiState.previewPlan?.changes?.isNotEmpty() == true && !uiState.isBusy,
+                                    canApply = uiState.selectedChangePaths.isNotEmpty() && !uiState.isBusy,
                                 )
                             }
                         }
 
-                        if (uiState.isBusy) {
+                        if (uiState.isBusy && progressLabel == null) {
                             item {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -440,9 +441,9 @@ private fun MimirScreen(
                             item {
                                 PreviewSummary(
                                     previewCount = uiState.previewCount,
+                                    selectedCount = uiState.selectedChangePaths.size,
                                     plan = plan,
-                                    onApply = onApply,
-                                    onUndo = onUndo,
+                                    onApply = { showApplyConfirmation = true },
                                     isBusy = uiState.isBusy,
                                 )
                             }
@@ -451,6 +452,11 @@ private fun MimirScreen(
                                 ChangeCard(
                                     plan = plan,
                                     change = change,
+                                    selected = change.detailPath in uiState.selectedChangePaths,
+                                    enabled = !uiState.isBusy,
+                                    onSelectedChange = { selected ->
+                                        onChangeSelection(change.detailPath, selected)
+                                    },
                                 )
                             }
                         }
@@ -458,7 +464,50 @@ private fun MimirScreen(
                     }
                 }
             }
+            progressLabel?.let { label ->
+                ProgressToast(
+                    label = label,
+                    progress = uiState.operationProgress,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                            bottom = innerPadding.calculateBottomPadding() + 16.dp,
+                        ),
+                )
+            }
         }
+    }
+
+    if (showApplyConfirmation) {
+        val changeCount = uiState.selectedChangePaths.size
+        AlertDialog(
+            onDismissRequest = { showApplyConfirmation = false },
+            title = { Text("Apply changes?") },
+            text = {
+                Text(
+                    "This will apply $changeCount planned changes to your selected ROM folder. " +
+                        "Original files may be moved or removed as shown in the preview, and Mimir cannot undo this action."
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showApplyConfirmation = false
+                        onApply()
+                    },
+                    enabled = !uiState.isBusy && changeCount > 0,
+                ) {
+                    Text("APPLY CHANGES")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { showApplyConfirmation = false }) {
+                    Text("CANCEL")
+                }
+            },
+        )
     }
 }
 
@@ -739,7 +788,7 @@ private fun ToolModeCards(
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         ToolCard(
             title = "Zipper",
-            body = "Compress zip-safe handheld ROMs while preserving a preview, backup, and undo path.",
+            body = "Compress zip-safe handheld ROMs after reviewing and confirming the planned changes.",
             cta = "LAUNCH UTILITY",
             selected = selectedMode == ToolMode.RomZipper,
             icon = Icons.Outlined.FolderZip,
@@ -851,42 +900,42 @@ private fun OrganizerPresetCard(
 }
 
 @Composable
-private fun StatusCard(uiState: pup.app.mimir.ui.MimirUiState) {
-    val metricLabel = when (uiState.selectedMode) {
-        ToolMode.MultiDiscOrganizer -> "Detected sets"
-        ToolMode.RomZipper -> "Zip candidates"
-        ToolMode.VitaAppIds -> "Queued shortcuts"
-    }
-    val accentRatio = (uiState.previewCount.coerceAtMost(20) / 20f).coerceAtLeast(0.08f)
-    StyledCard {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Label("STATUS REPORT")
-            Text("Library Health", style = MaterialTheme.typography.headlineMedium)
-            MetricRow(metricLabel, "${uiState.previewCount}")
-            ThinProgress(progress = accentRatio)
-            MetricRow("Queued operations", "${uiState.previewPlan?.operations?.size ?: 0}")
-            MetricRow("Conflicts", "${uiState.previewPlan?.conflicts?.size ?: 0}")
-        }
-    }
-}
-
-@Composable
-private fun MetricRow(label: String, value: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+private fun ProgressToast(
+    label: String,
+    progress: Float?,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f),
+        ),
+        shape = RoundedCornerShape(16.dp),
     ) {
-        Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f))
-        Surface(
-            color = MaterialTheme.colorScheme.surfaceVariant,
-            shape = RoundedCornerShape(8.dp),
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
-                value,
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                style = MaterialTheme.typography.labelLarge,
+                label,
+                modifier = Modifier.padding(start = 16.dp, top = 14.dp, end = 16.dp),
+                style = MaterialTheme.typography.bodyMedium,
             )
+            if (progress == null) {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 14.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            } else {
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 14.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            }
         }
     }
 }
@@ -939,6 +988,9 @@ private fun InfoPanel(
 private fun ChangeCard(
     plan: OperationPlan,
     change: pup.app.mimir.domain.PlannedChange,
+    selected: Boolean,
+    enabled: Boolean,
+    onSelectedChange: (Boolean) -> Unit,
 ) {
     val chipText = when (plan.mode) {
         ToolMode.MultiDiscOrganizer -> "${change.sourceFiles.size} DISCS"
@@ -978,15 +1030,25 @@ private fun ChangeCard(
                         tint = MaterialTheme.colorScheme.primary,
                     )
                 }
-                Surface(
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    shape = RoundedCornerShape(999.dp),
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    Text(
-                        chipText,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelMedium,
+                    Checkbox(
+                        checked = selected,
+                        onCheckedChange = onSelectedChange,
+                        enabled = enabled,
                     )
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = RoundedCornerShape(999.dp),
+                    ) {
+                        Text(
+                            chipText,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
                 }
             }
 
@@ -1060,9 +1122,9 @@ private fun <T> ChoiceRow(
 @Composable
 private fun PreviewSummary(
     previewCount: Int,
+    selectedCount: Int,
     plan: OperationPlan,
     onApply: () -> Unit,
-    onUndo: () -> Unit,
     isBusy: Boolean,
 ) {
     StyledCard {
@@ -1070,9 +1132,9 @@ private fun PreviewSummary(
             Label("PREVIEW")
             Text(
                 when (plan.mode) {
-                    ToolMode.MultiDiscOrganizer -> "$previewCount multi-disc sets detected."
-                    ToolMode.RomZipper -> "$previewCount ROMs matched the zip whitelist."
-                    ToolMode.VitaAppIds -> "$previewCount Vita shortcuts ready."
+                    ToolMode.MultiDiscOrganizer -> "$previewCount multi-disc sets detected; $selectedCount selected."
+                    ToolMode.RomZipper -> "$previewCount ROMs matched the zip whitelist; $selectedCount selected."
+                    ToolMode.VitaAppIds -> "$previewCount Vita shortcuts ready; $selectedCount selected."
                 },
                 style = MaterialTheme.typography.headlineMedium,
             )
@@ -1085,21 +1147,12 @@ private fun PreviewSummary(
             } else {
                 Text("No conflicts detected.", style = MaterialTheme.typography.bodyMedium)
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(
-                    onClick = onApply,
-                    enabled = !isBusy && plan.changes.isNotEmpty(),
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text("Apply")
-                }
-                OutlinedButton(
-                    onClick = onUndo,
-                    enabled = !isBusy,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text("Undo")
-                }
+            Button(
+                onClick = onApply,
+                enabled = !isBusy && selectedCount > 0,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Apply")
             }
         }
     }

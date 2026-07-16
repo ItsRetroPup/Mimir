@@ -51,6 +51,7 @@ data class PlannedChange(
     val targetFiles: List<String>,
     val detailLabel: String,
     val detailPath: String,
+    val operations: List<FileOperation>,
 )
 
 data class OperationPlan(
@@ -59,4 +60,12 @@ data class OperationPlan(
     val changes: List<PlannedChange>,
     val operations: List<FileOperation>,
     val conflicts: List<String>,
-)
+) {
+    fun forSelectedChanges(selectedDetailPaths: Set<String>): OperationPlan {
+        val selectedChanges = changes.filter { it.detailPath in selectedDetailPaths }
+        return copy(
+            changes = selectedChanges,
+            operations = selectedChanges.flatMap(PlannedChange::operations),
+        )
+    }
+}

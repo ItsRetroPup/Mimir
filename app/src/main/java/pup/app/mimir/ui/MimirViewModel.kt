@@ -31,10 +31,14 @@ data class MimirUiState(
     val addedVitaShortcuts: Map<String, String> = emptyMap(),
     val selectedMode: ToolMode = ToolMode.MultiDiscOrganizer,
     val selectedPreset: FrontendPreset = FrontendPreset.EsDe,
-    val useDarkMode: Boolean = false,
+    val useDarkMode: Boolean = true,
     val isBusy: Boolean = false,
+    val scanProgressLabel: String? = null,
+    val operationProgressLabel: String? = null,
+    val operationProgress: Float? = null,
     val previewCount: Int = 0,
     val previewPlan: OperationPlan? = null,
+    val selectedChangePaths: Set<String> = emptySet(),
     val message: String? = null,
 )
 
@@ -50,7 +54,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             selectedFolderName = prefs.getString(KEY_LABEL, null) ?: "No ROM folder selected",
             vitaOutputUri = prefs.getString(KEY_VITA_OUTPUT_URI, null)?.let(Uri::parse),
             vitaOutputName = prefs.getString(KEY_VITA_OUTPUT_LABEL, null) ?: "No Vita output directory selected",
-            useDarkMode = prefs.getBoolean(KEY_DARK_MODE, false),
+            useDarkMode = prefs.getBoolean(KEY_DARK_MODE, true),
         )
     )
     val uiState: StateFlow<MimirUiState> = _uiState.asStateFlow()
@@ -73,7 +77,9 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updatePreset(preset: FrontendPreset) {
-        _uiState.update { it.copy(selectedPreset = preset, previewPlan = null, message = null) }
+        _uiState.update {
+            it.copy(selectedPreset = preset, previewPlan = null, selectedChangePaths = emptySet(), message = null)
+        }
     }
 
     fun updateMode(mode: ToolMode) {
@@ -82,6 +88,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                 selectedMode = mode,
                 previewPlan = null,
                 previewCount = 0,
+                selectedChangePaths = emptySet(),
                 message = null,
             )
         }
@@ -94,6 +101,22 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                 vitaSearchResults = filterVitaCatalog(query),
                 message = null,
             )
+        }
+    }
+
+    fun updateChangeSelection(detailPath: String, selected: Boolean) {
+        _uiState.update { state ->
+            if (state.previewPlan?.changes?.any { it.detailPath == detailPath } != true) {
+                state
+            } else {
+                state.copy(
+                    selectedChangePaths = if (selected) {
+                        state.selectedChangePaths + detailPath
+                    } else {
+                        state.selectedChangePaths - detailPath
+                    },
+                )
+            }
         }
     }
 
@@ -178,6 +201,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                 selectedFolderUri = uri,
                 selectedFolderName = label,
                 previewPlan = null,
+                selectedChangePaths = emptySet(),
                 message = null,
             )
         }
@@ -218,11 +242,22 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { it.copy(isBusy = true, message = null) }
+            _uiState.update {
+                it.copy(
+                    isBusy = true,
+                    scanProgressLabel = initialScanLabel(mode),
+                    message = null,
+                )
+            }
             runCatching {
                 val plan = when (mode) {
                     ToolMode.MultiDiscOrganizer -> {
-                        val entries = repository.scanTree(requireNotNull(romUri))
+                        val entries = repository.scanTree(requireNotNull(romUri)) { scannedFiles ->
+                            updateScanProgress(mode, scannedFiles)
+                        }
+                        _uiState.update {
+                            it.copy(scanProgressLabel = "Checking ${entries.size} ROM files for multi-disc games…")
+                        }
                         val scanResult = RomScanner.scan(entries)
                         pup.app.mimir.domain.ChangePlanner.buildPlan(
                             scanResult = scanResult,
@@ -231,7 +266,12 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                     }
 
                     ToolMode.RomZipper -> {
-                        val entries = repository.scanTree(requireNotNull(romUri))
+                        val entries = repository.scanTree(requireNotNull(romUri)) { scannedFiles ->
+                            updateScanProgress(mode, scannedFiles)
+                        }
+                        _uiState.update {
+                            it.copy(scanProgressLabel = "Checking ${entries.size} ROM files for zip-compatible formats…")
+                        }
                         RomZipperPlanner.buildPlan(entries)
                     }
 
@@ -241,8 +281,10 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                 _uiState.update {
                     it.copy(
                         isBusy = false,
+                        scanProgressLabel = null,
                         previewCount = previewCount,
                         previewPlan = plan,
+                        selectedChangePaths = plan.changes.mapTo(linkedSetOf()) { it.detailPath },
                         message = if (plan.changes.isEmpty()) {
                             when (mode) {
                                 ToolMode.MultiDiscOrganizer -> "No multi-disc games found."
@@ -256,7 +298,11 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }.onFailure { error ->
                 _uiState.update {
-                    it.copy(isBusy = false, message = error.message ?: "Scan failed.")
+                    it.copy(
+                        isBusy = false,
+                        scanProgressLabel = null,
+                        message = error.message ?: "Scan failed.",
+                    )
                 }
             }
         }
@@ -264,52 +310,49 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
 
     fun applyChanges() {
         val current = _uiState.value
-        val plan = current.previewPlan ?: return
+        val plan = current.previewPlan
+            ?.forSelectedChanges(current.selectedChangePaths)
+            ?.takeIf { it.operations.isNotEmpty() }
+            ?: return
         val uri = when (plan.mode) {
             ToolMode.VitaAppIds -> current.vitaOutputUri
             else -> current.selectedFolderUri
         } ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { it.copy(isBusy = true, message = null) }
-            executor.apply(uri, plan)
+            _uiState.update {
+                it.copy(
+                    isBusy = true,
+                    operationProgressLabel = applyProgressLabel(plan.mode, 0, plan.operations.size),
+                    operationProgress = 0f,
+                    message = null,
+                )
+            }
+            executor.apply(uri, plan) { completed, total ->
+                _uiState.update {
+                    it.copy(
+                        operationProgressLabel = applyProgressLabel(plan.mode, completed, total),
+                        operationProgress = completed.toFloat() / total,
+                    )
+                }
+            }
                 .onSuccess {
                     _uiState.update {
                         it.copy(
                             isBusy = false,
-                            message = "Changes applied. Backup session is ready for undo.",
+                            operationProgressLabel = null,
+                            operationProgress = null,
+                            message = "Changes applied.",
                         )
                     }
                 }
                 .onFailure { error ->
                     _uiState.update {
-                        it.copy(isBusy = false, message = error.message ?: "Apply failed.")
-                    }
-                }
-        }
-    }
-
-    fun undoLastApply() {
-        val current = _uiState.value
-        val uri = when (current.previewPlan?.mode ?: current.selectedMode) {
-            ToolMode.VitaAppIds -> current.vitaOutputUri
-            else -> current.selectedFolderUri
-        } ?: return
-        viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { it.copy(isBusy = true, message = null) }
-            executor.undo(uri)
-                .onSuccess {
-                    _uiState.update {
                         it.copy(
                             isBusy = false,
-                            previewPlan = null,
-                            previewCount = 0,
-                            message = "Last apply session restored from backup.",
+                            operationProgressLabel = null,
+                            operationProgress = null,
+                            message = error.message ?: "Apply failed.",
                         )
-                    }
-                }
-                .onFailure { error ->
-                    _uiState.update {
-                        it.copy(isBusy = false, message = error.message ?: "Undo failed.")
                     }
                 }
         }
@@ -322,6 +365,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         private const val KEY_VITA_OUTPUT_LABEL = "vita_output_label"
         private const val KEY_DARK_MODE = "dark_mode"
         private const val MAX_VITA_RESULTS = 40
+        private const val SCAN_PROGRESS_UPDATE_INTERVAL = 25
     }
 
     private fun treeLabel(uri: Uri): String =
@@ -336,6 +380,32 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             app.title.lowercase().contains(normalized) || app.titleId.lowercase().contains(normalized)
         }
         return matches.take(MAX_VITA_RESULTS)
+    }
+
+    private fun initialScanLabel(mode: ToolMode): String =
+        when (mode) {
+            ToolMode.MultiDiscOrganizer -> "Scanning ROM files for multi-disc games…"
+            ToolMode.RomZipper -> "Scanning ROM files for zip-compatible formats…"
+            ToolMode.VitaAppIds -> "Scanning ROM files…"
+        }
+
+    private fun updateScanProgress(mode: ToolMode, scannedFiles: Int) {
+        if (scannedFiles % SCAN_PROGRESS_UPDATE_INTERVAL != 0) return
+        val activity = when (mode) {
+            ToolMode.MultiDiscOrganizer -> "Scanning for multi-disc games"
+            ToolMode.RomZipper -> "Scanning for zip-compatible ROMs"
+            ToolMode.VitaAppIds -> "Scanning ROM files"
+        }
+        _uiState.update { it.copy(scanProgressLabel = "$activity: $scannedFiles files checked") }
+    }
+
+    private fun applyProgressLabel(mode: ToolMode, completed: Int, total: Int): String {
+        val activity = when (mode) {
+            ToolMode.MultiDiscOrganizer -> "Organizing ROMs"
+            ToolMode.RomZipper -> "Zipping ROMs"
+            ToolMode.VitaAppIds -> "Creating shortcuts"
+        }
+        return "$activity: $completed of $total"
     }
 
     private suspend fun refreshExistingVitaShortcuts(uri: Uri) {
