@@ -1,8 +1,12 @@
+<img width="512" height="512" alt="mimir1" src="https://github.com/user-attachments/assets/7edde894-cf4a-4ad8-822e-5a50af306fd8" />
+
 # Mimir Android Companion
 
 Mimir is an open source Android toolkit for retro handheld owners.
 
 It is built to help organise ROM libraries safely on-device, with an initial focus on multi-disc cleanup and bulk ROM preparation for Android frontends used on devices like the AYN Odin and Thor.
+
+[![Get it on Obtainium](https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium%3A%2F%2Fadd%2Fhttps%3A%2F%2Fgithub.com%2FItsRetroPup%2FMimir)
 
 ## Current Modules
 
@@ -130,3 +134,5 @@ https://ko-fi.com/retropup84752
 ## License
 
 MIT. See [LICENSE](/Users/alex/Documents/Mimir/LICENSE).
+
+
