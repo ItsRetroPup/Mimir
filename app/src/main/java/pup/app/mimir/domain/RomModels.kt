@@ -3,6 +3,7 @@ package pup.app.mimir.domain
 data class RomEntry(
     val relativePath: String,
     val fileName: String,
+    val sourcePath: String = relativePath,
 )
 
 data class VitaApp(

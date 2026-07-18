@@ -52,6 +52,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -127,6 +128,7 @@ class MainActivity : ComponentActivity() {
                         onSelectVitaOutput = { vitaOutputLauncher.launch(null) },
                         onModeSelected = viewModel::updateMode,
                         onPresetSelected = viewModel::updatePreset,
+                        onScanHiddenFoldersChanged = viewModel::updateScanHiddenFolders,
                         onDarkModeToggled = viewModel::updateDarkMode,
                         onVitaQueryChanged = viewModel::updateVitaQuery,
                         onVitaShortcutAdd = viewModel::addVitaShortcut,
@@ -246,6 +248,7 @@ private fun MimirScreen(
     onSelectVitaOutput: () -> Unit,
     onModeSelected: (ToolMode) -> Unit,
     onPresetSelected: (FrontendPreset) -> Unit,
+    onScanHiddenFoldersChanged: (Boolean) -> Unit,
     onDarkModeToggled: (Boolean) -> Unit,
     onVitaQueryChanged: (String) -> Unit,
     onVitaShortcutAdd: (pup.app.mimir.domain.VitaApp) -> Unit,
@@ -400,6 +403,8 @@ private fun MimirScreen(
                                 OrganizerPresetCard(
                                     selectedPreset = uiState.selectedPreset,
                                     onPresetSelected = onPresetSelected,
+                                    scanHiddenFolders = uiState.scanHiddenFolders,
+                                    onScanHiddenFoldersChanged = onScanHiddenFoldersChanged,
                                     enabled = !uiState.isBusy,
                                 )
                             }
@@ -883,6 +888,8 @@ private fun ToolCard(
 private fun OrganizerPresetCard(
     selectedPreset: FrontendPreset,
     onPresetSelected: (FrontendPreset) -> Unit,
+    scanHiddenFolders: Boolean,
+    onScanHiddenFoldersChanged: (Boolean) -> Unit,
     enabled: Boolean,
 ) {
     StyledCard {
@@ -895,6 +902,24 @@ private fun OrganizerPresetCard(
                 label = { it.displayName },
                 onSelect = onPresetSelected,
             )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Scan hidden folders", style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        "Extract ROMs from .-prefixed folders into the system folder before organizing.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    )
+                }
+                Switch(
+                    checked = scanHiddenFolders,
+                    onCheckedChange = if (enabled) onScanHiddenFoldersChanged else null,
+                )
+            }
         }
     }
 }

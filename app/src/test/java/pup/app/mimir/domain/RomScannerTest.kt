@@ -83,6 +83,48 @@ class RomScannerTest {
     }
 
     @Test
+    fun movesPs2DiscsWithoutCreatingAPlaylist() {
+        val entries = listOf(
+            RomEntry("ps2/Xenosaga Disc 1.iso", "Xenosaga Disc 1.iso"),
+            RomEntry("ps2/Xenosaga Disc 2.iso", "Xenosaga Disc 2.iso"),
+        )
+
+        val plan = ChangePlanner.buildPlan(RomScanner.scan(entries), FrontendPreset.EsDe)
+
+        assertTrue(plan.conflicts.isEmpty())
+        assertEquals("ps2/Xenosaga", plan.changes.single().detailPath)
+        assertTrue(plan.operations.none { it is FileOperation.WriteTextFile })
+        assertEquals(
+            listOf("ps2/Xenosaga/Xenosaga Disc 1.iso", "ps2/Xenosaga/Xenosaga Disc 2.iso"),
+            plan.changes.single().targetFiles,
+        )
+    }
+
+    @Test
+    fun usesHiddenFolderSourcesWhilePlanningOutputAtTheSystemFolder() {
+        val entries = listOf(
+            RomEntry(
+                relativePath = "psx/Parasite Eve Disc 1.chd",
+                fileName = "Parasite Eve Disc 1.chd",
+                sourcePath = "psx/.imports/Parasite Eve Disc 1.chd",
+            ),
+            RomEntry(
+                relativePath = "psx/Parasite Eve Disc 2.chd",
+                fileName = "Parasite Eve Disc 2.chd",
+                sourcePath = "psx/.imports/Parasite Eve Disc 2.chd",
+            ),
+        )
+
+        val plan = ChangePlanner.buildPlan(RomScanner.scan(entries), FrontendPreset.EsDe)
+
+        assertEquals("psx/Parasite Eve.m3u/Parasite Eve.m3u", plan.changes.single().detailPath)
+        assertEquals(
+            "psx/.imports/Parasite Eve Disc 1.chd",
+            (plan.operations[1] as FileOperation.MoveFile).sourcePath,
+        )
+    }
+
+    @Test
     fun skipsOnlyConflictingDiscSets() {
         val entries = listOf(
             RomEntry("psx/Xenogears (Disc 1).chd", "Xenogears (Disc 1).chd"),

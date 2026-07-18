@@ -31,6 +31,7 @@ data class MimirUiState(
     val addedVitaShortcuts: Map<String, String> = emptyMap(),
     val selectedMode: ToolMode = ToolMode.MultiDiscOrganizer,
     val selectedPreset: FrontendPreset = FrontendPreset.EsDe,
+    val scanHiddenFolders: Boolean = false,
     val useDarkMode: Boolean = true,
     val isBusy: Boolean = false,
     val scanProgressLabel: String? = null,
@@ -54,6 +55,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             selectedFolderName = prefs.getString(KEY_LABEL, null) ?: "No ROM folder selected",
             vitaOutputUri = prefs.getString(KEY_VITA_OUTPUT_URI, null)?.let(Uri::parse),
             vitaOutputName = prefs.getString(KEY_VITA_OUTPUT_LABEL, null) ?: "No Vita output directory selected",
+            scanHiddenFolders = prefs.getBoolean(KEY_SCAN_HIDDEN_FOLDERS, false),
             useDarkMode = prefs.getBoolean(KEY_DARK_MODE, true),
         )
     )
@@ -79,6 +81,18 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
     fun updatePreset(preset: FrontendPreset) {
         _uiState.update {
             it.copy(selectedPreset = preset, previewPlan = null, selectedChangePaths = emptySet(), message = null)
+        }
+    }
+
+    fun updateScanHiddenFolders(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_SCAN_HIDDEN_FOLDERS, enabled).apply()
+        _uiState.update {
+            it.copy(
+                scanHiddenFolders = enabled,
+                previewPlan = null,
+                selectedChangePaths = emptySet(),
+                message = null,
+            )
         }
     }
 
@@ -252,7 +266,10 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             runCatching {
                 val plan = when (mode) {
                     ToolMode.MultiDiscOrganizer -> {
-                        val entries = repository.scanTree(requireNotNull(romUri)) { scannedFiles ->
+                        val entries = repository.scanTree(
+                            rootUri = requireNotNull(romUri),
+                            scanHiddenFolders = _uiState.value.scanHiddenFolders,
+                        ) { scannedFiles ->
                             updateScanProgress(mode, scannedFiles)
                         }
                         _uiState.update {
@@ -364,6 +381,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         private const val KEY_VITA_OUTPUT_URI = "vita_output_uri"
         private const val KEY_VITA_OUTPUT_LABEL = "vita_output_label"
         private const val KEY_DARK_MODE = "dark_mode"
+        private const val KEY_SCAN_HIDDEN_FOLDERS = "scan_hidden_folders"
         private const val MAX_VITA_RESULTS = 40
         private const val SCAN_PROGRESS_UPDATE_INTERVAL = 25
     }

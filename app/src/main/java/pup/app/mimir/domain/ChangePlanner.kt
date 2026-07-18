@@ -11,10 +11,14 @@ object ChangePlanner {
         val reservedPaths = mutableSetOf<String>()
 
         scanResult.discSets.forEach { discSet ->
-            val plan = when (preset.layout) {
-                FrontendLayout.FolderAsFile -> buildFolderAsFilePlan(discSet)
-                FrontendLayout.PlaylistAtRootWithoutMoves -> buildRootPlaylistWithoutMovesPlan(discSet)
-                FrontendLayout.PlaylistAtRootWithDiscFolder -> buildRootPlaylistPlan(discSet)
+            val plan = when {
+                discSet.parentPath.split('/').any { it.equals("ps2", ignoreCase = true) } ->
+                    buildPs2Plan(discSet)
+                else -> when (preset.layout) {
+                    FrontendLayout.FolderAsFile -> buildFolderAsFilePlan(discSet)
+                    FrontendLayout.PlaylistAtRootWithoutMoves -> buildRootPlaylistWithoutMovesPlan(discSet)
+                    FrontendLayout.PlaylistAtRootWithDiscFolder -> buildRootPlaylistPlan(discSet)
+                }
             }
 
             val discSetConflicts = mutableListOf<String>()
@@ -33,15 +37,17 @@ object ChangePlanner {
             val changeOperations = buildList {
                 addAll(plan.createdDirectories.map(FileOperation::CreateDirectory))
                 addAll(plan.moves.map { FileOperation.MoveFile(it.first, it.second) })
-                add(FileOperation.WriteTextFile(plan.playlistPath, plan.playlistContents))
+                if (plan.playlistPath != null) {
+                    add(FileOperation.WriteTextFile(plan.playlistPath, plan.playlistContents.orEmpty()))
+                }
             }
             operations += changeOperations
             changes += PlannedChange(
                 title = discSet.title,
                 sourceFiles = discSet.entries.map { it.relativePath },
                 targetFiles = plan.targetFiles,
-                detailLabel = "Playlist",
-                detailPath = plan.playlistPath,
+                detailLabel = if (plan.playlistPath == null) "Disc folder" else "Playlist",
+                detailPath = plan.playlistPath ?: plan.createdDirectories.single(),
                 operations = changeOperations,
             )
         }
@@ -60,7 +66,7 @@ object ChangePlanner {
         val containerPath = RelativePaths.join(discSet.parentPath, folderName)
         val playlistPath = RelativePaths.join(containerPath, "${discSet.title}.m3u")
         val moves = discSet.entries.map { entry ->
-            entry.relativePath to RelativePaths.join(containerPath, entry.fileName)
+            entry.sourcePath to RelativePaths.join(containerPath, entry.fileName)
         }
         val playlistContents = moves.joinToString("\n") { (_, target) ->
             RelativePaths.nameOf(target)
@@ -79,7 +85,7 @@ object ChangePlanner {
         val discFolder = RelativePaths.join(discSet.parentPath, discSet.title)
         val playlistPath = RelativePaths.join(discSet.parentPath, "${discSet.title}.m3u")
         val moves = discSet.entries.map { entry ->
-            entry.relativePath to RelativePaths.join(discFolder, entry.fileName)
+            entry.sourcePath to RelativePaths.join(discFolder, entry.fileName)
         }
         val playlistContents = moves.joinToString("\n") { (_, target) ->
             val folderName = RelativePaths.nameOf(discFolder)
@@ -110,12 +116,27 @@ object ChangePlanner {
         )
     }
 
+    private fun buildPs2Plan(discSet: DiscGameSet): InternalPlan {
+        val discFolder = RelativePaths.join(discSet.parentPath, discSet.title)
+        val moves = discSet.entries.map { entry ->
+            entry.sourcePath to RelativePaths.join(discFolder, entry.fileName)
+        }
+        return InternalPlan(
+            createdDirectories = listOf(discFolder),
+            moves = moves,
+            targetFiles = moves.map { it.second },
+            createdFiles = moves.map { it.second },
+            playlistPath = null,
+            playlistContents = null,
+        )
+    }
+
     private data class InternalPlan(
         val createdDirectories: List<String>,
         val moves: List<Pair<String, String>>,
         val targetFiles: List<String>,
         val createdFiles: List<String>,
-        val playlistPath: String,
-        val playlistContents: String,
+        val playlistPath: String?,
+        val playlistContents: String?,
     )
 }

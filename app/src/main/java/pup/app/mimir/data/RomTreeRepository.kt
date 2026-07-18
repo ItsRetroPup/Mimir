@@ -26,15 +26,32 @@ class RomTreeRepository(private val context: Context) {
 
     fun scanTree(
         rootUri: Uri,
+        scanHiddenFolders: Boolean = false,
         onFileScanned: ((Int) -> Unit)? = null,
     ): List<RomEntry> {
         val root = DocumentFile.fromTreeUri(context, rootUri) ?: return emptyList()
-        return buildList { walk(root, emptyList(), this, onFileScanned) }
+        return buildList {
+            walk(
+                node = root,
+                sourceSegments = emptyList(),
+                outputSegments = emptyList(),
+                collector = this,
+                scanHiddenFolders = scanHiddenFolders,
+                onFileScanned = onFileScanned,
+            )
+        }
     }
 
     fun loadExistingVitaShortcuts(rootUri: Uri): Map<String, String> {
         val root = DocumentFile.fromTreeUri(context, rootUri) ?: return emptyMap()
-        val entries = buildList { walk(root, emptyList(), this) }
+        val entries = buildList {
+            walk(
+                node = root,
+                sourceSegments = emptyList(),
+                outputSegments = emptyList(),
+                collector = this,
+            )
+        }
         return entries
             .filter { it.fileName.endsWith(".psvita", ignoreCase = true) }
             .mapNotNull { entry ->
@@ -106,8 +123,10 @@ class RomTreeRepository(private val context: Context) {
 
     private fun walk(
         node: DocumentFile,
-        segments: List<String>,
+        sourceSegments: List<String>,
+        outputSegments: List<String>,
         collector: MutableList<RomEntry>,
+        scanHiddenFolders: Boolean = false,
         onFileScanned: ((Int) -> Unit)? = null,
     ) {
         node.listFiles()
@@ -115,11 +134,21 @@ class RomTreeRepository(private val context: Context) {
             .forEach { child ->
                 val childName = child.name ?: return@forEach
                 if (child.isDirectory) {
-                    walk(child, segments + childName, collector, onFileScanned)
+                    if (childName.endsWith(".m3u", ignoreCase = true)) return@forEach
+                    if (childName.startsWith(".") && !scanHiddenFolders) return@forEach
+                    walk(
+                        node = child,
+                        sourceSegments = sourceSegments + childName,
+                        outputSegments = if (childName.startsWith(".")) outputSegments else outputSegments + childName,
+                        collector = collector,
+                        scanHiddenFolders = scanHiddenFolders,
+                        onFileScanned = onFileScanned,
+                    )
                 } else if (child.isFile) {
                     collector += RomEntry(
-                        relativePath = (segments + childName).joinToString("/"),
+                        relativePath = (outputSegments + childName).joinToString("/"),
                         fileName = childName,
+                        sourcePath = (sourceSegments + childName).joinToString("/"),
                     )
                     onFileScanned?.invoke(collector.size)
                 }
