@@ -36,6 +36,19 @@ class VitaAppIdPlannerTest {
     }
 
     @Test
+    fun buildsDptFilesWithVitaGameIdSection() {
+        val app = VitaApp(titleId = "PCSA00123", title = "Persona 4 Golden", sourcePath = "shortcut-db")
+
+        val plan = VitaAppIdPlanner.buildPlan(listOf(app), format = VitaShortcutFormat.Dpt)
+
+        assertEquals("Persona 4 Golden.dpt", plan.changes.single().targetFiles.single())
+        assertEquals(
+            "[vita_game_id]PCSA00123",
+            (plan.operations.single() as FileOperation.WriteTextFile).contents,
+        )
+    }
+
+    @Test
     fun skipsWhenExistingTargetsBlockPreferredAndFallbackNames() {
         val apps = listOf(
             VitaApp(titleId = "PCSA00123", title = "Persona/4 Golden", sourcePath = "app/PCSA00123"),

@@ -13,6 +13,7 @@ import pup.app.mimir.domain.RomScanner
 import pup.app.mimir.domain.RomZipperPlanner
 import pup.app.mimir.domain.ToolMode
 import pup.app.mimir.domain.VitaAppIdPlanner
+import pup.app.mimir.domain.VitaShortcutFormat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +26,7 @@ data class MimirUiState(
     val selectedFolderName: String = "No ROM folder selected",
     val vitaOutputUri: Uri? = null,
     val vitaOutputName: String = "No Vita output directory selected",
+    val vitaShortcutFormat: VitaShortcutFormat = VitaShortcutFormat.Psvita,
     val vitaQuery: String = "",
     val vitaDatabaseSize: Int = 0,
     val vitaSearchResults: List<pup.app.mimir.domain.VitaApp> = emptyList(),
@@ -55,6 +57,9 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             selectedFolderName = prefs.getString(KEY_LABEL, null) ?: "No ROM folder selected",
             vitaOutputUri = prefs.getString(KEY_VITA_OUTPUT_URI, null)?.let(Uri::parse),
             vitaOutputName = prefs.getString(KEY_VITA_OUTPUT_LABEL, null) ?: "No Vita output directory selected",
+            vitaShortcutFormat = prefs.getString(KEY_VITA_SHORTCUT_FORMAT, null)
+                ?.let { storedFormat -> VitaShortcutFormat.entries.find { it.name == storedFormat } }
+                ?: VitaShortcutFormat.Psvita,
             scanHiddenFolders = prefs.getBoolean(KEY_SCAN_HIDDEN_FOLDERS, false),
             useDarkMode = prefs.getBoolean(KEY_DARK_MODE, true),
         )
@@ -118,6 +123,18 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun updateVitaShortcutFormat(format: VitaShortcutFormat) {
+        prefs.edit().putString(KEY_VITA_SHORTCUT_FORMAT, format.name).apply()
+        _uiState.update {
+            it.copy(vitaShortcutFormat = format, addedVitaShortcuts = emptyMap(), message = null)
+        }
+        _uiState.value.vitaOutputUri?.let { outputUri ->
+            viewModelScope.launch(Dispatchers.IO) {
+                refreshExistingVitaShortcuts(outputUri, format)
+            }
+        }
+    }
+
     fun updateChangeSelection(detailPath: String, selected: Boolean) {
         _uiState.update { state ->
             if (state.previewPlan?.changes?.any { it.detailPath == detailPath } != true) {
@@ -145,6 +162,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             val plan = VitaAppIdPlanner.buildPlan(
                 apps = listOf(app),
                 existingEntries = existingEntries,
+                format = _uiState.value.vitaShortcutFormat,
             )
             if (plan.changes.isEmpty()) {
                 _uiState.update {
@@ -380,6 +398,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         private const val KEY_LABEL = "rom_tree_label"
         private const val KEY_VITA_OUTPUT_URI = "vita_output_uri"
         private const val KEY_VITA_OUTPUT_LABEL = "vita_output_label"
+        private const val KEY_VITA_SHORTCUT_FORMAT = "vita_shortcut_format"
         private const val KEY_DARK_MODE = "dark_mode"
         private const val KEY_SCAN_HIDDEN_FOLDERS = "scan_hidden_folders"
         private const val MAX_VITA_RESULTS = 40
@@ -426,8 +445,11 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         return "$activity: $completed of $total"
     }
 
-    private suspend fun refreshExistingVitaShortcuts(uri: Uri) {
-        val existing = runCatching { repository.loadExistingVitaShortcuts(uri) }.getOrElse { emptyMap() }
+    private suspend fun refreshExistingVitaShortcuts(
+        uri: Uri,
+        format: VitaShortcutFormat = _uiState.value.vitaShortcutFormat,
+    ) {
+        val existing = runCatching { repository.loadExistingVitaShortcuts(uri, format) }.getOrElse { emptyMap() }
         _uiState.update { it.copy(addedVitaShortcuts = existing) }
     }
 }

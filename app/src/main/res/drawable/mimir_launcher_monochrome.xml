@@ -4,5 +4,5 @@
     <bitmap
         android:antialias="true"
         android:gravity="center"
-        android:src="@drawable/mimir_launcher_m" />
+        android:src="@mipmap/mimir_launcher_m" />
 </inset>

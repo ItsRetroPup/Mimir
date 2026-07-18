@@ -81,6 +81,7 @@ import pup.app.mimir.domain.FileOperation
 import pup.app.mimir.domain.FrontendPreset
 import pup.app.mimir.domain.OperationPlan
 import pup.app.mimir.domain.ToolMode
+import pup.app.mimir.domain.VitaShortcutFormat
 import pup.app.mimir.ui.MimirViewModel
 import pup.app.mimir.R
 
@@ -131,6 +132,7 @@ class MainActivity : ComponentActivity() {
                         onScanHiddenFoldersChanged = viewModel::updateScanHiddenFolders,
                         onDarkModeToggled = viewModel::updateDarkMode,
                         onVitaQueryChanged = viewModel::updateVitaQuery,
+                        onVitaShortcutFormatSelected = viewModel::updateVitaShortcutFormat,
                         onVitaShortcutAdd = viewModel::addVitaShortcut,
                         onVitaShortcutRemove = viewModel::removeVitaShortcut,
                         onChangeSelection = viewModel::updateChangeSelection,
@@ -251,6 +253,7 @@ private fun MimirScreen(
     onScanHiddenFoldersChanged: (Boolean) -> Unit,
     onDarkModeToggled: (Boolean) -> Unit,
     onVitaQueryChanged: (String) -> Unit,
+    onVitaShortcutFormatSelected: (VitaShortcutFormat) -> Unit,
     onVitaShortcutAdd: (pup.app.mimir.domain.VitaApp) -> Unit,
     onVitaShortcutRemove: (pup.app.mimir.domain.VitaApp) -> Unit,
     onChangeSelection: (String, Boolean) -> Unit,
@@ -381,12 +384,14 @@ private fun MimirScreen(
                                 VitaControlCard(
                                     outputFolderName = uiState.vitaOutputName,
                                     onSelectVitaOutput = onSelectVitaOutput,
+                                    shortcutFormat = uiState.vitaShortcutFormat,
                                     vitaQuery = uiState.vitaQuery,
                                     databaseSize = uiState.vitaDatabaseSize,
                                     searchResults = uiState.vitaSearchResults,
                                     addedShortcuts = uiState.addedVitaShortcuts,
                                     isBusy = uiState.isBusy,
                                     onVitaQueryChanged = onVitaQueryChanged,
+                                    onVitaShortcutFormatSelected = onVitaShortcutFormatSelected,
                                     onVitaShortcutAdd = onVitaShortcutAdd,
                                     onVitaShortcutRemove = onVitaShortcutRemove,
                                 )
@@ -661,12 +666,14 @@ private fun ControlCard(
 private fun VitaControlCard(
     outputFolderName: String,
     onSelectVitaOutput: () -> Unit,
+    shortcutFormat: VitaShortcutFormat,
     vitaQuery: String,
     databaseSize: Int,
     searchResults: List<pup.app.mimir.domain.VitaApp>,
     addedShortcuts: Map<String, String>,
     isBusy: Boolean,
     onVitaQueryChanged: (String) -> Unit,
+    onVitaShortcutFormatSelected: (VitaShortcutFormat) -> Unit,
     onVitaShortcutAdd: (pup.app.mimir.domain.VitaApp) -> Unit,
     onVitaShortcutRemove: (pup.app.mimir.domain.VitaApp) -> Unit,
 ) {
@@ -682,6 +689,26 @@ private fun VitaControlCard(
             OutlinedButton(onClick = onSelectVitaOutput) {
                 Text("SELECT OUTPUT")
             }
+            Text(
+                "Shortcut file type",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.secondary,
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                VitaShortcutFormat.entries.forEach { format ->
+                    FilterChip(
+                        selected = shortcutFormat == format,
+                        onClick = { onVitaShortcutFormatSelected(format) },
+                        label = { Text(format.displayName) },
+                        enabled = !isBusy,
+                    )
+                }
+            }
+            Text(
+                "For Cocoon users, select .dpt",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
+            )
             Text(
                 "Shortcut database",
                 style = MaterialTheme.typography.labelLarge,

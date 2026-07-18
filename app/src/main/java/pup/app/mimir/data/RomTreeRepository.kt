@@ -6,6 +6,7 @@ import androidx.documentfile.provider.DocumentFile
 import pup.app.mimir.domain.RomEntry
 import pup.app.mimir.domain.ParamSfoParser
 import pup.app.mimir.domain.VitaApp
+import pup.app.mimir.domain.VitaShortcutFormat
 
 class RomTreeRepository(private val context: Context) {
     fun loadVitaShortcutCatalog(): List<VitaApp> =
@@ -42,7 +43,10 @@ class RomTreeRepository(private val context: Context) {
         }
     }
 
-    fun loadExistingVitaShortcuts(rootUri: Uri): Map<String, String> {
+    fun loadExistingVitaShortcuts(
+        rootUri: Uri,
+        format: VitaShortcutFormat,
+    ): Map<String, String> {
         val root = DocumentFile.fromTreeUri(context, rootUri) ?: return emptyMap()
         val entries = buildList {
             walk(
@@ -53,7 +57,7 @@ class RomTreeRepository(private val context: Context) {
             )
         }
         return entries
-            .filter { it.fileName.endsWith(".psvita", ignoreCase = true) }
+            .filter { it.fileName.endsWith(".${format.extension}", ignoreCase = true) }
             .mapNotNull { entry ->
                 val file = findFile(root, entry.relativePath) ?: return@mapNotNull null
                 val appId = runCatching {
@@ -62,7 +66,19 @@ class RomTreeRepository(private val context: Context) {
                         input.readBytes().toString(Charsets.UTF_8).trim()
                     }
                 }.getOrNull()
-                if (appId.isNullOrBlank()) null else appId to entry.relativePath
+                val titleId = appId?.let { contents ->
+                    when (format) {
+                        VitaShortcutFormat.Psvita -> contents
+                        VitaShortcutFormat.Dpt -> contents
+                            .lineSequence()
+                            .map(String::trim)
+                            .dropWhile(String::isBlank)
+                            .takeIf { it.firstOrNull() == "[vita_game_id]" }
+                            ?.drop(1)
+                            ?.firstOrNull { it.isNotBlank() }
+                    }
+                }
+                if (titleId.isNullOrBlank()) null else titleId to entry.relativePath
             }
             .toMap()
     }

@@ -1,7 +1,11 @@
 package pup.app.mimir.domain
 
 object VitaAppIdPlanner {
-    fun buildPlan(apps: List<VitaApp>, existingEntries: List<RomEntry> = emptyList()): OperationPlan {
+    fun buildPlan(
+        apps: List<VitaApp>,
+        existingEntries: List<RomEntry> = emptyList(),
+        format: VitaShortcutFormat = VitaShortcutFormat.Psvita,
+    ): OperationPlan {
         val operations = mutableListOf<FileOperation>()
         val changes = mutableListOf<PlannedChange>()
         val conflicts = mutableListOf<String>()
@@ -9,8 +13,8 @@ object VitaAppIdPlanner {
         val reservedPaths = mutableSetOf<String>()
 
         apps.sortedWith(compareBy({ it.title.lowercase() }, { it.titleId })).forEach { app ->
-            val preferredFileName = "${sanitizeFileStem(app.title)}.psvita"
-            val fallbackFileName = "${sanitizeFileStem(app.title)} [${app.titleId}].psvita"
+            val preferredFileName = "${sanitizeFileStem(app.title)}.${format.extension}"
+            val fallbackFileName = "${sanitizeFileStem(app.title)} [${app.titleId}].${format.extension}"
 
             val targetPath = when {
                 canReserve(preferredFileName, existingPaths, reservedPaths) ->
@@ -27,7 +31,7 @@ object VitaAppIdPlanner {
 
             val operation = FileOperation.WriteTextFile(
                 relativePath = targetPath,
-                contents = app.titleId,
+                contents = format.fileContents(app.titleId),
             )
             operations += operation
             changes += PlannedChange(
@@ -50,6 +54,12 @@ object VitaAppIdPlanner {
             conflicts = conflicts.distinct(),
         )
     }
+
+    private fun VitaShortcutFormat.fileContents(titleId: String): String =
+        when (this) {
+            VitaShortcutFormat.Psvita -> titleId
+            VitaShortcutFormat.Dpt -> "[vita_game_id]$titleId"
+        }
 
     private fun canReserve(
         path: String,

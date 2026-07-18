@@ -46,13 +46,15 @@ Zip naming behaviour:
 - example: `Pokemon.gba` becomes `Pokemon.zip`
 
 ### PS Vita Shortcuts
-Mimir includes a built-in searchable PS Vita shortcut database based on `.psvita` shortcut mappings.
+Mimir includes a built-in searchable PS Vita shortcut database.
 
 Current behaviour:
 - search by game title or app ID
 - select an output directory on-device
 - create shortcuts directly from search results
-- detect existing `.psvita` files already present in the selected output folder
+- choose either `.psvita` or `.dpt` shortcut files
+- generate `.dpt` files with a `[vita_game_id]` section followed by the game ID
+- detect existing shortcuts in the currently selected format
 - allow mistaken additions to be removed immediately from the same screen
 
 ## Design Goals
@@ -134,5 +136,4 @@ https://ko-fi.com/retropup84752
 ## License
 
 MIT. See [LICENSE](/Users/alex/Documents/Mimir/LICENSE).
-
 

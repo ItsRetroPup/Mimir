@@ -12,6 +12,14 @@ data class VitaApp(
     val sourcePath: String,
 )
 
+enum class VitaShortcutFormat(
+    val extension: String,
+    val displayName: String,
+) {
+    Psvita(extension = "psvita", displayName = ".psvita"),
+    Dpt(extension = "dpt", displayName = ".dpt"),
+}
+
 enum class ToolMode(val displayName: String) {
     MultiDiscOrganizer("Multi-disc Organizer"),
     RomZipper("RomZipper"),
