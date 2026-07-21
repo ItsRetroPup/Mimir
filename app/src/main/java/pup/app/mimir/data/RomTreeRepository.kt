@@ -29,6 +29,7 @@ class RomTreeRepository(private val context: Context) {
         rootUri: Uri,
         scanHiddenFolders: Boolean = false,
         onFileScanned: ((Int) -> Unit)? = null,
+        shouldStop: (() -> Boolean)? = null,
     ): List<RomEntry> {
         val root = DocumentFile.fromTreeUri(context, rootUri) ?: return emptyList()
         return buildList {
@@ -39,7 +40,57 @@ class RomTreeRepository(private val context: Context) {
                 collector = this,
                 scanHiddenFolders = scanHiddenFolders,
                 onFileScanned = onFileScanned,
+                shouldStop = shouldStop,
             )
+        }
+    }
+
+    /**
+     * Scans compatible files in the selected root and system-specific child folders only.
+     * This keeps, for example, a Dreamcast scan from picking up PS1 cue sheets elsewhere in a ROM root.
+     */
+    fun scanChdTree(
+        rootUri: Uri,
+        folderAliases: Set<String>,
+        supportedExtensions: Set<String>,
+        onFileScanned: ((Int) -> Unit)? = null,
+        shouldStop: (() -> Boolean)? = null,
+    ): List<RomEntry> {
+        val root = DocumentFile.fromTreeUri(context, rootUri) ?: return emptyList()
+        val normalizedAliases = folderAliases.map(String::lowercase).toSet()
+        // Existing CHDs are included so the planner can mark their matching source image as an
+        // overwrite choice. The planner itself only creates operations for supported source types.
+        val scanExtensions = supportedExtensions + "chd"
+        return buildList {
+            root.listFiles()
+                .sortedBy { it.name.orEmpty().lowercase() }
+                .forEach { child ->
+                    if (shouldStop?.invoke() == true) throw OperationStoppedException("Scan stopped by user.")
+                    val childName = child.name ?: return@forEach
+                    when {
+                        child.isFile && child.extension() in scanExtensions -> {
+                            addChdEntry(
+                                child = child,
+                                sourceSegments = emptyList(),
+                                outputSegments = emptyList(),
+                                collector = this,
+                                onFileScanned = onFileScanned,
+                            )
+                        }
+
+                        child.isDirectory && childName.lowercase() in normalizedAliases -> {
+                            walkChdDirectory(
+                                node = child,
+                                sourceSegments = listOf(childName),
+                                outputSegments = listOf(childName),
+                                supportedExtensions = scanExtensions,
+                                collector = this,
+                                onFileScanned = onFileScanned,
+                                shouldStop = shouldStop,
+                            )
+                        }
+                    }
+                }
         }
     }
 
@@ -144,10 +195,13 @@ class RomTreeRepository(private val context: Context) {
         collector: MutableList<RomEntry>,
         scanHiddenFolders: Boolean = false,
         onFileScanned: ((Int) -> Unit)? = null,
+        shouldStop: (() -> Boolean)? = null,
     ) {
+        if (shouldStop?.invoke() == true) throw OperationStoppedException("Scan stopped by user.")
         node.listFiles()
             .sortedBy { it.name.orEmpty().lowercase() }
             .forEach { child ->
+                if (shouldStop?.invoke() == true) throw OperationStoppedException("Scan stopped by user.")
                 val childName = child.name ?: return@forEach
                 if (child.isDirectory) {
                     if (childName.endsWith(".m3u", ignoreCase = true)) return@forEach
@@ -159,6 +213,7 @@ class RomTreeRepository(private val context: Context) {
                         collector = collector,
                         scanHiddenFolders = scanHiddenFolders,
                         onFileScanned = onFileScanned,
+                        shouldStop = shouldStop,
                     )
                 } else if (child.isFile) {
                     collector += RomEntry(
@@ -170,6 +225,62 @@ class RomTreeRepository(private val context: Context) {
                 }
             }
     }
+
+    private fun walkChdDirectory(
+        node: DocumentFile,
+        sourceSegments: List<String>,
+        outputSegments: List<String>,
+        supportedExtensions: Set<String>,
+        collector: MutableList<RomEntry>,
+        onFileScanned: ((Int) -> Unit)? = null,
+        shouldStop: (() -> Boolean)? = null,
+    ) {
+        if (shouldStop?.invoke() == true) throw OperationStoppedException("Scan stopped by user.")
+        node.listFiles()
+            .sortedBy { it.name.orEmpty().lowercase() }
+            .forEach { child ->
+                if (shouldStop?.invoke() == true) throw OperationStoppedException("Scan stopped by user.")
+                val childName = child.name ?: return@forEach
+                when {
+                    child.isDirectory -> walkChdDirectory(
+                        node = child,
+                        sourceSegments = sourceSegments + childName,
+                        outputSegments = outputSegments + childName,
+                        supportedExtensions = supportedExtensions,
+                        collector = collector,
+                        onFileScanned = onFileScanned,
+                        shouldStop = shouldStop,
+                    )
+
+                    child.isFile && child.extension() in supportedExtensions -> addChdEntry(
+                        child = child,
+                        sourceSegments = sourceSegments,
+                        outputSegments = outputSegments,
+                        collector = collector,
+                        onFileScanned = onFileScanned,
+                    )
+                }
+            }
+    }
+
+    private fun addChdEntry(
+        child: DocumentFile,
+        sourceSegments: List<String>,
+        outputSegments: List<String>,
+        collector: MutableList<RomEntry>,
+        onFileScanned: ((Int) -> Unit)?,
+    ) {
+        val childName = child.name ?: return
+        collector += RomEntry(
+            relativePath = (outputSegments + childName).joinToString("/"),
+            fileName = childName,
+            sourcePath = (sourceSegments + childName).joinToString("/"),
+        )
+        onFileScanned?.invoke(collector.size)
+    }
+
+    private fun DocumentFile.extension(): String =
+        name.orEmpty().substringAfterLast('.', "").lowercase()
 
     private fun findFile(root: DocumentFile, relativePath: String): DocumentFile? {
         val parts = relativePath.split('/').filter { it.isNotBlank() }
