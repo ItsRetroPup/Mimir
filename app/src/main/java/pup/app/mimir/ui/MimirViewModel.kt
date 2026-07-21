@@ -14,6 +14,7 @@ import pup.app.mimir.domain.FrontendPreset
 import pup.app.mimir.domain.ChdDiscType
 import pup.app.mimir.domain.ChdPlanner
 import pup.app.mimir.domain.ChdSystem
+import pup.app.mimir.domain.FileOperation
 import pup.app.mimir.domain.OperationPlan
 import pup.app.mimir.domain.RomScanner
 import pup.app.mimir.domain.RomZipperPlanner
@@ -139,7 +140,9 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
     fun updateDeleteOriginalChdFiles(enabled: Boolean) {
         prefs.edit().putBoolean(KEY_DELETE_ORIGINAL_CHD_FILES, enabled).apply()
         _uiState.update {
-            it.copy(deleteOriginalChdFiles = enabled, previewPlan = null, selectedChangePaths = emptySet(), message = null)
+            // This choice is made in the final conversion dialog, so keep the current scan and
+            // selection intact. applyChanges applies the value to the queued CHD operations.
+            it.copy(deleteOriginalChdFiles = enabled, message = null)
         }
     }
 
@@ -441,6 +444,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         val current = _uiState.value
         val plan = current.previewPlan
             ?.forSelectedChanges(current.selectedChangePaths)
+            ?.withChdDeleteOriginalFiles(current.deleteOriginalChdFiles)
             ?.takeIf { it.operations.isNotEmpty() }
             ?: return
         val uri = when (plan.mode) {
@@ -558,6 +562,20 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun treeLabel(uri: Uri): String =
         DocumentsContract.getTreeDocumentId(uri).substringAfterLast(':')
+
+    private fun OperationPlan.withChdDeleteOriginalFiles(deleteOriginalFiles: Boolean): OperationPlan {
+        if (mode != ToolMode.ChdConverter) return this
+        fun update(operation: FileOperation): FileOperation = when (operation) {
+            is FileOperation.ConvertToChd -> operation.copy(deleteOriginalFiles = deleteOriginalFiles)
+            else -> operation
+        }
+        return copy(
+            changes = changes.map { change ->
+                change.copy(operations = change.operations.map(::update))
+            },
+            operations = operations.map(::update),
+        )
+    }
 
     private fun filterVitaCatalog(query: String): List<pup.app.mimir.domain.VitaApp> {
         val normalized = query.trim().lowercase()
