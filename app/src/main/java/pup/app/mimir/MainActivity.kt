@@ -518,7 +518,9 @@ private fun MimirScreen(
                             }
                         }
 
-                        if (uiState.selectedMode != ToolMode.VitaAppIds) {
+                        if (uiState.selectedMode != ToolMode.VitaAppIds &&
+                            !(uiState.selectedMode == ToolMode.ChdConverter && uiState.isBusy)
+                        ) {
                             item {
                                 ActionCard(
                                     onScan = onStart,
@@ -552,6 +554,11 @@ private fun MimirScreen(
                 ChdProgressToast(
                     report = uiState.chdConversionReport,
                     currentJobProgress = uiState.chdCurrentJobProgress ?: 0f,
+                    canStopAfterCurrent = uiState.operationProgressLabel != null &&
+                        uiState.stopRequest == pup.app.mimir.data.StopRequest.None,
+                    stopNowEnabled = uiState.stopRequest != pup.app.mimir.data.StopRequest.Now,
+                    onStopNow = onStopNow,
+                    onStopAfterCurrent = onStopAfterCurrent,
                     modifier = progressModifier,
                 )
             } else {
@@ -1204,6 +1211,10 @@ private fun ProgressToast(
 private fun ChdProgressToast(
     report: pup.app.mimir.ui.ChdConversionReport,
     currentJobProgress: Float,
+    canStopAfterCurrent: Boolean,
+    stopNowEnabled: Boolean,
+    onStopNow: () -> Unit,
+    onStopAfterCurrent: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val currentJob = (report.completed + 1).coerceAtMost(report.total)
@@ -1240,6 +1251,16 @@ private fun ChdProgressToast(
                     trackColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             }
+            OutlinedButton(
+                onClick = onStopAfterCurrent,
+                enabled = canStopAfterCurrent,
+                modifier = Modifier.fillMaxWidth(),
+            ) { Text("STOP AFTER CURRENT CONVERSION") }
+            OutlinedButton(
+                onClick = onStopNow,
+                enabled = stopNowEnabled,
+                modifier = Modifier.fillMaxWidth(),
+            ) { Text("STOP NOW") }
         }
     }
 }
