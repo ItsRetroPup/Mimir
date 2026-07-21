@@ -7,7 +7,13 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import pup.app.mimir.data.PlanExecutor
 import pup.app.mimir.data.RomTreeRepository
+import pup.app.mimir.data.OperationCancellation
+import pup.app.mimir.data.OperationStoppedException
+import pup.app.mimir.data.StopRequest
 import pup.app.mimir.domain.FrontendPreset
+import pup.app.mimir.domain.ChdDiscType
+import pup.app.mimir.domain.ChdPlanner
+import pup.app.mimir.domain.ChdSystem
 import pup.app.mimir.domain.OperationPlan
 import pup.app.mimir.domain.RomScanner
 import pup.app.mimir.domain.RomZipperPlanner
@@ -33,16 +39,28 @@ data class MimirUiState(
     val addedVitaShortcuts: Map<String, String> = emptyMap(),
     val selectedMode: ToolMode = ToolMode.MultiDiscOrganizer,
     val selectedPreset: FrontendPreset = FrontendPreset.EsDe,
+    val selectedChdSystem: ChdSystem = ChdSystem.Dreamcast,
+    val selectedChdDiscType: ChdDiscType = ChdDiscType.Cd,
+    val deleteOriginalChdFiles: Boolean = false,
     val scanHiddenFolders: Boolean = false,
     val useDarkMode: Boolean = true,
     val isBusy: Boolean = false,
     val scanProgressLabel: String? = null,
     val operationProgressLabel: String? = null,
     val operationProgress: Float? = null,
+    val chdConversionReport: ChdConversionReport? = null,
+    val chdCurrentJobProgress: Float? = null,
+    val stopRequest: StopRequest = StopRequest.None,
     val previewCount: Int = 0,
     val previewPlan: OperationPlan? = null,
     val selectedChangePaths: Set<String> = emptySet(),
     val message: String? = null,
+)
+
+data class ChdConversionReport(
+    val completed: Int,
+    val total: Int,
+    val stopped: Boolean = false,
 )
 
 class MimirViewModel(application: Application) : AndroidViewModel(application) {
@@ -50,6 +68,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
     private val executor = PlanExecutor(application)
     private val prefs = application.getSharedPreferences("mimir_prefs", 0)
     private var vitaCatalog: List<pup.app.mimir.domain.VitaApp> = emptyList()
+    private var activeCancellation: OperationCancellation? = null
 
     private val _uiState = MutableStateFlow(
         MimirUiState(
@@ -61,6 +80,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                 ?.let { storedFormat -> VitaShortcutFormat.entries.find { it.name == storedFormat } }
                 ?: VitaShortcutFormat.Psvita,
             scanHiddenFolders = prefs.getBoolean(KEY_SCAN_HIDDEN_FOLDERS, false),
+            deleteOriginalChdFiles = prefs.getBoolean(KEY_DELETE_ORIGINAL_CHD_FILES, false),
             useDarkMode = prefs.getBoolean(KEY_DARK_MODE, true),
         )
     )
@@ -87,6 +107,50 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update {
             it.copy(selectedPreset = preset, previewPlan = null, selectedChangePaths = emptySet(), message = null)
         }
+    }
+
+    fun updateChdSystem(system: ChdSystem) {
+        _uiState.update {
+            it.copy(
+                selectedChdSystem = system,
+                selectedChdDiscType = when (system) {
+                    ChdSystem.PlayStationPortable -> ChdDiscType.Dvd
+                    ChdSystem.PlayStation2 -> it.selectedChdDiscType
+                    else -> ChdDiscType.Cd
+                },
+                previewPlan = null,
+                selectedChangePaths = emptySet(),
+                message = null,
+            )
+        }
+    }
+
+    fun updateChdDiscType(discType: ChdDiscType) {
+        _uiState.update {
+            if (it.selectedChdSystem != ChdSystem.PlayStation2) it else it.copy(
+                selectedChdDiscType = discType,
+                previewPlan = null,
+                selectedChangePaths = emptySet(),
+                message = null,
+            )
+        }
+    }
+
+    fun updateDeleteOriginalChdFiles(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_DELETE_ORIGINAL_CHD_FILES, enabled).apply()
+        _uiState.update {
+            it.copy(deleteOriginalChdFiles = enabled, previewPlan = null, selectedChangePaths = emptySet(), message = null)
+        }
+    }
+
+    fun stopNow() {
+        activeCancellation?.stopNow()
+        _uiState.update { it.copy(stopRequest = StopRequest.Now, message = "Stopping…") }
+    }
+
+    fun stopAfterCurrentConversion() {
+        activeCancellation?.stopAfterCurrent()
+        _uiState.update { it.copy(stopRequest = StopRequest.AfterCurrent, message = "Will stop after the current conversion.") }
     }
 
     fun updateScanHiddenFolders(enabled: Boolean) {
@@ -264,7 +328,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         val romUri = currentState.selectedFolderUri
 
         when (mode) {
-            ToolMode.MultiDiscOrganizer, ToolMode.RomZipper -> {
+            ToolMode.MultiDiscOrganizer, ToolMode.RomZipper, ToolMode.ChdConverter -> {
                 if (romUri == null) {
                     _uiState.update { it.copy(message = "Select a ROM folder first.") }
                     return
@@ -274,11 +338,14 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         viewModelScope.launch(Dispatchers.IO) {
+            val cancellation = OperationCancellation()
+            activeCancellation = cancellation
             _uiState.update {
                 it.copy(
                     isBusy = true,
                     scanProgressLabel = initialScanLabel(mode),
                     message = null,
+                    stopRequest = StopRequest.None,
                 )
             }
             runCatching {
@@ -287,9 +354,9 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         val entries = repository.scanTree(
                             rootUri = requireNotNull(romUri),
                             scanHiddenFolders = _uiState.value.scanHiddenFolders,
-                        ) { scannedFiles ->
-                            updateScanProgress(mode, scannedFiles)
-                        }
+                            onFileScanned = { scannedFiles -> updateScanProgress(mode, scannedFiles) },
+                            shouldStop = cancellation::shouldInterruptCurrentOperation,
+                        )
                         _uiState.update {
                             it.copy(scanProgressLabel = "Checking ${entries.size} ROM files for multi-disc games…")
                         }
@@ -301,13 +368,34 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                     }
 
                     ToolMode.RomZipper -> {
-                        val entries = repository.scanTree(requireNotNull(romUri)) { scannedFiles ->
-                            updateScanProgress(mode, scannedFiles)
-                        }
+                        val entries = repository.scanTree(
+                            rootUri = requireNotNull(romUri),
+                            onFileScanned = { scannedFiles -> updateScanProgress(mode, scannedFiles) },
+                            shouldStop = cancellation::shouldInterruptCurrentOperation,
+                        )
                         _uiState.update {
                             it.copy(scanProgressLabel = "Checking ${entries.size} ROM files for zip-compatible formats…")
                         }
                         RomZipperPlanner.buildPlan(entries)
+                    }
+
+                    ToolMode.ChdConverter -> {
+                        val entries = repository.scanChdTree(
+                            rootUri = requireNotNull(romUri),
+                            folderAliases = currentState.selectedChdSystem.folderAliases,
+                            supportedExtensions = currentState.selectedChdSystem.supportedExtensions,
+                            onFileScanned = { scannedFiles -> updateScanProgress(mode, scannedFiles) },
+                            shouldStop = cancellation::shouldInterruptCurrentOperation,
+                        )
+                        _uiState.update {
+                            it.copy(scanProgressLabel = "Checking ${entries.size} ${currentState.selectedChdSystem.displayName} images for CHD conversion…")
+                        }
+                        ChdPlanner.buildPlan(
+                            entries = entries,
+                            system = currentState.selectedChdSystem,
+                            discType = currentState.selectedChdDiscType,
+                            deleteOriginalFiles = currentState.deleteOriginalChdFiles,
+                        )
                     }
 
                     ToolMode.VitaAppIds -> error("Vita shortcuts are created directly from search results.")
@@ -319,16 +407,20 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         scanProgressLabel = null,
                         previewCount = previewCount,
                         previewPlan = plan,
-                        selectedChangePaths = plan.changes.mapTo(linkedSetOf()) { it.detailPath },
+                        selectedChangePaths = plan.changes
+                            .filterNot { mode == ToolMode.ChdConverter && it.targetAlreadyExists }
+                            .mapTo(linkedSetOf()) { it.detailPath },
                         message = if (plan.changes.isEmpty()) {
                             when (mode) {
                                 ToolMode.MultiDiscOrganizer -> "No multi-disc games found."
                                 ToolMode.RomZipper -> "No zip-compatible ROMs found."
+                                ToolMode.ChdConverter -> "No ${currentState.selectedChdSystem.displayName} images found for CHD conversion."
                                 ToolMode.VitaAppIds -> "No Vita shortcuts queued."
                             }
                         } else {
                             null
                         },
+                        stopRequest = StopRequest.None,
                     )
                 }
             }.onFailure { error ->
@@ -336,10 +428,12 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                     it.copy(
                         isBusy = false,
                         scanProgressLabel = null,
-                        message = error.message ?: "Scan failed.",
+                        stopRequest = StopRequest.None,
+                        message = if (error is OperationStoppedException) "Scan stopped." else error.message ?: "Scan failed.",
                     )
                 }
             }
+            if (activeCancellation === cancellation) activeCancellation = null
         }
     }
 
@@ -354,29 +448,69 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             else -> current.selectedFolderUri
         } ?: return
         viewModelScope.launch(Dispatchers.IO) {
+            val cancellation = OperationCancellation()
+            activeCancellation = cancellation
             _uiState.update {
                 it.copy(
                     isBusy = true,
                     operationProgressLabel = applyProgressLabel(plan.mode, 0, plan.operations.size),
                     operationProgress = 0f,
                     message = null,
+                    chdConversionReport = if (plan.mode == ToolMode.ChdConverter) {
+                        ChdConversionReport(completed = 0, total = plan.operations.size)
+                    } else {
+                        it.chdConversionReport
+                    },
+                    chdCurrentJobProgress = if (plan.mode == ToolMode.ChdConverter) 0f else null,
+                    stopRequest = StopRequest.None,
                 )
             }
-            executor.apply(uri, plan) { completed, total ->
-                _uiState.update {
-                    it.copy(
-                        operationProgressLabel = applyProgressLabel(plan.mode, completed, total),
-                        operationProgress = completed.toFloat() / total,
-                    )
-                }
-            }
-                .onSuccess {
+            executor.apply(
+                rootUri = uri,
+                plan = plan,
+                onProgress = { completed, total ->
+                    _uiState.update {
+                        it.copy(
+                            operationProgressLabel = applyProgressLabel(plan.mode, completed, total),
+                            operationProgress = completed.toFloat() / total,
+                            chdConversionReport = if (plan.mode == ToolMode.ChdConverter) {
+                                ChdConversionReport(completed = completed, total = total)
+                            } else {
+                                it.chdConversionReport
+                            },
+                            chdCurrentJobProgress = if (plan.mode == ToolMode.ChdConverter) 0f else null,
+                        )
+                    }
+                },
+                onCurrentOperationProgress = { progress ->
+                    if (plan.mode == ToolMode.ChdConverter) {
+                        _uiState.update { it.copy(chdCurrentJobProgress = progress) }
+                    }
+                },
+                cancellation = cancellation,
+            )
+                .onSuccess { result ->
                     _uiState.update {
                         it.copy(
                             isBusy = false,
                             operationProgressLabel = null,
                             operationProgress = null,
-                            message = "Changes applied.",
+                            chdCurrentJobProgress = null,
+                            chdConversionReport = if (plan.mode == ToolMode.ChdConverter) {
+                                ChdConversionReport(
+                                    completed = result.completedOperations,
+                                    total = plan.operations.size,
+                                    stopped = result.stopped,
+                                )
+                            } else {
+                                it.chdConversionReport
+                            },
+                            stopRequest = StopRequest.None,
+                            message = if (result.stopped) {
+                                "Stopped after ${result.completedOperations} of ${plan.operations.size} conversions."
+                            } else {
+                                "Changes applied."
+                            },
                         )
                     }
                 }
@@ -386,10 +520,26 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                             isBusy = false,
                             operationProgressLabel = null,
                             operationProgress = null,
-                            message = error.message ?: "Apply failed.",
+                            chdCurrentJobProgress = null,
+                            chdConversionReport = if (plan.mode == ToolMode.ChdConverter) {
+                                ChdConversionReport(
+                                    completed = it.chdConversionReport?.completed ?: 0,
+                                    total = plan.operations.size,
+                                    stopped = error is OperationStoppedException,
+                                )
+                            } else {
+                                it.chdConversionReport
+                            },
+                            stopRequest = StopRequest.None,
+                            message = if (error is OperationStoppedException) {
+                                "Conversion stopped."
+                            } else {
+                                error.message ?: "Apply failed."
+                            },
                         )
                     }
                 }
+            if (activeCancellation === cancellation) activeCancellation = null
         }
     }
 
@@ -401,6 +551,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         private const val KEY_VITA_SHORTCUT_FORMAT = "vita_shortcut_format"
         private const val KEY_DARK_MODE = "dark_mode"
         private const val KEY_SCAN_HIDDEN_FOLDERS = "scan_hidden_folders"
+        private const val KEY_DELETE_ORIGINAL_CHD_FILES = "delete_original_chd_files"
         private const val MAX_VITA_RESULTS = 40
         private const val SCAN_PROGRESS_UPDATE_INTERVAL = 25
     }
@@ -423,6 +574,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         when (mode) {
             ToolMode.MultiDiscOrganizer -> "Scanning ROM files for multi-disc games…"
             ToolMode.RomZipper -> "Scanning ROM files for zip-compatible formats…"
+            ToolMode.ChdConverter -> "Scanning ROM files for CHD-compatible images…"
             ToolMode.VitaAppIds -> "Scanning ROM files…"
         }
 
@@ -431,6 +583,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         val activity = when (mode) {
             ToolMode.MultiDiscOrganizer -> "Scanning for multi-disc games"
             ToolMode.RomZipper -> "Scanning for zip-compatible ROMs"
+            ToolMode.ChdConverter -> "Scanning for CHD-compatible images"
             ToolMode.VitaAppIds -> "Scanning ROM files"
         }
         _uiState.update { it.copy(scanProgressLabel = "$activity: $scannedFiles files checked") }
@@ -440,6 +593,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         val activity = when (mode) {
             ToolMode.MultiDiscOrganizer -> "Organizing ROMs"
             ToolMode.RomZipper -> "Zipping ROMs"
+            ToolMode.ChdConverter -> "Creating CHDs"
             ToolMode.VitaAppIds -> "Creating shortcuts"
         }
         return "$activity: $completed of $total"

@@ -20,8 +20,8 @@ android {
         applicationId = "pup.app.mimir"
         minSdk = 29
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 6
+        versionName = "0.1.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -64,6 +64,10 @@ android {
     }
 
     packaging {
+        jniLibs {
+            // CHDMan is launched as a process from nativeLibraryDir, so its executable must be extracted.
+            useLegacyPackaging = true
+        }
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }

@@ -11,16 +11,22 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 class PlanExecutor(private val context: Context) {
+    private val chdmanRunner = ChdmanRunner(context)
     fun apply(
         rootUri: Uri,
         plan: OperationPlan,
         onProgress: ((completedOperations: Int, totalOperations: Int) -> Unit)? = null,
-    ): Result<Unit> = runCatching {
+        onCurrentOperationProgress: ((Float) -> Unit)? = null,
+        cancellation: OperationCancellation? = null,
+    ): Result<ExecutionResult> = runCatching {
         require(plan.operations.isNotEmpty()) { "No valid changes to apply." }
         val root = DocumentFile.fromTreeUri(context, rootUri)
             ?: error("Unable to access selected ROM folder.")
 
         plan.operations.forEachIndexed { index, operation ->
+            if (cancellation?.shouldStopBeforeNextOperation() == true) {
+                return@runCatching ExecutionResult(completedOperations = index, stopped = true)
+            }
             when (operation) {
                 is FileOperation.CreateDirectory -> {
                     if (findDirectory(root, operation.relativePath) == null) {
@@ -71,9 +77,35 @@ class PlanExecutor(private val context: Context) {
                         error("Failed to remove original file: ${operation.sourcePath}")
                     }
                 }
+
+                is FileOperation.ConvertToChd -> {
+                    val conversion = chdmanRunner.convert(
+                        root = root,
+                        operation = operation,
+                        cancellation = cancellation,
+                        onProgress = onCurrentOperationProgress,
+                    )
+                    try {
+                        val target = createFile(root, operation.targetPath)
+                        context.contentResolver.openOutputStream(target.uri, "w").use { output ->
+                            requireNotNull(output) { "Unable to write ${operation.targetPath}" }
+                            conversion.output.inputStream().use { input -> input.copyTo(output) }
+                        }
+                        if (operation.deleteOriginalFiles) {
+                            conversion.originalSourcePaths.forEach { sourcePath ->
+                                val source = findFile(root, sourcePath)
+                                    ?: error("Missing original source file: $sourcePath")
+                                require(source.delete()) { "Failed to delete original source file: $sourcePath" }
+                            }
+                        }
+                    } finally {
+                        conversion.output.delete()
+                    }
+                }
             }
             onProgress?.invoke(index + 1, plan.operations.size)
         }
+        ExecutionResult(completedOperations = plan.operations.size, stopped = false)
     }
 
     fun deleteOutputFile(rootUri: Uri, relativePath: String): Result<Unit> = runCatching {

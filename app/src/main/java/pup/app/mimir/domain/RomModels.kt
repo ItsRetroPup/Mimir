@@ -23,7 +23,53 @@ enum class VitaShortcutFormat(
 enum class ToolMode(val displayName: String) {
     MultiDiscOrganizer("Multi-disc Organizer"),
     RomZipper("RomZipper"),
+    ChdConverter("CHDMan"),
     VitaAppIds("Vita App IDs"),
+}
+
+enum class ChdDiscType(
+    val displayName: String,
+    val commandName: String,
+) {
+    Cd(displayName = "CD", commandName = "createcd"),
+    Dvd(displayName = "DVD", commandName = "createdvd"),
+}
+
+enum class ChdSystem(
+    val displayName: String,
+    val supportedExtensions: Set<String>,
+    val folderAliases: Set<String>,
+) {
+    Dreamcast(
+        displayName = "Dreamcast",
+        supportedExtensions = setOf("gdi", "cue", "iso"),
+        folderAliases = setOf("dreamcast", "dc"),
+    ),
+    PlayStation1(
+        displayName = "PS1",
+        supportedExtensions = setOf("cue", "iso"),
+        folderAliases = setOf("playstation 1", "ps1", "psx"),
+    ),
+    PlayStation2(
+        displayName = "PS2",
+        supportedExtensions = setOf("cue","iso"),
+        folderAliases = setOf("playstation 2", "ps2"),
+    ),
+    SegaCd(
+        displayName = "Sega CD",
+        supportedExtensions = setOf("cue", "iso"),
+        folderAliases = setOf("sega cd", "segacd", "mega cd", "megacd"),
+    ),
+    SegaSaturn(
+        displayName = "Sega Saturn",
+        supportedExtensions = setOf("cue", "iso"),
+        folderAliases = setOf("sega saturn", "saturn"),
+    ),
+    PlayStationPortable(
+        displayName = "PSP",
+        supportedExtensions = setOf("iso"),
+        folderAliases = setOf("playstation portable", "psp"),
+    ),
 }
 
 data class DiscMatch(
@@ -52,6 +98,13 @@ sealed interface FileOperation {
         val targetPath: String,
         val archiveEntryName: String,
     ) : FileOperation
+    data class ConvertToChd(
+        val sourcePath: String,
+        val targetPath: String,
+        val system: ChdSystem,
+        val discType: ChdDiscType,
+        val deleteOriginalFiles: Boolean,
+    ) : FileOperation
 }
 
 data class PlannedChange(
@@ -61,6 +114,8 @@ data class PlannedChange(
     val detailLabel: String,
     val detailPath: String,
     val operations: List<FileOperation>,
+    /** A matching output is already in the source folder and will be replaced if selected. */
+    val targetAlreadyExists: Boolean = false,
 )
 
 data class OperationPlan(
