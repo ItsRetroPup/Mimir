@@ -39,6 +39,7 @@ object ChdPlanner {
                     detailLabel = "${discType.displayName} CHD",
                     detailPath = targetPath,
                     operations = listOf(operation),
+                    sourceSizeBytes = entry.sizeBytes,
                     targetAlreadyExists = targetPath.lowercase() in existingPaths,
                 )
             }

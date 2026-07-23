@@ -17,16 +17,19 @@ class PlanExecutor(private val context: Context) {
         plan: OperationPlan,
         onProgress: ((completedOperations: Int, totalOperations: Int) -> Unit)? = null,
         onCurrentOperationProgress: ((Float) -> Unit)? = null,
+        onOperationStarted: ((FileOperation) -> Unit)? = null,
         cancellation: OperationCancellation? = null,
     ): Result<ExecutionResult> = runCatching {
         require(plan.operations.isNotEmpty()) { "No valid changes to apply." }
         val root = DocumentFile.fromTreeUri(context, rootUri)
             ?: error("Unable to access selected ROM folder.")
 
+        var spaceSavedBytes = 0L
         plan.operations.forEachIndexed { index, operation ->
             if (cancellation?.shouldStopBeforeNextOperation() == true) {
-                return@runCatching ExecutionResult(completedOperations = index, stopped = true)
+                return@runCatching ExecutionResult(completedOperations = index, stopped = true, spaceSavedBytes = spaceSavedBytes)
             }
+            onOperationStarted?.invoke(operation)
             when (operation) {
                 is FileOperation.CreateDirectory -> {
                     if (findDirectory(root, operation.relativePath) == null) {
@@ -91,6 +94,13 @@ class PlanExecutor(private val context: Context) {
                             requireNotNull(output) { "Unable to write ${operation.targetPath}" }
                             conversion.output.inputStream().use { input -> input.copyTo(output) }
                         }
+                        val sourceBytesBefore = conversion.originalSourcePaths
+                            .filterNot { sourcePath ->
+                                operation.sourcePath.endsWith(".cue", ignoreCase = true) &&
+                                    sourcePath == operation.sourcePath
+                            }
+                            .sumOf { sourceSize(root, it) }
+                        spaceSavedBytes += sourceBytesBefore - target.length()
                         if (operation.deleteOriginalFiles) {
                             conversion.originalSourcePaths.forEach { sourcePath ->
                                 val source = findFile(root, sourcePath)
@@ -105,7 +115,7 @@ class PlanExecutor(private val context: Context) {
             }
             onProgress?.invoke(index + 1, plan.operations.size)
         }
-        ExecutionResult(completedOperations = plan.operations.size, stopped = false)
+        ExecutionResult(completedOperations = plan.operations.size, stopped = false, spaceSavedBytes = spaceSavedBytes)
     }
 
     fun deleteOutputFile(rootUri: Uri, relativePath: String): Result<Unit> = runCatching {
@@ -146,6 +156,9 @@ class PlanExecutor(private val context: Context) {
         }
         return null
     }
+
+    private fun sourceSize(root: DocumentFile, relativePath: String): Long =
+        findFile(root, relativePath)?.length()?.coerceAtLeast(0L) ?: 0L
 
     private fun createFile(root: DocumentFile, relativePath: String): DocumentFile {
         val parentPath = RelativePaths.parentOf(relativePath)

@@ -51,6 +51,8 @@ data class MimirUiState(
     val operationProgress: Float? = null,
     val chdConversionReport: ChdConversionReport? = null,
     val chdCurrentJobProgress: Float? = null,
+    val chdCurrentJobLabel: String? = null,
+    val storageInfo: RomTreeRepository.StorageInfo? = null,
     val stopRequest: StopRequest = StopRequest.None,
     val previewCount: Int = 0,
     val previewPlan: OperationPlan? = null,
@@ -61,6 +63,7 @@ data class MimirUiState(
 data class ChdConversionReport(
     val completed: Int,
     val total: Int,
+    val spaceSavedBytes: Long = 0L,
     val stopped: Boolean = false,
 )
 
@@ -218,6 +221,19 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun selectAllChanges() {
+        _uiState.update { state ->
+            val plan = state.previewPlan ?: return@update state
+            state.copy(selectedChangePaths = plan.changes
+                .filterNot { state.selectedMode == ToolMode.ChdConverter && it.targetAlreadyExists }
+                .mapTo(linkedSetOf()) { it.detailPath })
+        }
+    }
+
+    fun deselectAllChanges() {
+        _uiState.update { it.copy(selectedChangePaths = emptySet()) }
+    }
+
     fun addVitaShortcut(app: pup.app.mimir.domain.VitaApp) {
         val outputUri = _uiState.value.vitaOutputUri ?: run {
             _uiState.update { it.copy(message = "Select a Vita shortcut output folder first.") }
@@ -301,6 +317,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                 selectedFolderName = label,
                 previewPlan = null,
                 selectedChangePaths = emptySet(),
+                storageInfo = null,
                 message = null,
             )
         }
@@ -410,6 +427,9 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         scanProgressLabel = null,
                         previewCount = previewCount,
                         previewPlan = plan,
+                        storageInfo = if (mode == ToolMode.ChdConverter) {
+                            repository.storageInfo(requireNotNull(romUri))
+                        } else it.storageInfo,
                         selectedChangePaths = plan.changes
                             .filterNot { mode == ToolMode.ChdConverter && it.targetAlreadyExists }
                             .mapTo(linkedSetOf()) { it.detailPath },
@@ -466,6 +486,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         it.chdConversionReport
                     },
                     chdCurrentJobProgress = if (plan.mode == ToolMode.ChdConverter) 0f else null,
+                    chdCurrentJobLabel = if (plan.mode == ToolMode.ChdConverter) null else it.chdCurrentJobLabel,
                     stopRequest = StopRequest.None,
                 )
             }
@@ -478,7 +499,11 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                             operationProgressLabel = applyProgressLabel(plan.mode, completed, total),
                             operationProgress = completed.toFloat() / total,
                             chdConversionReport = if (plan.mode == ToolMode.ChdConverter) {
-                                ChdConversionReport(completed = completed, total = total)
+                                ChdConversionReport(
+                                    completed = completed,
+                                    total = total,
+                                    spaceSavedBytes = it.chdConversionReport?.spaceSavedBytes ?: 0L,
+                                )
                             } else {
                                 it.chdConversionReport
                             },
@@ -491,6 +516,17 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         _uiState.update { it.copy(chdCurrentJobProgress = progress) }
                     }
                 },
+                onOperationStarted = { operation ->
+                    if (operation is FileOperation.ConvertToChd) {
+                        _uiState.update {
+                            it.copy(
+                                chdCurrentJobLabel = operation.sourcePath
+                                    .substringAfterLast('/')
+                                    .substringBeforeLast('.'),
+                            )
+                        }
+                    }
+                },
                 cancellation = cancellation,
             )
                 .onSuccess { result ->
@@ -500,10 +536,12 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                             operationProgressLabel = null,
                             operationProgress = null,
                             chdCurrentJobProgress = null,
+                            chdCurrentJobLabel = null,
                             chdConversionReport = if (plan.mode == ToolMode.ChdConverter) {
                                 ChdConversionReport(
                                     completed = result.completedOperations,
                                     total = plan.operations.size,
+                                    spaceSavedBytes = result.spaceSavedBytes,
                                     stopped = result.stopped,
                                 )
                             } else {
@@ -525,6 +563,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                             operationProgressLabel = null,
                             operationProgress = null,
                             chdCurrentJobProgress = null,
+                            chdCurrentJobLabel = null,
                             chdConversionReport = if (plan.mode == ToolMode.ChdConverter) {
                                 ChdConversionReport(
                                     completed = it.chdConversionReport?.completed ?: 0,

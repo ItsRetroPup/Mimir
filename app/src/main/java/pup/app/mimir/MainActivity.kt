@@ -30,14 +30,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Archive
+import androidx.compose.material.icons.outlined.Coffee
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderZip
-import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Subscriptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -95,7 +95,6 @@ private enum class AppSection {
     Organizer,
     Chd,
     Vita,
-    About,
 }
 
 class MainActivity : ComponentActivity() {
@@ -144,6 +143,8 @@ class MainActivity : ComponentActivity() {
                         onVitaShortcutAdd = viewModel::addVitaShortcut,
                         onVitaShortcutRemove = viewModel::removeVitaShortcut,
                         onChangeSelection = viewModel::updateChangeSelection,
+                        onSelectAllChanges = viewModel::selectAllChanges,
+                        onDeselectAllChanges = viewModel::deselectAllChanges,
                         onStart = viewModel::scan,
                         onApply = viewModel::applyChanges,
                         onStopNow = viewModel::stopNow,
@@ -270,6 +271,8 @@ private fun MimirScreen(
     onVitaShortcutAdd: (pup.app.mimir.domain.VitaApp) -> Unit,
     onVitaShortcutRemove: (pup.app.mimir.domain.VitaApp) -> Unit,
     onChangeSelection: (String, Boolean) -> Unit,
+    onSelectAllChanges: () -> Unit,
+    onDeselectAllChanges: () -> Unit,
     onStart: () -> Unit,
     onApply: () -> Unit,
     onStopNow: () -> Unit,
@@ -286,6 +289,7 @@ private fun MimirScreen(
     var currentSection by rememberSaveable { mutableStateOf(AppSection.Home) }
     var showApplyConfirmation by rememberSaveable { mutableStateOf(false) }
     var pendingDeleteOriginalChdFiles by rememberSaveable { mutableStateOf(false) }
+    var chdSortOption by rememberSaveable { mutableStateOf(ChdSortOption.NameAscending.name) }
     val openUrl: (String) -> Unit = { url ->
         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     }
@@ -338,13 +342,6 @@ private fun MimirScreen(
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                         }
-                        IconButton(onClick = { currentSection = AppSection.About }) {
-                            Icon(
-                                imageVector = Icons.Outlined.Settings,
-                                contentDescription = "About",
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
-                            )
-                        }
                     }
                 }
             }
@@ -367,19 +364,11 @@ private fun MimirScreen(
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                if (currentSection == AppSection.About) {
-                    item {
-                        AboutSection(
-                            onOpenYoutube = { openUrl(YOUTUBE_CHANNEL_URL) },
-                            onOpenGithub = { openUrl(GITHUB_PAGE_URL) },
-                        )
-                    }
-                } else {
-                    item {
+                item {
                         HeroSection(
                             currentSection = currentSection,
                         )
-                    }
+                }
 
                     if (currentSection == AppSection.Home) {
                         item {
@@ -395,6 +384,13 @@ private fun MimirScreen(
                                         ToolMode.VitaAppIds -> AppSection.Vita
                                     }
                                 },
+                            )
+                        }
+                        item {
+                            SupportSection(
+                                onOpenYoutube = { openUrl(YOUTUBE_CHANNEL_URL) },
+                                onOpenKofi = { openUrl(KOFI_URL) },
+                                onOpenBuyMeACoffee = { openUrl(BUY_ME_A_COFFEE_URL) },
                             )
                         }
                     } else {
@@ -446,10 +442,6 @@ private fun MimirScreen(
                             }
                         }
 
-                        if (uiState.selectedMode == ToolMode.ChdConverter) uiState.chdConversionReport?.let { report ->
-                            item { ChdConversionReportCard(report) }
-                        }
-
                         if (uiState.isBusy && progressLabel == null) {
                             item {
                                 Row(
@@ -461,59 +453,67 @@ private fun MimirScreen(
                             }
                         }
 
-                        uiState.message?.let { message ->
-                            item {
-                                InfoPanel(
-                                    title = "Status",
-                                    body = message,
-                                    accent = MaterialTheme.colorScheme.secondary,
-                                )
-                            }
-                        }
-
                         if (uiState.selectedMode != ToolMode.VitaAppIds) uiState.previewPlan?.let { plan ->
+                            if (uiState.selectedMode == ToolMode.ChdConverter) {
+                                item {
+                                    ChdQueueTable(
+                                        plan = plan,
+                                        selectedPaths = uiState.selectedChangePaths,
+                                        sortOption = ChdSortOption.valueOf(chdSortOption),
+                                        enabled = !uiState.isBusy,
+                                        storageInfo = uiState.storageInfo,
+                                        onSortOptionChanged = { chdSortOption = it.name },
+                                        onSelectAll = onSelectAllChanges,
+                                        onDeselectAll = onDeselectAllChanges,
+                                        onChangeSelection = onChangeSelection,
+                                    )
+                                }
+                            }
                             item {
                                 PreviewSummary(
                                     previewCount = uiState.previewCount,
                                     selectedCount = uiState.selectedChangePaths.size,
+                                    selectedPaths = uiState.selectedChangePaths,
                                     plan = plan,
                                     onApply = { showApplyConfirmation = true },
                                     isBusy = uiState.isBusy,
                                 )
                             }
 
-                            if (useTwoColumns) {
-                                items(plan.changes.chunked(2)) { row ->
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                    ) {
-                                        row.forEach { change ->
-                                            ChangeCard(
-                                                plan = plan,
-                                                change = change,
-                                                selected = change.detailPath in uiState.selectedChangePaths,
-                                                enabled = !uiState.isBusy,
-                                                modifier = Modifier.weight(1f),
-                                                onSelectedChange = { selected ->
-                                                    onChangeSelection(change.detailPath, selected)
-                                                },
-                                            )
+                            if (uiState.selectedMode != ToolMode.ChdConverter) {
+                                if (useTwoColumns) {
+                                    items(plan.changes.chunked(2)) { row ->
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                        ) {
+                                            row.forEach { change ->
+                                                ChangeCard(
+                                                    plan = plan,
+                                                    change = change,
+                                                    selected = change.detailPath in uiState.selectedChangePaths,
+                                                    enabled = !uiState.isBusy,
+                                                    modifier = Modifier.weight(1f),
+                                                    onSelectedChange = { selected ->
+                                                        onChangeSelection(change.detailPath, selected)
+                                                    },
+                                                )
+                                            }
+                                            if (row.size == 1) Spacer(Modifier.weight(1f))
                                         }
-                                        if (row.size == 1) Spacer(Modifier.weight(1f))
                                     }
-                                }
-                            } else {
-                                items(plan.changes) { change ->
-                                    ChangeCard(
-                                        plan = plan,
-                                        change = change,
-                                        selected = change.detailPath in uiState.selectedChangePaths,
-                                        enabled = !uiState.isBusy,
-                                        onSelectedChange = { selected ->
-                                            onChangeSelection(change.detailPath, selected)
-                                        },
-                                    )
+                                } else {
+                                    items(plan.changes) { change ->
+                                        ChangeCard(
+                                            plan = plan,
+                                            change = change,
+                                            selected = change.detailPath in uiState.selectedChangePaths,
+                                            enabled = !uiState.isBusy,
+                                            onSelectedChange = { selected ->
+                                                onChangeSelection(change.detailPath, selected)
+                                            },
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -522,26 +522,46 @@ private fun MimirScreen(
                             !(uiState.selectedMode == ToolMode.ChdConverter && uiState.isBusy)
                         ) {
                             item {
-                                ActionCard(
-                                    onScan = onStart,
-                                    onConvertSelected = {
-                                        pendingDeleteOriginalChdFiles = uiState.deleteOriginalChdFiles
-                                        showApplyConfirmation = true
-                                    },
-                                    showConvertSelected = uiState.selectedMode == ToolMode.ChdConverter &&
-                                        uiState.selectedChangePaths.isNotEmpty(),
-                                    canScan = uiState.selectedFolderUri != null && !uiState.isBusy,
-                                    canConvertSelected = uiState.selectedChangePaths.isNotEmpty() && !uiState.isBusy,
-                                    showStopControls = uiState.selectedMode == ToolMode.ChdConverter && uiState.isBusy,
-                                    canStopAfterCurrent = uiState.operationProgressLabel != null && uiState.stopRequest == pup.app.mimir.data.StopRequest.None,
-                                    onStopNow = onStopNow,
-                                    onStopAfterCurrent = onStopAfterCurrent,
-                                )
+                                if (uiState.selectedMode == ToolMode.ChdConverter) {
+                                    val hasSelection = uiState.selectedChangePaths.isNotEmpty()
+                                    Button(
+                                        onClick = if (hasSelection) {
+                                            {
+                                                pendingDeleteOriginalChdFiles = uiState.deleteOriginalChdFiles
+                                                showApplyConfirmation = true
+                                            }
+                                        } else {
+                                            onStart
+                                        },
+                                        enabled = if (hasSelection) !uiState.isBusy else uiState.selectedFolderUri != null && !uiState.isBusy,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    ) {
+                                        Text(if (hasSelection) "CONVERT SELECTED" else "SCAN")
+                                    }
+                                } else {
+                                    ActionCard(
+                                        onScan = onStart,
+                                        onConvertSelected = {
+                                            pendingDeleteOriginalChdFiles = uiState.deleteOriginalChdFiles
+                                            showApplyConfirmation = true
+                                        },
+                                        showConvertSelected = false,
+                                        canScan = uiState.selectedFolderUri != null && !uiState.isBusy,
+                                        canConvertSelected = false,
+                                        showStopControls = false,
+                                        canStopAfterCurrent = false,
+                                        onStopNow = onStopNow,
+                                        onStopAfterCurrent = onStopAfterCurrent,
+                                    )
+                                }
                             }
                         }
 
+                        if (uiState.selectedMode == ToolMode.ChdConverter) uiState.chdConversionReport?.let { report ->
+                            item { ChdConversionReportCard(report) }
+                        }
+
                     }
-                }
             }
             val progressModifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -553,6 +573,7 @@ private fun MimirScreen(
             if (uiState.selectedMode == ToolMode.ChdConverter && uiState.isBusy && uiState.chdConversionReport != null) {
                 ChdProgressToast(
                     report = uiState.chdConversionReport,
+                    currentJobLabel = uiState.chdCurrentJobLabel,
                     currentJobProgress = uiState.chdCurrentJobProgress ?: 0f,
                     canStopAfterCurrent = uiState.operationProgressLabel != null &&
                         uiState.stopRequest == pup.app.mimir.data.StopRequest.None,
@@ -635,6 +656,149 @@ private fun MimirScreen(
 
 }
 
+private enum class ChdSortOption(val label: String) {
+    NameAscending("Name A–Z"),
+    NameDescending("Name Z–A"),
+    SizeLargest("Size largest"),
+    SizeSmallest("Size smallest"),
+}
+
+private fun formatBytes(bytes: Long): String {
+    val units = listOf("B", "KB", "MB", "GB", "TB")
+    var value = bytes.toDouble()
+    var unit = 0
+    while (value >= 1024 && unit < units.lastIndex) {
+        value /= 1024
+        unit++
+    }
+    return "%.1f %s".format(java.util.Locale.US, value, units[unit])
+}
+
+private fun formatQueueSize(bytes: Long): String {
+    val gibibyte = 1024L * 1024L * 1024L
+    return if (bytes < gibibyte) {
+        "%.1f MB".format(java.util.Locale.US, bytes / (1024.0 * 1024.0))
+    } else {
+        "%.1f GB".format(java.util.Locale.US, bytes / gibibyte.toDouble())
+    }
+}
+
+@Composable
+private fun ChdQueueTable(
+    plan: OperationPlan,
+    selectedPaths: Set<String>,
+    sortOption: ChdSortOption,
+    enabled: Boolean,
+    storageInfo: pup.app.mimir.data.RomTreeRepository.StorageInfo?,
+    onSortOptionChanged: (ChdSortOption) -> Unit,
+    onSelectAll: () -> Unit,
+    onDeselectAll: () -> Unit,
+    onChangeSelection: (String, Boolean) -> Unit,
+) {
+    var pendingOverwrite by remember { mutableStateOf<pup.app.mimir.domain.PlannedChange?>(null) }
+    val sortedChanges = when (sortOption) {
+        ChdSortOption.NameAscending -> plan.changes.sortedBy { it.title.lowercase() }
+        ChdSortOption.NameDescending -> plan.changes.sortedByDescending { it.title.lowercase() }
+        ChdSortOption.SizeLargest -> plan.changes.sortedByDescending { it.sourceSizeBytes }
+        ChdSortOption.SizeSmallest -> plan.changes.sortedBy { it.sourceSizeBytes }
+    }
+    val selectedBytes = plan.changes
+        .filter { it.detailPath in selectedPaths }
+        .sumOf { it.sourceSizeBytes }
+    val lowSpace = storageInfo != null && selectedBytes > storageInfo.freeBytes
+
+    StyledCard {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Label("CONVERSION QUEUE")
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = onSelectAll, enabled = enabled) { Text("SELECT ALL") }
+                    OutlinedButton(onClick = onDeselectAll, enabled = enabled) { Text("DESELECT ALL") }
+                }
+            }
+            Text("Sort by", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            ChoiceRow(
+                options = ChdSortOption.entries,
+                selected = sortOption,
+                enabled = enabled,
+                label = { it.label },
+                onSelect = onSortOptionChanged,
+            )
+            if (storageInfo != null) {
+                InfoPanel(
+                    title = "Storage on scanned device",
+                    body = "${formatBytes(storageInfo.freeBytes)} free of ${formatBytes(storageInfo.totalBytes)}. " +
+                        "This queue needs about ${formatBytes(selectedBytes)} of working space.",
+                    accent = if (lowSpace) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary,
+                )
+                if (lowSpace) {
+                    Text(
+                        "Warning: there may not be enough free space to convert the selected queue. Deselect some items or free space first.",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text("", modifier = Modifier.size(40.dp))
+                Text("ROM", modifier = Modifier.weight(1.4f), style = MaterialTheme.typography.labelMedium)
+                Text("SIZE", modifier = Modifier.weight(0.65f), style = MaterialTheme.typography.labelMedium)
+                Text("OUTPUT", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
+            }
+            sortedChanges.forEach { change ->
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Checkbox(
+                        checked = change.detailPath in selectedPaths,
+                        onCheckedChange = { checked ->
+                            if (checked && change.targetAlreadyExists) {
+                                pendingOverwrite = change
+                            } else {
+                                onChangeSelection(change.detailPath, checked)
+                            }
+                        },
+                        enabled = enabled,
+                    )
+                    Column(modifier = Modifier.weight(1.4f)) {
+                        Text(change.title, style = MaterialTheme.typography.bodyMedium)
+                        if (change.targetAlreadyExists) {
+                            Text("Existing CHD — select individually to replace", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                        }
+                    }
+                    Text(formatBytes(change.sourceSizeBytes), modifier = Modifier.weight(0.65f), style = MaterialTheme.typography.bodySmall)
+                    Text(change.targetFiles.singleOrNull().orEmpty(), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+    }
+    pendingOverwrite?.let { change ->
+        AlertDialog(
+            onDismissRequest = { pendingOverwrite = null },
+            title = { Text("Replace existing CHD?") },
+            text = { Text("${change.targetFiles.singleOrNull() ?: change.detailPath} already exists and will be overwritten if selected.") },
+            confirmButton = {
+                Button(onClick = {
+                    pendingOverwrite = null
+                    onChangeSelection(change.detailPath, true)
+                }) { Text("REPLACE CHD") }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { pendingOverwrite = null }) { Text("CANCEL") }
+            },
+        )
+    }
+}
+
 @Composable
 private fun HeroSection(
     currentSection: AppSection,
@@ -645,7 +809,6 @@ private fun HeroSection(
         AppSection.Zipper -> "Zipper"
         AppSection.Chd -> "CHD Converter"
         AppSection.Vita -> "Vita Shortcuts"
-        AppSection.About -> "About"
     }
     val body = when (currentSection) {
         AppSection.Home ->
@@ -658,8 +821,6 @@ private fun HeroSection(
             "Converts supported disc images to space-saving CHD files while keeping the original image"
         AppSection.Vita ->
             "Search the built-in Vita shortcut database, queue titles, and generate scraper-friendly .psvita files on-device"
-        AppSection.About ->
-            "Mimir is a simple tool utilty designed by RetroPup. Check out RetroPup on YouTube for guides, tips and tricks for the AYN Thor and other retro handhelds!"
     }
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
@@ -676,82 +837,63 @@ private fun HeroSection(
 }
 
 @Composable
-private fun AboutSection(
+private fun SupportSection(
     onOpenYoutube: () -> Unit,
-    onOpenGithub: () -> Unit,
+    onOpenKofi: () -> Unit,
+    onOpenBuyMeACoffee: () -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        InfoPanel(
-            title = "About Mimir",
-            body = "Mimir is a toolkit designed to streamline your ROMs library",
-            accent = MaterialTheme.colorScheme.primary,
-        )
-        StyledCard {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Label("LINKS")
-                AboutLinkCard(
-                    title = "GitHub Page",
-                    body = GITHUB_PAGE_URL,
-                    buttonLabel = "OPEN GITHUB",
-                    enabled = true,
-                    icon = Icons.Outlined.GridView,
-                    onClick = onOpenGithub,
-                )
-                AboutLinkCard(
-                    title = "Follow RetroPup on YouTube!",
-                    body = YOUTUBE_CHANNEL_URL,
-                    buttonLabel = "OPEN CHANNEL",
-                    enabled = true,
-                    icon = Icons.Outlined.Subscriptions,
-                    onClick = onOpenYoutube,
-                )
-            }
+    StyledCard {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Label("SUPPORT MIMIR")
+            Text(
+                "Mimir is, and always will be, 100% free and without ads. If you would like to show your support, please consider checking out my YouTube channel or donating.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.82f),
+            )
+            SupportLinkButton(
+                label = "YouTube",
+                icon = Icons.Outlined.Subscriptions,
+                containerColor = Color(0xFFFF0000),
+                contentColor = Color.White,
+                onClick = onOpenYoutube,
+            )
+            SupportLinkButton(
+                label = "Ko-fi",
+                icon = Icons.Outlined.Favorite,
+                containerColor = Color(0xFF29ABE0),
+                contentColor = Color.White,
+                onClick = onOpenKofi,
+            )
+            SupportLinkButton(
+                label = "Buy Me a Coffee",
+                icon = Icons.Outlined.Coffee,
+                containerColor = Color(0xFFFFDD00),
+                contentColor = Color(0xFF1F1F1F),
+                onClick = onOpenBuyMeACoffee,
+            )
         }
     }
 }
 
 @Composable
-private fun AboutLinkCard(
-    title: String,
-    body: String,
-    buttonLabel: String,
-    enabled: Boolean,
+private fun SupportLinkButton(
+    label: String,
     icon: ImageVector,
+    containerColor: Color,
+    contentColor: Color,
     onClick: () -> Unit,
 ) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    Button(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = contentColor,
         ),
-        shape = RoundedCornerShape(14.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-                Text(title, style = MaterialTheme.typography.titleMedium)
-            }
-            Text(
-                body,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.78f),
-            )
-            OutlinedButton(
-                onClick = onClick,
-                enabled = enabled,
-            ) {
-                Text(buttonLabel)
-            }
-        }
+        Icon(imageVector = icon, contentDescription = null)
+        Spacer(Modifier.size(8.dp))
+        Text(label)
     }
 }
 
@@ -1160,7 +1302,8 @@ private fun ChdConverterOptionsCard(
 private fun ChdConversionReportCard(report: pup.app.mimir.ui.ChdConversionReport) {
     InfoPanel(
         title = "Conversion report",
-        body = "Completed ${report.completed} of ${report.total} conversions." +
+        body = "Completed ${report.completed} of ${report.total} conversions. " +
+            "Net compression saving: ${formatBytes(report.spaceSavedBytes)}." +
             if (report.stopped) " Stopped by user." else "",
         accent = MaterialTheme.colorScheme.secondary,
     )
@@ -1210,6 +1353,7 @@ private fun ProgressToast(
 @Composable
 private fun ChdProgressToast(
     report: pup.app.mimir.ui.ChdConversionReport,
+    currentJobLabel: String?,
     currentJobProgress: Float,
     canStopAfterCurrent: Boolean,
     stopNowEnabled: Boolean,
@@ -1230,7 +1374,7 @@ private fun ChdProgressToast(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                "Current conversion: ${(currentJobProgress * 100).toInt()}%",
+                "Converting ${currentJobLabel ?: "selected image"}: ${(currentJobProgress * 100).toInt()}%",
                 style = MaterialTheme.typography.bodyMedium,
             )
             LinearProgressIndicator(
@@ -1487,32 +1631,31 @@ private fun <T> ChoiceRow(
 private fun PreviewSummary(
     previewCount: Int,
     selectedCount: Int,
+    selectedPaths: Set<String>,
     plan: OperationPlan,
     onApply: () -> Unit,
     isBusy: Boolean,
 ) {
+    val selectedSize = plan.changes
+        .filter { it.detailPath in selectedPaths }
+        .sumOf { it.sourceSizeBytes }
     StyledCard {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Label("PREVIEW")
-            Text(
-                when (plan.mode) {
-                    ToolMode.MultiDiscOrganizer -> "$previewCount multi-disc sets detected; $selectedCount selected."
-                    ToolMode.RomZipper -> "$previewCount ROMs matched the zip whitelist; $selectedCount selected."
-                    ToolMode.ChdConverter -> "$previewCount disc images ready for CHD conversion; $selectedCount selected."
-                    ToolMode.VitaAppIds -> "$previewCount Vita shortcuts ready; $selectedCount selected."
-                },
-                style = MaterialTheme.typography.headlineMedium,
-            )
-            ThinProgress(
-                progress = (plan.operations.size.coerceAtMost(20) / 20f).coerceAtLeast(0.12f)
-            )
-            if (plan.conflicts.isNotEmpty()) {
-                Text("Conflicts", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary)
-                plan.conflicts.forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
+            if (plan.mode == ToolMode.ChdConverter) {
+                Text(
+                    "$selectedCount ${if (selectedCount == 1) "job" else "jobs"} selected • ${formatQueueSize(selectedSize)}",
+                    style = MaterialTheme.typography.headlineMedium,
+                )
             } else {
-                Text("No conflicts detected.", style = MaterialTheme.typography.bodyMedium)
-            }
-            if (plan.mode != ToolMode.ChdConverter) {
+                Text(
+                    when (plan.mode) {
+                        ToolMode.MultiDiscOrganizer -> "$previewCount multi-disc sets detected; $selectedCount selected."
+                        ToolMode.RomZipper -> "$previewCount ROMs matched the zip whitelist; $selectedCount selected."
+                        ToolMode.ChdConverter, ToolMode.VitaAppIds -> "$previewCount items ready; $selectedCount selected."
+                    },
+                    style = MaterialTheme.typography.headlineMedium,
+                )
                 Button(
                     onClick = onApply,
                     enabled = !isBusy && selectedCount > 0,
@@ -1533,5 +1676,6 @@ private fun FileOperation.describe(): String = when (this) {
     is FileOperation.ConvertToChd -> "Create ${discType.displayName} CHD $sourcePath -> $targetPath"
 }
 
-private const val GITHUB_PAGE_URL = "https://github.com/ItsRetroPup/Mimir"
 private const val YOUTUBE_CHANNEL_URL = "https://youtube.com/@ItsRetroPup"
+private const val KOFI_URL = "https://ko-fi.com/retropup84752"
+private const val BUY_ME_A_COFFEE_URL = "https://buymeacoffee.com/retropupz"
