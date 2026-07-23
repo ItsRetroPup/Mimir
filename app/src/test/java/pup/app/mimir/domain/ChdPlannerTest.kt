@@ -101,4 +101,22 @@ class ChdPlannerTest {
 
         assertEquals(listOf("dc/Sonic Adventure.chd"), plan.changes.map { it.detailPath })
     }
+
+    @Test
+    fun carriesCueInputSizeIntoTheQueuedChange() {
+        val plan = ChdPlanner.buildPlan(
+            entries = listOf(
+                RomEntry(
+                    relativePath = "psx/Metal Gear Solid.cue",
+                    fileName = "Metal Gear Solid.cue",
+                    sizeBytes = 1_234_567L,
+                ),
+            ),
+            system = ChdSystem.PlayStation1,
+            discType = ChdDiscType.Cd,
+            deleteOriginalFiles = false,
+        )
+
+        assertEquals(1_234_567L, plan.changes.single().sourceSizeBytes)
+    }
 }

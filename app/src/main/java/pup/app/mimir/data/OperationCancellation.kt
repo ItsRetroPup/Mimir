@@ -32,4 +32,5 @@ class OperationStoppedException(message: String = "Operation stopped by user.") 
 data class ExecutionResult(
     val completedOperations: Int,
     val stopped: Boolean,
+    val spaceSavedBytes: Long = 0L,
 )

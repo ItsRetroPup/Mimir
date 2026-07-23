@@ -4,6 +4,7 @@ data class RomEntry(
     val relativePath: String,
     val fileName: String,
     val sourcePath: String = relativePath,
+    val sizeBytes: Long = 0L,
 )
 
 data class VitaApp(
@@ -114,6 +115,7 @@ data class PlannedChange(
     val detailLabel: String,
     val detailPath: String,
     val operations: List<FileOperation>,
+    val sourceSizeBytes: Long = 0L,
     /** A matching output is already in the source folder and will be replaced if selected. */
     val targetAlreadyExists: Boolean = false,
 )

@@ -2,6 +2,8 @@ package pup.app.mimir.data
 
 import android.content.Context
 import android.net.Uri
+import android.os.StatFs
+import android.os.storage.StorageManager
 import androidx.documentfile.provider.DocumentFile
 import pup.app.mimir.domain.RomEntry
 import pup.app.mimir.domain.ParamSfoParser
@@ -9,6 +11,15 @@ import pup.app.mimir.domain.VitaApp
 import pup.app.mimir.domain.VitaShortcutFormat
 
 class RomTreeRepository(private val context: Context) {
+    data class StorageInfo(val totalBytes: Long, val freeBytes: Long)
+
+    fun storageInfo(rootUri: Uri): StorageInfo? = runCatching {
+        val storageManager = context.getSystemService(StorageManager::class.java)
+        val directory = storageManager?.getStorageVolume(rootUri)?.directory ?: return null
+        val stat = StatFs(directory.path)
+        StorageInfo(totalBytes = stat.totalBytes, freeBytes = stat.availableBytes)
+    }.getOrNull()
+
     fun loadVitaShortcutCatalog(): List<VitaApp> =
         context.assets.open("vita_shortcuts.tsv").bufferedReader().useLines { lines ->
             lines.mapNotNull { line ->
@@ -220,6 +231,7 @@ class RomTreeRepository(private val context: Context) {
                         relativePath = (outputSegments + childName).joinToString("/"),
                         fileName = childName,
                         sourcePath = (sourceSegments + childName).joinToString("/"),
+                        sizeBytes = child.length(),
                     )
                     onFileScanned?.invoke(collector.size)
                 }
@@ -275,12 +287,26 @@ class RomTreeRepository(private val context: Context) {
             relativePath = (outputSegments + childName).joinToString("/"),
             fileName = childName,
             sourcePath = (sourceSegments + childName).joinToString("/"),
+            sizeBytes = chdInputSize(child),
         )
         onFileScanned?.invoke(collector.size)
     }
 
     private fun DocumentFile.extension(): String =
         name.orEmpty().substringAfterLast('.', "").lowercase()
+
+    private fun chdInputSize(source: DocumentFile): Long {
+        if (source.extension() != "cue") return source.length()
+        val cueContents = context.contentResolver.openInputStream(source.uri)
+            ?.bufferedReader()
+            ?.use { it.readText() }
+            ?: return 0L
+        val parent = source.parentFile ?: return 0L
+        return CUE_FILE_PATTERN.findAll(cueContents)
+            .map { it.groupValues[1] }
+            .distinct()
+            .sumOf { fileName -> parent.findFile(fileName)?.length() ?: 0L }
+    }
 
     private fun findFile(root: DocumentFile, relativePath: String): DocumentFile? {
         val parts = relativePath.split('/').filter { it.isNotBlank() }
@@ -293,5 +319,9 @@ class RomTreeRepository(private val context: Context) {
             current = child
         }
         return null
+    }
+
+    private companion object {
+        val CUE_FILE_PATTERN = Regex("""(?im)^\s*FILE\s+\"([^\"]+)\"""")
     }
 }
