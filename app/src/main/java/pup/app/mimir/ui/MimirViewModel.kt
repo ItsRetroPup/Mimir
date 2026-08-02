@@ -14,7 +14,9 @@ import pup.app.mimir.domain.FrontendPreset
 import pup.app.mimir.domain.ChdDiscType
 import pup.app.mimir.domain.ChdPlanner
 import pup.app.mimir.domain.ChdSystem
+import pup.app.mimir.domain.ConverterTool
 import pup.app.mimir.domain.FileOperation
+import pup.app.mimir.domain.NativeConverterPlanner
 import pup.app.mimir.domain.OperationPlan
 import pup.app.mimir.domain.RomScanner
 import pup.app.mimir.domain.RomZipperPlanner
@@ -42,6 +44,7 @@ data class MimirUiState(
     val selectedPreset: FrontendPreset = FrontendPreset.EsDe,
     val selectedChdSystem: ChdSystem = ChdSystem.Dreamcast,
     val selectedChdDiscType: ChdDiscType = ChdDiscType.Cd,
+    val selectedConverterTool: ConverterTool = ConverterTool.Chd,
     val deleteOriginalChdFiles: Boolean = false,
     val scanHiddenFolders: Boolean = false,
     val useDarkMode: Boolean = true,
@@ -134,6 +137,18 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             if (it.selectedChdSystem != ChdSystem.PlayStation2) it else it.copy(
                 selectedChdDiscType = discType,
                 previewPlan = null,
+                selectedChangePaths = emptySet(),
+                message = null,
+            )
+        }
+    }
+
+    fun updateConverterTool(tool: ConverterTool) {
+        _uiState.update {
+            it.copy(
+                selectedConverterTool = tool,
+                previewPlan = null,
+                previewCount = 0,
                 selectedChangePaths = emptySet(),
                 message = null,
             )
@@ -400,22 +415,40 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                     }
 
                     ToolMode.ChdConverter -> {
-                        val entries = repository.scanChdTree(
-                            rootUri = requireNotNull(romUri),
-                            folderAliases = currentState.selectedChdSystem.folderAliases,
-                            supportedExtensions = currentState.selectedChdSystem.supportedExtensions,
-                            onFileScanned = { scannedFiles -> updateScanProgress(mode, scannedFiles) },
-                            shouldStop = cancellation::shouldInterruptCurrentOperation,
-                        )
-                        _uiState.update {
-                            it.copy(scanProgressLabel = "Checking ${entries.size} ${currentState.selectedChdSystem.displayName} images for CHD conversion…")
+                        when (currentState.selectedConverterTool) {
+                            ConverterTool.Chd -> {
+                                val entries = repository.scanChdTree(
+                                    rootUri = requireNotNull(romUri),
+                                    folderAliases = currentState.selectedChdSystem.folderAliases,
+                                    supportedExtensions = currentState.selectedChdSystem.supportedExtensions,
+                                    onFileScanned = { scannedFiles -> updateScanProgress(mode, scannedFiles) },
+                                    shouldStop = cancellation::shouldInterruptCurrentOperation,
+                                )
+                                _uiState.update {
+                                    it.copy(scanProgressLabel = "Checking ${entries.size} ${currentState.selectedChdSystem.displayName} images for CHD conversion…")
+                                }
+                                ChdPlanner.buildPlan(
+                                    entries = entries,
+                                    system = currentState.selectedChdSystem,
+                                    discType = currentState.selectedChdDiscType,
+                                    deleteOriginalFiles = currentState.deleteOriginalChdFiles,
+                                )
+                            }
+                            else -> {
+                                val tool = currentState.selectedConverterTool
+                                val entries = repository.scanChdTree(
+                                    rootUri = requireNotNull(romUri),
+                                    folderAliases = tool.folderAliases,
+                                    supportedExtensions = tool.sourceExtensions,
+                                    onFileScanned = { scannedFiles -> updateScanProgress(mode, scannedFiles) },
+                                    shouldStop = cancellation::shouldInterruptCurrentOperation,
+                                )
+                                _uiState.update {
+                                    it.copy(scanProgressLabel = "Checking ${entries.size} files for ${tool.displayName} conversion…")
+                                }
+                                NativeConverterPlanner.buildPlan(entries, tool)
+                            }
                         }
-                        ChdPlanner.buildPlan(
-                            entries = entries,
-                            system = currentState.selectedChdSystem,
-                            discType = currentState.selectedChdDiscType,
-                            deleteOriginalFiles = currentState.deleteOriginalChdFiles,
-                        )
                     }
 
                     ToolMode.VitaAppIds -> error("Vita shortcuts are created directly from search results.")
@@ -437,7 +470,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                             when (mode) {
                                 ToolMode.MultiDiscOrganizer -> "No multi-disc games found."
                                 ToolMode.RomZipper -> "No zip-compatible ROMs found."
-                                ToolMode.ChdConverter -> "No ${currentState.selectedChdSystem.displayName} images found for CHD conversion."
+                                ToolMode.ChdConverter -> "No compatible ${currentState.selectedConverterTool.displayName} files found."
                                 ToolMode.VitaAppIds -> "No Vita shortcuts queued."
                             }
                         } else {
@@ -631,7 +664,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         when (mode) {
             ToolMode.MultiDiscOrganizer -> "Scanning ROM files for multi-disc games…"
             ToolMode.RomZipper -> "Scanning ROM files for zip-compatible formats…"
-            ToolMode.ChdConverter -> "Scanning ROM files for CHD-compatible images…"
+            ToolMode.ChdConverter -> "Scanning ROM files for ${_uiState.value.selectedConverterTool.displayName}-compatible files…"
             ToolMode.VitaAppIds -> "Scanning ROM files…"
         }
 
@@ -640,7 +673,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         val activity = when (mode) {
             ToolMode.MultiDiscOrganizer -> "Scanning for multi-disc games"
             ToolMode.RomZipper -> "Scanning for zip-compatible ROMs"
-            ToolMode.ChdConverter -> "Scanning for CHD-compatible images"
+            ToolMode.ChdConverter -> "Scanning for ${_uiState.value.selectedConverterTool.displayName}-compatible files"
             ToolMode.VitaAppIds -> "Scanning ROM files"
         }
         _uiState.update { it.copy(scanProgressLabel = "$activity: $scannedFiles files checked") }
@@ -650,7 +683,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         val activity = when (mode) {
             ToolMode.MultiDiscOrganizer -> "Organizing ROMs"
             ToolMode.RomZipper -> "Zipping ROMs"
-            ToolMode.ChdConverter -> "Creating CHDs"
+            ToolMode.ChdConverter -> "Converting with ${_uiState.value.selectedConverterTool.displayName}"
             ToolMode.VitaAppIds -> "Creating shortcuts"
         }
         return "$activity: $completed of $total"

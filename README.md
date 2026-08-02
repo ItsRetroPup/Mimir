@@ -53,9 +53,13 @@ Zip naming behaviour:
 - strips the original file extension before creating the archive
 - example: `Pokemon.gba` becomes `Pokemon.zip`
 
-### CHDMan
+### Converter Tools
 
-CHDMan converts supported disc images into `.chd` files while retaining the source image.
+Mimir's Converter Tools page provides one scan, review, overwrite, progress, and cancellation flow
+for each supported converter. Every conversion retains the source image unless the CHD delete-source
+option is selected.
+
+#### CHDMan
 
 Supported system and source formats:
 - Dreamcast: `.gdi`, `.cue`, `.iso`
@@ -85,6 +89,17 @@ at `licenses/MAME-GPL-2.0.txt`. Before publishing a release, publish the complet
 MAME source for revision `ecf0add29f06ba131994dca5b88c3a0edf6c2ad8` (including the build instructions used for this binary) or a
 valid GPLv2 source offer.
 
+#### Native converter backends
+
+Mimir bundles the following Android ARM64 command-line backends in
+`app/src/main/jniLibs/arm64-v8a/`:
+
+- DolphinTool: `.iso` to `.rvz`, using RVZ with 128 KiB blocks and Zstandard level 5.
+  Expected binary: `libdolphintool.so` (GPL-2.0-or-later).
+- Azahar: decrypted `.3ds` / `.cci` to `.zcci`, using `libazahar.so` built from Azahar
+  `2126.0-alpha1` revision `e11f3da49346a45c400001ea424de298649618c8` (GPL-2.0-or-later).
+  The reproducible standalone-target patch and build instructions are in
+  `docs/azahar-compression-cli.patch` and `docs/azahar-compression-build.md`.
 ### PS Vita Shortcuts
 Mimir includes a built-in searchable PS Vita shortcut database.
 

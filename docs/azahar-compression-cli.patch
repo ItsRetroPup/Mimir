@@ -1,0 +1,108 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 42664571b..a3007e250 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -38,6 +38,7 @@ if (BSD STREQUAL "OpenBSD")
+ endif()
+ 
+ option(ENABLE_LIBRETRO "Build as a LibRetro core" OFF)
++option(ENABLE_COMPRESSION_CLI "Build the standalone compression CLI" OFF)
+ 
+ # Some submodules like to pick their own default build type if not specified.
+ # Make sure we default to Release build type always, unless the generator has custom types.
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 329af28d2..afc1a77eb 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -202,11 +202,18 @@ if (ENABLE_QT)
+     add_subdirectory(citra_qt)
+ endif()
+ 
+-if (ENABLE_QT) # Or any other hypothetical future frontends
++if (ENABLE_QT OR ENABLE_COMPRESSION_CLI)
+     add_subdirectory(citra_cli)
++endif()
++
++if (ENABLE_QT)
+     add_subdirectory(citra_meta)
+ endif()
+ 
++if (ENABLE_COMPRESSION_CLI)
++    add_subdirectory(citra_compression_cli)
++endif()
++
+ if (ENABLE_LIBRETRO)
+     add_subdirectory(citra_libretro)
+ endif()
+diff --git a/src/citra_cli/compression_cli.cpp b/src/citra_cli/compression_cli.cpp
+index 4ebce18b7..65732fa16 100644
+--- a/src/citra_cli/compression_cli.cpp
++++ b/src/citra_cli/compression_cli.cpp
+@@ -48,8 +48,10 @@ static bool perform_z3ds_operation(bool is_compressing, const std::string& src_f
+ }
+ 
+ int ParseCompressionCommand(int argc, char* argv[]) {
++#ifndef CITRA_COMPRESSION_CLI
+     Common::Log::Initialize();
+     Common::Log::Start();
++#endif
+ 
+     const std::string common_error_addendum = "\nCheck log for more details.";
+ 
+diff --git a/src/citra_compression_cli/CMakeLists.txt b/src/citra_compression_cli/CMakeLists.txt
+new file mode 100644
+index 000000000..4e917bed5
+--- /dev/null
++++ b/src/citra_compression_cli/CMakeLists.txt
+@@ -0,0 +1,7 @@
++add_executable(azahar-compress main.cpp)
++target_compile_definitions(citra_common PRIVATE CITRA_COMPRESSION_CLI)
++target_compile_definitions(citra_cli PRIVATE CITRA_COMPRESSION_CLI)
++target_link_libraries(azahar-compress PRIVATE citra_cli citra_common fmt)
++if (ANDROID)
++    target_link_libraries(azahar-compress PRIVATE log)
++endif()
+diff --git a/src/citra_compression_cli/main.cpp b/src/citra_compression_cli/main.cpp
+new file mode 100644
+index 000000000..02f353c96
+--- /dev/null
++++ b/src/citra_compression_cli/main.cpp
+@@ -0,0 +1,8 @@
++// Copyright Azahar Emulator Project
++// Licensed under GPLv2 or any later version.
++
++#include "citra_cli/compression_cli.h"
++
++int main(int argc, char* argv[]) {
++    return CitraCLI::ParseCompressionCommand(argc, argv);
++}
+diff --git a/src/common/android_storage.cpp b/src/common/android_storage.cpp
+index 0fb6ceaaf..9ca7d86de 100644
+--- a/src/common/android_storage.cpp
++++ b/src/common/android_storage.cpp
+@@ -161,8 +161,12 @@ std::vector<std::string> GetFilesName(const std::string& filepath) {
+ 
+ std::optional<std::string> GetUserDirectory() {
+     if (get_user_directory == nullptr) {
++#ifdef CITRA_COMPRESSION_CLI
++        return std::string{"/"};
++#else
+         throw std::runtime_error(
+             "Unable to locate user directory: Function with ID 'get_user_directory' is missing");
++#endif
+     }
+ 
+     auto env = GetEnvForThread();
+@@ -190,8 +194,12 @@ std::optional<std::string> GetUserDirectory() {
+ 
+ std::string GetBuildFlavor() {
+     if (get_build_flavor == nullptr) {
++#ifdef CITRA_COMPRESSION_CLI
++        return AndroidBuildFlavors::VANILLA;
++#else
+         throw std::runtime_error(
+             "Unable get build flavor: Function with ID 'get_build_flavor' is missing");
++#endif
+     }
+     auto env = GetEnvForThread();
+     const auto jflavor =

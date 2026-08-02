@@ -12,6 +12,7 @@ import java.util.zip.ZipOutputStream
 
 class PlanExecutor(private val context: Context) {
     private val chdmanRunner = ChdmanRunner(context)
+    private val nativeConverterRunner = NativeConverterRunner(context)
     fun apply(
         rootUri: Uri,
         plan: OperationPlan,
@@ -108,6 +109,25 @@ class PlanExecutor(private val context: Context) {
                                 require(source.delete()) { "Failed to delete original source file: $sourcePath" }
                             }
                         }
+                    } finally {
+                        conversion.output.delete()
+                    }
+                }
+
+                is FileOperation.ConvertWithTool -> {
+                    val conversion = nativeConverterRunner.convert(
+                        root = root,
+                        operation = operation,
+                        cancellation = cancellation,
+                        onProgress = onCurrentOperationProgress,
+                    )
+                    try {
+                        val target = createFile(root, operation.targetPath)
+                        context.contentResolver.openOutputStream(target.uri, "w").use { output ->
+                            requireNotNull(output) { "Unable to write ${operation.targetPath}" }
+                            conversion.output.inputStream().use { input -> input.copyTo(output) }
+                        }
+                        spaceSavedBytes += sourceSize(root, operation.sourcePath) - target.length()
                     } finally {
                         conversion.output.delete()
                     }

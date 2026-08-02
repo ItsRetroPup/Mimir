@@ -24,8 +24,42 @@ enum class VitaShortcutFormat(
 enum class ToolMode(val displayName: String) {
     MultiDiscOrganizer("Multi-disc Organizer"),
     RomZipper("RomZipper"),
-    ChdConverter("CHDMan"),
+    ChdConverter("Converter Tools"),
     VitaAppIds("Vita App IDs"),
+}
+
+enum class ConverterTool(
+    val displayName: String,
+    val description: String,
+    val sourceExtensions: Set<String>,
+    val outputExtension: String,
+    val folderAliases: Set<String>,
+    val executableName: String,
+) {
+    Chd(
+        displayName = "CHDMan",
+        description = "Disc images to space-saving CHD files",
+        sourceExtensions = emptySet(),
+        outputExtension = "chd",
+        folderAliases = emptySet(),
+        executableName = "libchdman.so",
+    ),
+    DolphinRvz(
+        displayName = "Dolphin RVZ",
+        description = "GameCube and Wii ISO images to RVZ",
+        sourceExtensions = setOf("iso"),
+        outputExtension = "rvz",
+        folderAliases = setOf("gamecube", "gc", "nintendo gamecube", "wii", "nintendo wii"),
+        executableName = "libdolphintool.so",
+    ),
+    AzaharZcci(
+        displayName = "Azahar ZCCI",
+        description = "Decrypted 3DS/CCI images to compressed ZCCI",
+        sourceExtensions = setOf("3ds", "cci"),
+        outputExtension = "zcci",
+        folderAliases = setOf("3ds", "nintendo 3ds"),
+        executableName = "libazahar.so",
+    ),
 }
 
 enum class ChdDiscType(
@@ -53,7 +87,7 @@ enum class ChdSystem(
     ),
     PlayStation2(
         displayName = "PS2",
-        supportedExtensions = setOf("cue","iso"),
+        supportedExtensions = setOf("iso"),
         folderAliases = setOf("playstation 2", "ps2"),
     ),
     SegaCd(
@@ -105,6 +139,11 @@ sealed interface FileOperation {
         val system: ChdSystem,
         val discType: ChdDiscType,
         val deleteOriginalFiles: Boolean,
+    ) : FileOperation
+    data class ConvertWithTool(
+        val sourcePath: String,
+        val targetPath: String,
+        val tool: ConverterTool,
     ) : FileOperation
 }
 
