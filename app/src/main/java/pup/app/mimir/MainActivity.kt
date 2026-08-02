@@ -83,6 +83,7 @@ import pup.app.mimir.domain.FileOperation
 import pup.app.mimir.domain.FrontendPreset
 import pup.app.mimir.domain.ChdDiscType
 import pup.app.mimir.domain.ChdSystem
+import pup.app.mimir.domain.ConverterTool
 import pup.app.mimir.domain.OperationPlan
 import pup.app.mimir.domain.ToolMode
 import pup.app.mimir.domain.VitaShortcutFormat
@@ -93,7 +94,7 @@ private enum class AppSection {
     Home,
     Zipper,
     Organizer,
-    Chd,
+    Converter,
     Vita,
 }
 
@@ -124,7 +125,6 @@ class MainActivity : ComponentActivity() {
                 )
                 viewModel.onVitaOutputSelected(uri)
             }
-
             MimirTheme(useDarkMode = uiState.useDarkMode) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     MimirScreen(
@@ -135,6 +135,7 @@ class MainActivity : ComponentActivity() {
                         onPresetSelected = viewModel::updatePreset,
                         onChdSystemSelected = viewModel::updateChdSystem,
                         onChdDiscTypeSelected = viewModel::updateChdDiscType,
+                        onConverterToolSelected = viewModel::updateConverterTool,
                         onDeleteOriginalChdFilesChanged = viewModel::updateDeleteOriginalChdFiles,
                         onScanHiddenFoldersChanged = viewModel::updateScanHiddenFolders,
                         onDarkModeToggled = viewModel::updateDarkMode,
@@ -263,6 +264,7 @@ private fun MimirScreen(
     onPresetSelected: (FrontendPreset) -> Unit,
     onChdSystemSelected: (ChdSystem) -> Unit,
     onChdDiscTypeSelected: (ChdDiscType) -> Unit,
+    onConverterToolSelected: (ConverterTool) -> Unit,
     onDeleteOriginalChdFilesChanged: (Boolean) -> Unit,
     onScanHiddenFoldersChanged: (Boolean) -> Unit,
     onDarkModeToggled: (Boolean) -> Unit,
@@ -380,7 +382,7 @@ private fun MimirScreen(
                                     currentSection = when (it) {
                                         ToolMode.RomZipper -> AppSection.Zipper
                                         ToolMode.MultiDiscOrganizer -> AppSection.Organizer
-                                        ToolMode.ChdConverter -> AppSection.Chd
+                                        ToolMode.ChdConverter -> AppSection.Converter
                                         ToolMode.VitaAppIds -> AppSection.Vita
                                     }
                                 },
@@ -430,12 +432,14 @@ private fun MimirScreen(
                             }
                         }
 
-                        if (currentSection == AppSection.Chd && uiState.selectedMode == ToolMode.ChdConverter) {
+                        if (currentSection == AppSection.Converter && uiState.selectedMode == ToolMode.ChdConverter) {
                             item {
-                                ChdConverterOptionsCard(
+                                ConverterToolsOptionsCard(
+                                    selectedTool = uiState.selectedConverterTool,
                                     system = uiState.selectedChdSystem,
                                     discType = uiState.selectedChdDiscType,
                                     enabled = !uiState.isBusy,
+                                    onToolSelected = onConverterToolSelected,
                                     onSystemSelected = onChdSystemSelected,
                                     onDiscTypeSelected = onChdDiscTypeSelected,
                                 )
@@ -772,7 +776,7 @@ private fun ChdQueueTable(
                     Column(modifier = Modifier.weight(1.4f)) {
                         Text(change.title, style = MaterialTheme.typography.bodyMedium)
                         if (change.targetAlreadyExists) {
-                            Text("Existing CHD — select individually to replace", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                            Text("Existing output — select individually to replace", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                         }
                     }
                     Text(formatBytes(change.sourceSizeBytes), modifier = Modifier.weight(0.65f), style = MaterialTheme.typography.bodySmall)
@@ -784,13 +788,13 @@ private fun ChdQueueTable(
     pendingOverwrite?.let { change ->
         AlertDialog(
             onDismissRequest = { pendingOverwrite = null },
-            title = { Text("Replace existing CHD?") },
+            title = { Text("Replace existing output?") },
             text = { Text("${change.targetFiles.singleOrNull() ?: change.detailPath} already exists and will be overwritten if selected.") },
             confirmButton = {
                 Button(onClick = {
                     pendingOverwrite = null
                     onChangeSelection(change.detailPath, true)
-                }) { Text("REPLACE CHD") }
+                }) { Text("REPLACE OUTPUT") }
             },
             dismissButton = {
                 OutlinedButton(onClick = { pendingOverwrite = null }) { Text("CANCEL") }
@@ -807,7 +811,7 @@ private fun HeroSection(
         AppSection.Home -> "Welcome, Brother"
         AppSection.Organizer -> "Organizer"
         AppSection.Zipper -> "Zipper"
-        AppSection.Chd -> "CHD Converter"
+        AppSection.Converter -> "Converter Tools"
         AppSection.Vita -> "Vita Shortcuts"
     }
     val body = when (currentSection) {
@@ -817,8 +821,8 @@ private fun HeroSection(
             "Organises your multi-disc ROMs into the appropriate format for your chosen frontend"
         AppSection.Zipper ->
             "Compresses compatible ROM files to .zip to save some space"
-        AppSection.Chd ->
-            "Converts supported disc images to space-saving CHD files while keeping the original image"
+        AppSection.Converter ->
+            "Convert compatible ROM formats while keeping the original files"
         AppSection.Vita ->
             "Search the built-in Vita shortcut database, queue titles, and generate scraper-friendly .psvita files on-device"
     }
@@ -1104,9 +1108,9 @@ private fun ToolModeCards(
                 onClick = { onModeSelected(mode) },
             )
             ToolMode.ChdConverter -> ToolCard(
-                title = "CHD Converter",
-                body = "Convert Dreamcast, PlayStation, Sega CD, Saturn, PS2, and PSP disc images to .chd to save space",
-                cta = "CONVERT TO CHD",
+                title = "Converter Tools",
+                body = "Create CHD, RVZ, and ZCCI files with dedicated on-device converters.",
+                cta = "OPEN CONVERTERS",
                 selected = selectedMode == mode,
                 icon = Icons.Outlined.Archive,
                 modifier = modifier,
@@ -1253,46 +1257,62 @@ private fun OrganizerPresetCard(
 }
 
 @Composable
-private fun ChdConverterOptionsCard(
+private fun ConverterToolsOptionsCard(
+    selectedTool: ConverterTool,
     system: ChdSystem,
     discType: ChdDiscType,
     enabled: Boolean,
+    onToolSelected: (ConverterTool) -> Unit,
     onSystemSelected: (ChdSystem) -> Unit,
     onDiscTypeSelected: (ChdDiscType) -> Unit,
 ) {
     StyledCard {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Label("CHDMAN SETTINGS")
-            Text(
-                "System",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-            )
+            Label("CONVERTER")
             ChoiceRow(
-                options = ChdSystem.entries,
-                selected = system,
+                options = ConverterTool.entries,
+                selected = selectedTool,
                 enabled = enabled,
                 label = { it.displayName },
-                onSelect = onSystemSelected,
+                onSelect = onToolSelected,
             )
-            if (system == ChdSystem.PlayStation2) {
+            InfoPanel(
+                title = selectedTool.displayName,
+                body = selectedTool.description,
+                accent = MaterialTheme.colorScheme.secondary,
+            )
+            if (selectedTool == ConverterTool.Chd) {
                 Text(
-                    "Conversion type",
+                    "System",
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                 )
                 ChoiceRow(
-                    options = ChdDiscType.entries,
-                    selected = discType,
+                    options = ChdSystem.entries,
+                    selected = system,
                     enabled = enabled,
                     label = { it.displayName },
-                    onSelect = onDiscTypeSelected,
+                    onSelect = onSystemSelected,
                 )
-                InfoPanel(
-                    title = "Compatibility guidance",
-                    body = "Use CD when using NetherSX2; use DVD when using ARMSX2.",
-                    accent = MaterialTheme.colorScheme.secondary,
-                )
+                if (system == ChdSystem.PlayStation2) {
+                    Text(
+                        "Conversion type",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    ChoiceRow(
+                        options = ChdDiscType.entries,
+                        selected = discType,
+                        enabled = enabled,
+                        label = { it.displayName },
+                        onSelect = onDiscTypeSelected,
+                    )
+                    InfoPanel(
+                        title = "Compatibility guidance",
+                        body = "Use CD when using NetherSX2; use DVD when using ARMSX2.",
+                        accent = MaterialTheme.colorScheme.secondary,
+                    )
+                }
             }
         }
     }
@@ -1564,13 +1584,13 @@ private fun ChangeCard(
     if (showOverwriteWarning) {
         AlertDialog(
             onDismissRequest = { showOverwriteWarning = false },
-            title = { Text("Replace existing CHD?") },
+            title = { Text("Replace existing output?") },
             text = { Text("${change.targetFiles.singleOrNull() ?: change.detailPath} already exists and will be overwritten if you convert this image.") },
             confirmButton = {
                 Button(onClick = {
                     showOverwriteWarning = false
                     onSelectedChange(true)
-                }) { Text("REPLACE CHD") }
+                }) { Text("REPLACE OUTPUT") }
             },
             dismissButton = {
                 OutlinedButton(onClick = { showOverwriteWarning = false }) { Text("CANCEL") }
@@ -1674,6 +1694,7 @@ private fun FileOperation.describe(): String = when (this) {
     is FileOperation.WriteTextFile -> "Write playlist $relativePath"
     is FileOperation.ZipFile -> "Zip $sourcePath -> $targetPath"
     is FileOperation.ConvertToChd -> "Create ${discType.displayName} CHD $sourcePath -> $targetPath"
+    is FileOperation.ConvertWithTool -> "Convert with ${tool.displayName} $sourcePath -> $targetPath"
 }
 
 private const val YOUTUBE_CHANNEL_URL = "https://youtube.com/@ItsRetroPup"
