@@ -60,6 +60,14 @@ enum class ConverterTool(
         folderAliases = setOf("3ds", "nintendo 3ds"),
         executableName = "libazahar.so",
     ),
+    NszNsp(
+        displayName = "NSZ to NSP",
+        description = "Decompress Nintendo Switch NSZ packages to NSP",
+        sourceExtensions = setOf("nsz"),
+        outputExtension = "nsp",
+        folderAliases = setOf("switch", "nintendo switch"),
+        executableName = "",
+    ),
 }
 
 enum class ChdDiscType(

@@ -31,6 +31,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.Coffee
+import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Delete
@@ -56,6 +57,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -71,12 +73,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import pup.app.mimir.domain.FileOperation
@@ -94,7 +96,10 @@ private enum class AppSection {
     Home,
     Zipper,
     Organizer,
-    Converter,
+    ChdMan,
+    Rvz,
+    Zcci,
+    Nsz,
     Vita,
 }
 
@@ -125,12 +130,19 @@ class MainActivity : ComponentActivity() {
                 )
                 viewModel.onVitaOutputSelected(uri)
             }
+            val nszKeysLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.OpenDocument(),
+            ) { uri ->
+                uri ?: return@rememberLauncherForActivityResult
+                viewModel.onNszKeysSelected(uri)
+            }
             MimirTheme(useDarkMode = uiState.useDarkMode) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     MimirScreen(
                         uiState = uiState,
                         onSelectFolder = { folderLauncher.launch(null) },
                         onSelectVitaOutput = { vitaOutputLauncher.launch(null) },
+                        onSelectNszKeys = { nszKeysLauncher.launch(arrayOf("*/*")) },
                         onModeSelected = viewModel::updateMode,
                         onPresetSelected = viewModel::updatePreset,
                         onChdSystemSelected = viewModel::updateChdSystem,
@@ -163,30 +175,30 @@ private fun MimirTheme(
     content: @Composable () -> Unit,
 ) {
     val lightScheme = lightColorScheme(
-        primary = Color(0xFF007B83),
+        primary = Color(0xFF7B1FA2),
         onPrimary = Color.White,
-        secondary = Color(0xFF00C8DE),
-        onSecondary = Color(0xFF002D33),
-        tertiary = Color(0xFF59646A),
-        background = Color(0xFFF0F4F8),
-        onBackground = Color(0xFF111316),
+        secondary = Color(0xFF6A1B9A),
+        onSecondary = Color.White,
+        tertiary = Color(0xFF5F5663),
+        background = Color(0xFFFAF7FC),
+        onBackground = Color(0xFF1A111F),
         surface = Color(0xFFFFFFFF),
-        onSurface = Color(0xFF161A1D),
-        surfaceVariant = Color(0xFFE3E9EE),
-        outline = Color(0xFF97A3AA),
+        onSurface = Color(0xFF1A111F),
+        surfaceVariant = Color(0xFFEEE5F2),
+        outline = Color(0xFF76677A),
     )
     val darkScheme = darkColorScheme(
-        primary = Color(0xFF7AD5DD),
-        onPrimary = Color(0xFF00363A),
-        secondary = Color(0xFF00E5FF),
-        onSecondary = Color(0xFF00363D),
-        tertiary = Color(0xFFC3C7CB),
-        background = Color(0xFF111316),
-        onBackground = Color(0xFFE2E2E6),
-        surface = Color(0xFF1A1C1F),
-        onSurface = Color(0xFFE2E2E6),
-        surfaceVariant = Color(0xFF282A2D),
-        outline = Color(0xFF3E494A),
+        primary = Color(0xFFE0B0FF),
+        onPrimary = Color(0xFF2A003F),
+        secondary = Color(0xFFF5B7FF),
+        onSecondary = Color(0xFF24102F),
+        tertiary = Color(0xFFD0C4D8),
+        background = Color(0xFF100B14),
+        onBackground = Color(0xFFF5EDF8),
+        surface = Color(0xFF19121F),
+        onSurface = Color(0xFFF5EDF8),
+        surfaceVariant = Color(0xFF30243A),
+        outline = Color(0xFFA99AAF),
     )
 
     val typography = MaterialTheme.typography.copy(
@@ -260,6 +272,7 @@ private fun MimirScreen(
     uiState: pup.app.mimir.ui.MimirUiState,
     onSelectFolder: () -> Unit,
     onSelectVitaOutput: () -> Unit,
+    onSelectNszKeys: () -> Unit,
     onModeSelected: (ToolMode) -> Unit,
     onPresetSelected: (FrontendPreset) -> Unit,
     onChdSystemSelected: (ChdSystem) -> Unit,
@@ -283,9 +296,9 @@ private fun MimirScreen(
     val context = LocalContext.current
     val backgroundBrush = remember(uiState.useDarkMode) {
         if (uiState.useDarkMode) {
-            Brush.verticalGradient(listOf(Color(0xFF111316), Color(0xFF15181C), Color(0xFF0F1114)))
+            Brush.verticalGradient(listOf(Color(0xFF100B14), Color(0xFF17101E), Color(0xFF0D0911)))
         } else {
-            Brush.verticalGradient(listOf(Color(0xFFF0F4F8), Color(0xFFE7EEF3), Color(0xFFF7FAFC)))
+            Brush.verticalGradient(listOf(Color(0xFFFAF7FC), Color(0xFFF1EAF5), Color(0xFFFDFBFE)))
         }
     }
     var currentSection by rememberSaveable { mutableStateOf(AppSection.Home) }
@@ -295,7 +308,6 @@ private fun MimirScreen(
     val openUrl: (String) -> Unit = { url ->
         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     }
-
     Scaffold(
         containerColor = Color.Transparent,
         topBar = {
@@ -354,7 +366,6 @@ private fun MimirScreen(
                 .fillMaxSize()
                 .background(backgroundBrush)
         ) {
-            val useTwoColumns = maxWidth >= 700.dp
             val progressLabel = uiState.operationProgressLabel ?: uiState.scanProgressLabel
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -362,29 +373,22 @@ private fun MimirScreen(
                     start = 16.dp,
                     top = innerPadding.calculateTopPadding() + 16.dp,
                     end = 16.dp,
-                    bottom = innerPadding.calculateBottomPadding() + 16.dp,
+                    bottom = innerPadding.calculateBottomPadding() + 96.dp,
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                item {
-                        HeroSection(
-                            currentSection = currentSection,
-                        )
-                }
-
                     if (currentSection == AppSection.Home) {
+                        item {
+                            HomeIntroSection()
+                        }
                         item {
                             ToolModeCards(
                                 selectedMode = uiState.selectedMode,
-                                useTwoColumns = useTwoColumns,
-                                onModeSelected = {
-                                    onModeSelected(it)
-                                    currentSection = when (it) {
-                                        ToolMode.RomZipper -> AppSection.Zipper
-                                        ToolMode.MultiDiscOrganizer -> AppSection.Organizer
-                                        ToolMode.ChdConverter -> AppSection.Converter
-                                        ToolMode.VitaAppIds -> AppSection.Vita
-                                    }
+                                selectedConverterTool = uiState.selectedConverterTool,
+                                onPageSelected = { section, mode, converter ->
+                                    onModeSelected(mode)
+                                    converter?.let(onConverterToolSelected)
+                                    currentSection = section
                                 },
                             )
                         }
@@ -395,7 +399,16 @@ private fun MimirScreen(
                                 onOpenBuyMeACoffee = { openUrl(BUY_ME_A_COFFEE_URL) },
                             )
                         }
+                        item {
+                            HomeFooter()
+                        }
                     } else {
+                        item {
+                            ToolPageHeader(
+                                section = currentSection,
+                                converterTool = uiState.selectedConverterTool,
+                            )
+                        }
                         item {
                             if (uiState.selectedMode == ToolMode.VitaAppIds) {
                                 VitaControlCard(
@@ -432,16 +445,25 @@ private fun MimirScreen(
                             }
                         }
 
-                        if (currentSection == AppSection.Converter && uiState.selectedMode == ToolMode.ChdConverter) {
+                        if (currentSection == AppSection.ChdMan && uiState.selectedMode == ToolMode.ChdConverter) {
                             item {
                                 ConverterToolsOptionsCard(
                                     selectedTool = uiState.selectedConverterTool,
                                     system = uiState.selectedChdSystem,
                                     discType = uiState.selectedChdDiscType,
                                     enabled = !uiState.isBusy,
-                                    onToolSelected = onConverterToolSelected,
                                     onSystemSelected = onChdSystemSelected,
                                     onDiscTypeSelected = onChdDiscTypeSelected,
+                                )
+                            }
+                        }
+
+                        if (currentSection == AppSection.Nsz && uiState.selectedMode == ToolMode.ChdConverter) {
+                            item {
+                                NszKeysCard(
+                                    configured = uiState.nszKeysConfigured,
+                                    enabled = !uiState.isBusy,
+                                    onSelect = onSelectNszKeys,
                                 )
                             }
                         }
@@ -485,77 +507,15 @@ private fun MimirScreen(
                             }
 
                             if (uiState.selectedMode != ToolMode.ChdConverter) {
-                                if (useTwoColumns) {
-                                    items(plan.changes.chunked(2)) { row ->
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                        ) {
-                                            row.forEach { change ->
-                                                ChangeCard(
-                                                    plan = plan,
-                                                    change = change,
-                                                    selected = change.detailPath in uiState.selectedChangePaths,
-                                                    enabled = !uiState.isBusy,
-                                                    modifier = Modifier.weight(1f),
-                                                    onSelectedChange = { selected ->
-                                                        onChangeSelection(change.detailPath, selected)
-                                                    },
-                                                )
-                                            }
-                                            if (row.size == 1) Spacer(Modifier.weight(1f))
-                                        }
-                                    }
-                                } else {
-                                    items(plan.changes) { change ->
-                                        ChangeCard(
-                                            plan = plan,
-                                            change = change,
-                                            selected = change.detailPath in uiState.selectedChangePaths,
-                                            enabled = !uiState.isBusy,
-                                            onSelectedChange = { selected ->
-                                                onChangeSelection(change.detailPath, selected)
-                                            },
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        if (uiState.selectedMode != ToolMode.VitaAppIds &&
-                            !(uiState.selectedMode == ToolMode.ChdConverter && uiState.isBusy)
-                        ) {
-                            item {
-                                if (uiState.selectedMode == ToolMode.ChdConverter) {
-                                    val hasSelection = uiState.selectedChangePaths.isNotEmpty()
-                                    Button(
-                                        onClick = if (hasSelection) {
-                                            {
-                                                pendingDeleteOriginalChdFiles = uiState.deleteOriginalChdFiles
-                                                showApplyConfirmation = true
-                                            }
-                                        } else {
-                                            onStart
+                                items(plan.changes) { change ->
+                                    ChangeCard(
+                                        plan = plan,
+                                        change = change,
+                                        selected = change.detailPath in uiState.selectedChangePaths,
+                                        enabled = !uiState.isBusy,
+                                        onSelectedChange = { selected ->
+                                            onChangeSelection(change.detailPath, selected)
                                         },
-                                        enabled = if (hasSelection) !uiState.isBusy else uiState.selectedFolderUri != null && !uiState.isBusy,
-                                        modifier = Modifier.fillMaxWidth(),
-                                    ) {
-                                        Text(if (hasSelection) "CONVERT SELECTED" else "SCAN")
-                                    }
-                                } else {
-                                    ActionCard(
-                                        onScan = onStart,
-                                        onConvertSelected = {
-                                            pendingDeleteOriginalChdFiles = uiState.deleteOriginalChdFiles
-                                            showApplyConfirmation = true
-                                        },
-                                        showConvertSelected = false,
-                                        canScan = uiState.selectedFolderUri != null && !uiState.isBusy,
-                                        canConvertSelected = false,
-                                        showStopControls = false,
-                                        canStopAfterCurrent = false,
-                                        onStopNow = onStopNow,
-                                        onStopAfterCurrent = onStopAfterCurrent,
                                     )
                                 }
                             }
@@ -566,6 +526,41 @@ private fun MimirScreen(
                         }
 
                     }
+            }
+            if (currentSection != AppSection.Home && uiState.selectedMode != ToolMode.VitaAppIds && !uiState.isBusy) {
+                val hasSelection = uiState.selectedChangePaths.isNotEmpty()
+                Surface(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.98f),
+                    tonalElevation = 6.dp,
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    Button(
+                        onClick = if (uiState.selectedMode == ToolMode.ChdConverter && hasSelection) {
+                            {
+                                pendingDeleteOriginalChdFiles = uiState.deleteOriginalChdFiles
+                                showApplyConfirmation = true
+                            }
+                        } else if (hasSelection) {
+                            { showApplyConfirmation = true }
+                        } else {
+                            onStart
+                        },
+                        enabled = if (hasSelection) true else uiState.selectedFolderUri != null,
+                        modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                    ) {
+                        Text(
+                            when {
+                                uiState.selectedMode == ToolMode.ChdConverter && hasSelection -> "CONVERT ${uiState.selectedChangePaths.size} SELECTED"
+                                hasSelection -> "APPLY ${uiState.selectedChangePaths.size} SELECTED"
+                                else -> "SCAN SELECTED FOLDER"
+                            }
+                        )
+                    }
+                }
             }
             val progressModifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -606,27 +601,30 @@ private fun MimirScreen(
                 if (uiState.selectedMode == ToolMode.ChdConverter) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Text(
-                            "This will convert $changeCount selected images to CHD. " +
-                                if (existingChdCount > 0) "$existingChdCount selected output${if (existingChdCount == 1) "" else "s"} already exists and will be overwritten. " else "" +
+                            "This will convert $changeCount selected file${if (changeCount == 1) "" else "s"} " +
+                                "to .${uiState.selectedConverterTool.outputExtension}. " +
+                                (if (existingChdCount > 0) "$existingChdCount selected output${if (existingChdCount == 1) "" else "s"} already exists and will be overwritten. " else "") +
                                 "Mimir cannot undo this action."
                         )
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text("Delete original files", style = MaterialTheme.typography.bodyLarge)
-                                Text(
-                                    "Also removes same-folder tracks referenced by a .cue or .gdi file after conversion succeeds.",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
+                        if (uiState.selectedConverterTool == ConverterTool.Chd) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text("Delete original files", style = MaterialTheme.typography.bodyLarge)
+                                    Text(
+                                        "Also removes same-folder tracks referenced by a .cue or .gdi file after conversion succeeds.",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
+                                    )
+                                }
+                                Switch(
+                                    checked = pendingDeleteOriginalChdFiles,
+                                    onCheckedChange = { pendingDeleteOriginalChdFiles = it },
                                 )
                             }
-                            Switch(
-                                checked = pendingDeleteOriginalChdFiles,
-                                onCheckedChange = { pendingDeleteOriginalChdFiles = it },
-                            )
                         }
                     }
                 } else {
@@ -639,7 +637,7 @@ private fun MimirScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        if (uiState.selectedMode == ToolMode.ChdConverter) {
+                        if (uiState.selectedMode == ToolMode.ChdConverter && uiState.selectedConverterTool == ConverterTool.Chd) {
                             onDeleteOriginalChdFilesChanged(pendingDeleteOriginalChdFiles)
                         }
                         showApplyConfirmation = false
@@ -811,7 +809,10 @@ private fun HeroSection(
         AppSection.Home -> "Welcome, Brother"
         AppSection.Organizer -> "Organizer"
         AppSection.Zipper -> "Zipper"
-        AppSection.Converter -> "Converter Tools"
+        AppSection.ChdMan -> "CHDMan"
+        AppSection.Rvz -> "Dolphin RVZ"
+        AppSection.Zcci -> "Azahar ZCCI"
+        AppSection.Nsz -> "NSZ to NSP"
         AppSection.Vita -> "Vita Shortcuts"
     }
     val body = when (currentSection) {
@@ -821,7 +822,7 @@ private fun HeroSection(
             "Organises your multi-disc ROMs into the appropriate format for your chosen frontend"
         AppSection.Zipper ->
             "Compresses compatible ROM files to .zip to save some space"
-        AppSection.Converter ->
+        AppSection.ChdMan, AppSection.Rvz, AppSection.Zcci, AppSection.Nsz ->
             "Convert compatible ROM formats while keeping the original files"
         AppSection.Vita ->
             "Search the built-in Vita shortcut database, queue titles, and generate scraper-friendly .psvita files on-device"
@@ -854,27 +855,15 @@ private fun SupportSection(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.82f),
             )
-            SupportLinkButton(
-                label = "YouTube",
-                icon = Icons.Outlined.Subscriptions,
-                containerColor = Color(0xFFFF0000),
-                contentColor = Color.White,
-                onClick = onOpenYoutube,
-            )
-            SupportLinkButton(
-                label = "Ko-fi",
-                icon = Icons.Outlined.Favorite,
-                containerColor = Color(0xFF29ABE0),
-                contentColor = Color.White,
-                onClick = onOpenKofi,
-            )
-            SupportLinkButton(
-                label = "Buy Me a Coffee",
-                icon = Icons.Outlined.Coffee,
-                containerColor = Color(0xFFFFDD00),
-                contentColor = Color(0xFF1F1F1F),
-                onClick = onOpenBuyMeACoffee,
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SupportLinkButton("YouTube", Icons.Outlined.Subscriptions, onOpenYoutube)
+                SupportLinkButton("Ko-fi", Icons.Outlined.Favorite, onOpenKofi)
+                SupportLinkButton("Buy Me a Coffee", Icons.Outlined.Coffee, onOpenBuyMeACoffee)
+            }
         }
     }
 }
@@ -883,21 +872,15 @@ private fun SupportSection(
 private fun SupportLinkButton(
     label: String,
     icon: ImageVector,
-    containerColor: Color,
-    contentColor: Color,
     onClick: () -> Unit,
 ) {
-    Button(
+    TextButton(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-            containerColor = containerColor,
-            contentColor = contentColor,
-        ),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
     ) {
-        Icon(imageVector = icon, contentDescription = null)
-        Spacer(Modifier.size(8.dp))
-        Text(label)
+        Icon(imageVector = icon, contentDescription = label)
+        Spacer(Modifier.size(6.dp))
+        Text(label, maxLines = 1)
     }
 }
 
@@ -911,14 +894,13 @@ private fun ControlCard(
             Label("SYSTEM CONTROL")
             Text("Selected ROM folder", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             Text(folderName, style = MaterialTheme.typography.bodyLarge)
-            Row(
+            Button(
+                onClick = onSelectFolder,
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
             ) {
-                OutlinedButton(onClick = onSelectFolder) {
-                    Text("SELECT FOLDER")
-                }
+                Icon(Icons.Outlined.Folder, contentDescription = null)
+                Spacer(Modifier.size(8.dp))
+                Text("SELECT ROM FOLDER")
             }
         }
     }
@@ -949,8 +931,13 @@ private fun VitaControlCard(
                 color = MaterialTheme.colorScheme.secondary,
             )
             Text(outputFolderName, style = MaterialTheme.typography.bodyLarge)
-            OutlinedButton(onClick = onSelectVitaOutput) {
-                Text("SELECT OUTPUT")
+            Button(
+                onClick = onSelectVitaOutput,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(Icons.Outlined.Folder, contentDescription = null)
+                Spacer(Modifier.size(8.dp))
+                Text("SELECT OUTPUT FOLDER")
             }
             Text(
                 "Shortcut file type",
@@ -1082,135 +1069,181 @@ private fun ActionCard(
 }
 
 @Composable
+private fun HomeIntroSection() {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            "Mimir",
+            style = MaterialTheme.typography.displaySmall,
+            color = MaterialTheme.colorScheme.onBackground,
+        )
+        Text(
+            "A toolkit designed to help you organise your ROMs and save space on your device.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.82f),
+        )
+    }
+}
+
+@Composable
+private fun ToolPageHeader(
+    section: AppSection,
+    converterTool: ConverterTool,
+) {
+    val title = when (section) {
+        AppSection.Organizer -> "Multi-disc Organizer"
+        AppSection.Zipper -> "RomZipper"
+        AppSection.ChdMan -> "CHDMan"
+        AppSection.Rvz -> "Dolphin RVZ"
+        AppSection.Zcci -> "Azahar ZCCI"
+        AppSection.Nsz -> "NSZ to NSP"
+        AppSection.Vita -> "Vita Shortcuts"
+        AppSection.Home -> "Mimir"
+    }
+    val description = when (section) {
+        AppSection.Organizer -> "Organise multi-disc games into frontend-ready folders and playlists."
+        AppSection.Zipper -> "Compress supported ROM files into .zip archives to save space."
+        AppSection.ChdMan -> converterTool.description
+        AppSection.Rvz -> converterTool.description
+        AppSection.Zcci -> converterTool.description
+        AppSection.Nsz -> converterTool.description
+        AppSection.Vita -> "Create .psvita or .dpt shortcut files from the built-in Vita database."
+        AppSection.Home -> ""
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(title, style = MaterialTheme.typography.headlineMedium)
+        Text(
+            description,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.78f),
+        )
+    }
+}
+
+@Composable
+private fun HomeFooter() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            "Built by RetroPup",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.64f),
+        )
+    }
+}
+
+@Composable
 private fun ToolModeCards(
     selectedMode: ToolMode,
-    useTwoColumns: Boolean,
-    onModeSelected: (ToolMode) -> Unit,
+    selectedConverterTool: ConverterTool,
+    onPageSelected: (AppSection, ToolMode, ConverterTool?) -> Unit,
 ) {
-    val cards: @Composable (Modifier, ToolMode) -> Unit = { modifier, mode ->
-        when (mode) {
-            ToolMode.RomZipper -> ToolCard(
-                title = "Zipper",
-                body = "Compress zip-safe handheld ROMs after reviewing and confirming the planned changes.",
-                cta = "LAUNCH UTILITY",
-                selected = selectedMode == mode,
-                icon = Icons.Outlined.FolderZip,
-                modifier = modifier,
-                onClick = { onModeSelected(mode) },
-            )
-            ToolMode.MultiDiscOrganizer -> ToolCard(
-                title = "Organizer",
-                body = "Clean up multi-disc libraries and emit frontend-safe folder and playlist structures.",
-                cta = "BROWSE FILES",
-                selected = selectedMode == mode,
-                icon = Icons.Outlined.Archive,
-                modifier = modifier,
-                onClick = { onModeSelected(mode) },
-            )
-            ToolMode.ChdConverter -> ToolCard(
-                title = "Converter Tools",
-                body = "Create CHD, RVZ, and ZCCI files with dedicated on-device converters.",
-                cta = "OPEN CONVERTERS",
-                selected = selectedMode == mode,
-                icon = Icons.Outlined.Archive,
-                modifier = modifier,
-                onClick = { onModeSelected(mode) },
-            )
-            ToolMode.VitaAppIds -> ToolCard(
-                title = "Vita Shortcuts",
-                body = "Search a built-in PSVita shortcut database and prepare title-based .psvita files in your chosen output directory.",
-                cta = "BUILD SHORTCUTS",
-                selected = selectedMode == mode,
-                icon = Icons.Outlined.Home,
-                modifier = modifier,
-                onClick = { onModeSelected(mode) },
+    data class ToolEntry(
+        val title: String,
+        val description: String,
+        val mode: ToolMode,
+        val section: AppSection,
+        val converter: ConverterTool? = null,
+        val icon: ImageVector,
+    )
+    val utilities = listOf(
+        ToolEntry("Multi-disc Organizer", "Group discs and create frontend-ready folders and playlists.", ToolMode.MultiDiscOrganizer, AppSection.Organizer, icon = Icons.Outlined.Archive),
+        ToolEntry("Vita Shortcuts", "Create .psvita or .dpt shortcut files from the built-in Vita database.", ToolMode.VitaAppIds, AppSection.Vita, icon = Icons.Outlined.Home),
+        ToolEntry("NSZ to NSP", "Decompress Nintendo Switch NSZ packages into NSP files.", ToolMode.ChdConverter, AppSection.Nsz, ConverterTool.NszNsp, Icons.Outlined.Archive),
+    )
+    val spaceSavers = listOf(
+        ToolEntry("RomZipper", "Compress supported cartridge and ROM files into .zip archives.", ToolMode.RomZipper, AppSection.Zipper, icon = Icons.Outlined.FolderZip),
+        ToolEntry("CHDMan", "Convert PSX, PS2, PSP, Saturn, Dreamcast, and Sega CD images to .chd.", ToolMode.ChdConverter, AppSection.ChdMan, ConverterTool.Chd, Icons.Outlined.Archive),
+        ToolEntry("Dolphin RVZ", "Compress GameCube and Wii ISO images into .rvz files.", ToolMode.ChdConverter, AppSection.Rvz, ConverterTool.DolphinRvz, Icons.Outlined.Archive),
+        ToolEntry("Azahar ZCCI", "Compress decrypted Nintendo 3DS and CCI images into .zcci files.", ToolMode.ChdConverter, AppSection.Zcci, ConverterTool.AzaharZcci, Icons.Outlined.Archive),
+    )
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text("Choose a tool", style = MaterialTheme.typography.headlineMedium)
+        Text("Utilities", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+        utilities.forEach { tool ->
+            ToolListItem(
+                title = tool.title,
+                description = tool.description,
+                icon = tool.icon,
+                selected = selectedMode == tool.mode && (tool.converter == null || selectedConverterTool == tool.converter),
+                onClick = { onPageSelected(tool.section, tool.mode, tool.converter) },
             )
         }
-    }
-    if (useTwoColumns) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                cards(Modifier.weight(1f), ToolMode.RomZipper)
-                cards(Modifier.weight(1f), ToolMode.MultiDiscOrganizer)
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                cards(Modifier.weight(1f), ToolMode.ChdConverter)
-                cards(Modifier.weight(1f), ToolMode.VitaAppIds)
-            }
-        }
-    } else {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            cards(Modifier.fillMaxWidth(), ToolMode.RomZipper)
-            cards(Modifier.fillMaxWidth(), ToolMode.MultiDiscOrganizer)
-            cards(Modifier.fillMaxWidth(), ToolMode.ChdConverter)
-            cards(Modifier.fillMaxWidth(), ToolMode.VitaAppIds)
+        Text("Space Savers", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+        spaceSavers.forEach { tool ->
+            ToolListItem(
+                title = tool.title,
+                description = tool.description,
+                icon = tool.icon,
+                selected = selectedMode == tool.mode && (tool.converter == null || selectedConverterTool == tool.converter),
+                onClick = { onPageSelected(tool.section, tool.mode, tool.converter) },
+            )
         }
     }
 }
 
 @Composable
-private fun ToolCard(
+private fun ToolListItem(
     title: String,
-    body: String,
-    cta: String,
-    selected: Boolean,
+    description: String,
     icon: ImageVector,
-    modifier: Modifier = Modifier,
+    selected: Boolean,
     onClick: () -> Unit,
 ) {
     Card(
-        modifier = modifier,
+        modifier = Modifier.fillMaxWidth(),
         onClick = onClick,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.86f)
+            containerColor = if (selected) {
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+            } else {
+                MaterialTheme.colorScheme.surface.copy(alpha = 0.88f)
+            },
         ),
         border = BorderStroke(
-            width = 1.dp,
-            brush = Brush.linearGradient(
-                if (selected) {
-                    listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
-                } else {
-                    listOf(
-                        MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                        MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                    )
-                }
-            )
+            1.dp,
+            MaterialTheme.colorScheme.outline.copy(alpha = if (selected) 0.9f else 0.5f),
         ),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(12.dp),
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Box(
                 modifier = Modifier
                     .size(44.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(10.dp))
                     .background(
-                        if (selected) MaterialTheme.colorScheme.secondary
-                        else MaterialTheme.colorScheme.surfaceVariant
+                        if (selected) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.surfaceVariant,
                     ),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = if (selected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.primary,
+                    tint = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                 )
             }
-            Text(title, style = MaterialTheme.typography.headlineMedium)
-            Text(
-                body,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-            )
-            Text(
-                text = "$cta ->",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                Text(title, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.78f),
+                )
+            }
+            Icon(
+                imageVector = Icons.Outlined.ChevronRight,
+                contentDescription = "Open $title",
+                tint = MaterialTheme.colorScheme.primary,
             )
         }
     }
@@ -1257,30 +1290,41 @@ private fun OrganizerPresetCard(
 }
 
 @Composable
+private fun NszKeysCard(
+    configured: Boolean,
+    enabled: Boolean,
+    onSelect: () -> Unit,
+) {
+    StyledCard {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("NSZ keys", style = MaterialTheme.typography.titleMedium)
+            Text(
+                if (configured) {
+                    "prod.keys is imported and will be kept in Mimir's private storage."
+                } else {
+                    "Import your legally obtained prod.keys file before scanning or converting NSZ packages."
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.78f),
+            )
+            Button(onClick = onSelect, enabled = enabled, modifier = Modifier.fillMaxWidth()) {
+                Text(if (configured) "REPLACE PROD.KEYS" else "IMPORT PROD.KEYS")
+            }
+        }
+    }
+}
+
+@Composable
 private fun ConverterToolsOptionsCard(
     selectedTool: ConverterTool,
     system: ChdSystem,
     discType: ChdDiscType,
     enabled: Boolean,
-    onToolSelected: (ConverterTool) -> Unit,
     onSystemSelected: (ChdSystem) -> Unit,
     onDiscTypeSelected: (ChdDiscType) -> Unit,
 ) {
     StyledCard {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Label("CONVERTER")
-            ChoiceRow(
-                options = ConverterTool.entries,
-                selected = selectedTool,
-                enabled = enabled,
-                label = { it.displayName },
-                onSelect = onToolSelected,
-            )
-            InfoPanel(
-                title = selectedTool.displayName,
-                body = selectedTool.description,
-                accent = MaterialTheme.colorScheme.secondary,
-            )
             if (selectedTool == ConverterTool.Chd) {
                 Text(
                     "System",
@@ -1320,10 +1364,15 @@ private fun ConverterToolsOptionsCard(
 
 @Composable
 private fun ChdConversionReportCard(report: pup.app.mimir.ui.ChdConversionReport) {
+    val sizeSummary = when {
+        report.spaceSavedBytes > 0L -> "Net space saved: ${formatBytes(report.spaceSavedBytes)}."
+        report.spaceSavedBytes < 0L -> "Net size increase: ${formatBytes(-report.spaceSavedBytes)}."
+        else -> "No net size change."
+    }
     InfoPanel(
         title = "Conversion report",
         body = "Completed ${report.completed} of ${report.total} conversions. " +
-            "Net compression saving: ${formatBytes(report.spaceSavedBytes)}." +
+            sizeSummary +
             if (report.stopped) " Stopped by user." else "",
         accent = MaterialTheme.colorScheme.secondary,
     )
@@ -1601,16 +1650,12 @@ private fun ChangeCard(
 
 @Composable
 private fun StyledCard(content: @Composable () -> Unit) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.88f)
-        ),
-        shape = RoundedCornerShape(16.dp),
-        border = CardDefaults.outlinedCardBorder(),
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
     ) {
-        Box(modifier = Modifier.padding(16.dp)) {
-            content()
-        }
+        content()
     }
 }
 

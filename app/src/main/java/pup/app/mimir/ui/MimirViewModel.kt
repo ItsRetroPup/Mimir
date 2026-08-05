@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
 
 data class MimirUiState(
     val selectedFolderUri: Uri? = null,
@@ -45,6 +46,7 @@ data class MimirUiState(
     val selectedChdSystem: ChdSystem = ChdSystem.Dreamcast,
     val selectedChdDiscType: ChdDiscType = ChdDiscType.Cd,
     val selectedConverterTool: ConverterTool = ConverterTool.Chd,
+    val nszKeysConfigured: Boolean = false,
     val deleteOriginalChdFiles: Boolean = false,
     val scanHiddenFolders: Boolean = false,
     val useDarkMode: Boolean = true,
@@ -76,6 +78,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
     private val prefs = application.getSharedPreferences("mimir_prefs", 0)
     private var vitaCatalog: List<pup.app.mimir.domain.VitaApp> = emptyList()
     private var activeCancellation: OperationCancellation? = null
+    private val nszKeysFile = File(application.filesDir, NSZ_KEYS_RELATIVE_PATH)
 
     private val _uiState = MutableStateFlow(
         MimirUiState(
@@ -86,6 +89,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             vitaShortcutFormat = prefs.getString(KEY_VITA_SHORTCUT_FORMAT, null)
                 ?.let { storedFormat -> VitaShortcutFormat.entries.find { it.name == storedFormat } }
                 ?: VitaShortcutFormat.Psvita,
+            nszKeysConfigured = nszKeysFile.isFile && nszKeysFile.length() > 0L,
             scanHiddenFolders = prefs.getBoolean(KEY_SCAN_HIDDEN_FOLDERS, false),
             deleteOriginalChdFiles = prefs.getBoolean(KEY_DELETE_ORIGINAL_CHD_FILES, false),
             useDarkMode = prefs.getBoolean(KEY_DARK_MODE, true),
@@ -357,6 +361,43 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun onNszKeysSelected(uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update { it.copy(isBusy = true, message = null) }
+            runCatching {
+                val parent = nszKeysFile.parentFile
+                    ?: error("Unable to prepare Mimir's NSZ key directory.")
+                require(parent.exists() || parent.mkdirs()) {
+                    "Unable to prepare Mimir's NSZ key directory."
+                }
+                val temporary = File(parent, "prod.keys.importing")
+                getApplication<Application>().contentResolver.openInputStream(uri).use { input ->
+                    requireNotNull(input) { "Unable to read the selected prod.keys file." }
+                    temporary.outputStream().use { output -> input.copyTo(output) }
+                }
+                require(temporary.length() > 0L) { "The selected prod.keys file is empty." }
+                if (!temporary.renameTo(nszKeysFile)) {
+                    temporary.copyTo(nszKeysFile, overwrite = true)
+                    require(temporary.delete()) { "Unable to finish importing prod.keys." }
+                }
+            }
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(
+                            isBusy = false,
+                            nszKeysConfigured = true,
+                            message = "prod.keys imported and saved on this device.",
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    _uiState.update {
+                        it.copy(isBusy = false, message = error.message ?: "Unable to import prod.keys.")
+                    }
+                }
+        }
+    }
+
     fun scan() {
         val currentState = _uiState.value
         val mode = currentState.selectedMode
@@ -366,6 +407,13 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             ToolMode.MultiDiscOrganizer, ToolMode.RomZipper, ToolMode.ChdConverter -> {
                 if (romUri == null) {
                     _uiState.update { it.copy(message = "Select a ROM folder first.") }
+                    return
+                }
+                if (mode == ToolMode.ChdConverter &&
+                    currentState.selectedConverterTool == ConverterTool.NszNsp &&
+                    !currentState.nszKeysConfigured
+                ) {
+                    _uiState.update { it.copy(message = "Import a prod.keys file before scanning NSZ packages.") }
                     return
                 }
             }
@@ -440,6 +488,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                                     rootUri = requireNotNull(romUri),
                                     folderAliases = tool.folderAliases,
                                     supportedExtensions = tool.sourceExtensions,
+                                    outputExtension = tool.outputExtension,
                                     onFileScanned = { scannedFiles -> updateScanProgress(mode, scannedFiles) },
                                     shouldStop = cancellation::shouldInterruptCurrentOperation,
                                 )
@@ -550,10 +599,15 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 },
                 onOperationStarted = { operation ->
-                    if (operation is FileOperation.ConvertToChd) {
+                    if (operation is FileOperation.ConvertToChd || operation is FileOperation.ConvertWithTool) {
+                        val sourcePath = when (operation) {
+                            is FileOperation.ConvertToChd -> operation.sourcePath
+                            is FileOperation.ConvertWithTool -> operation.sourcePath
+                            else -> error("Unsupported converter operation.")
+                        }
                         _uiState.update {
                             it.copy(
-                                chdCurrentJobLabel = operation.sourcePath
+                                chdCurrentJobLabel = sourcePath
                                     .substringAfterLast('/')
                                     .substringBeforeLast('.'),
                             )
@@ -628,6 +682,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         private const val KEY_DARK_MODE = "dark_mode"
         private const val KEY_SCAN_HIDDEN_FOLDERS = "scan_hidden_folders"
         private const val KEY_DELETE_ORIGINAL_CHD_FILES = "delete_original_chd_files"
+        private const val NSZ_KEYS_RELATIVE_PATH = "nsz/prod.keys"
         private const val MAX_VITA_RESULTS = 40
         private const val SCAN_PROGRESS_UPDATE_INTERVAL = 25
     }

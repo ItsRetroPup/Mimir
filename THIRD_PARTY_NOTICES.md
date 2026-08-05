@@ -41,3 +41,14 @@ For every distributed Mimir build containing this binary, distribute the complet
 Azahar source for this exact revision, its recursive submodules, and Mimir's local patch/build
 instructions, or provide a valid GPLv2 written offer for that source. The corresponding source also
 contains the copyright and license notices for Azahar's statically linked third-party components.
+
+## NSZ
+
+This app uses NSZ 5.0.0 to decompress NSZ packages to NSP.
+
+- Source: https://github.com/nicoboss/nsz
+- License: MIT; the license text is included at `app/src/main/assets/licenses/NSZ-MIT.txt`.
+
+NSZ is run using the MIT-licensed Chaquopy Python runtime and its packaged Python dependencies,
+including `zstandard`, `pycryptodome`, and `enlighten`. Their package metadata and license notices
+are supplied by their respective distributions.
