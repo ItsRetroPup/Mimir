@@ -3,6 +3,7 @@ package pup.app.mimir.ui
 import android.app.Application
 import android.net.Uri
 import android.provider.DocumentsContract
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import pup.app.mimir.data.PlanExecutor
@@ -10,6 +11,8 @@ import pup.app.mimir.data.RomTreeRepository
 import pup.app.mimir.data.OperationCancellation
 import pup.app.mimir.data.OperationStoppedException
 import pup.app.mimir.data.StopRequest
+import pup.app.mimir.data.EsDeSystem
+import pup.app.mimir.data.EsDeSystemsRepository
 import pup.app.mimir.domain.FrontendPreset
 import pup.app.mimir.domain.ChdDiscType
 import pup.app.mimir.domain.ChdPlanner
@@ -47,6 +50,9 @@ data class MimirUiState(
     val selectedChdDiscType: ChdDiscType = ChdDiscType.Cd,
     val selectedConverterTool: ConverterTool = ConverterTool.Chd,
     val nszKeysConfigured: Boolean = false,
+    val esDeRootUri: Uri? = null,
+    val esDeRootName: String = "No ES-DE folder selected",
+    val esDeSystems: List<EsDeSystem> = emptyList(),
     val deleteOriginalChdFiles: Boolean = false,
     val scanHiddenFolders: Boolean = false,
     val useDarkMode: Boolean = true,
@@ -75,9 +81,11 @@ data class ChdConversionReport(
 class MimirViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = RomTreeRepository(application)
     private val executor = PlanExecutor(application)
+    private val esDeRepository = EsDeSystemsRepository(application)
     private val prefs = application.getSharedPreferences("mimir_prefs", 0)
     private var vitaCatalog: List<pup.app.mimir.domain.VitaApp> = emptyList()
     private var activeCancellation: OperationCancellation? = null
+    private var esDeLatestRequested = false
     private val nszKeysFile = File(application.filesDir, NSZ_KEYS_RELATIVE_PATH)
 
     private val _uiState = MutableStateFlow(
@@ -90,6 +98,8 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                 ?.let { storedFormat -> VitaShortcutFormat.entries.find { it.name == storedFormat } }
                 ?: VitaShortcutFormat.Psvita,
             nszKeysConfigured = nszKeysFile.isFile && nszKeysFile.length() > 0L,
+            esDeRootUri = prefs.getString(KEY_ESDE_URI, null)?.let(Uri::parse),
+            esDeRootName = prefs.getString(KEY_ESDE_LABEL, null) ?: "No ES-DE folder selected",
             scanHiddenFolders = prefs.getBoolean(KEY_SCAN_HIDDEN_FOLDERS, false),
             deleteOriginalChdFiles = prefs.getBoolean(KEY_DELETE_ORIGINAL_CHD_FILES, false),
             useDarkMode = prefs.getBoolean(KEY_DARK_MODE, true),
@@ -111,6 +121,134 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             if (existingOutputUri != null) {
                 refreshExistingVitaShortcuts(existingOutputUri)
             }
+            _uiState.value.esDeRootUri?.let { rootUri ->
+                val systems = runCatching {
+                    val installed = esDeRepository.loadInstalled(rootUri)
+                    val romRoot = _uiState.value.selectedFolderUri
+                    if (romRoot == null) installed else {
+                        val folders = esDeRepository.scanRomFolders(romRoot).map(String::lowercase).toSet()
+                        installed.filter { it.name.lowercase() in folders }
+                    }
+                }.getOrElse { emptyList() }
+                _uiState.update { it.copy(esDeSystems = systems) }
+            }
+        }
+    }
+
+    fun onEsDeFolderSelected(uri: Uri) {
+        val label = treeLabel(uri)
+        esDeLatestRequested = false
+        prefs.edit()
+            .putString(KEY_ESDE_URI, uri.toString())
+            .putString(KEY_ESDE_LABEL, label)
+            .apply()
+        _uiState.update { it.copy(esDeRootUri = uri, esDeRootName = label, esDeSystems = emptyList(), message = null) }
+        viewModelScope.launch(Dispatchers.IO) {
+            val systems = runCatching {
+                val installed = esDeRepository.loadInstalled(uri)
+                val romRoot = _uiState.value.selectedFolderUri
+                if (romRoot == null) {
+                    installed
+                } else {
+                    val folders = esDeRepository.scanRomFolders(romRoot).map(String::lowercase).toSet()
+                    installed.filter { it.name.lowercase() in folders }
+                }
+            }.getOrElse { emptyList() }
+            _uiState.update { it.copy(esDeSystems = systems) }
+        }
+    }
+
+    fun onEsDeSystemFolderSelected(name: String, uri: Uri) {
+        val path = EsDeSystemsRepository.absolutePathForTreeUri(uri) ?: run {
+            _uiState.update { it.copy(message = "Unable to resolve the selected ROM folder path.") }
+            return
+        }
+        _uiState.update { state ->
+            state.copy(esDeSystems = state.esDeSystems.map { system ->
+                if (system.name == name) system.copy(romFolder = path) else system
+            })
+        }
+    }
+
+    fun defaultEsDeFolderUri(name: String): Uri? {
+        val rootUri = _uiState.value.selectedFolderUri ?: return null
+        val system = _uiState.value.esDeSystems.firstOrNull { it.name == name } ?: return null
+        if (!system.isDefault) return null
+        return EsDeSystemsRepository.childTreeUri(rootUri, system.romFolder)
+    }
+
+    fun refreshEsDeSystems() {
+        val romRootUri = _uiState.value.selectedFolderUri
+        if (_uiState.value.esDeRootUri == null) {
+            _uiState.update { it.copy(message = "Select the ES-DE folder first.") }
+            return
+        }
+        if (romRootUri == null) {
+            _uiState.update { it.copy(message = "Select the ROM root folder first so Mimir can find its systems.") }
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update { it.copy(isBusy = true, message = "Downloading the latest ES-DE custom systems…") }
+            runCatching {
+                val catalog = esDeRepository.fetchLatest()
+                esDeRepository.systemsForRomFolders(catalog, esDeRepository.scanRomFolders(romRootUri))
+            }
+                .onSuccess { systems ->
+                    _uiState.update {
+                        it.copy(
+                            isBusy = false,
+                            esDeSystems = mergeEsDeOverrides(systems, it.esDeSystems),
+                            message = "Downloaded ${systems.size} ES-DE systems. Review the folders, then apply them.",
+                        )
+                    }
+                    esDeLatestRequested = true
+                }
+                .onFailure { error ->
+                    Log.e(TAG, "Unable to download ES-DE systems", error)
+                    _uiState.update { it.copy(isBusy = false, message = error.message ?: "Unable to download ES-DE systems.") }
+                }
+        }
+    }
+
+    fun applyEsDeSystems() {
+        val rootUri = _uiState.value.esDeRootUri
+        val systems = _uiState.value.esDeSystems
+        val romRootUri = _uiState.value.selectedFolderUri
+        if (rootUri == null) {
+            _uiState.update { it.copy(message = "Select the ES-DE folder first.") }
+            return
+        }
+        if (systems.isEmpty()) {
+            _uiState.update { it.copy(message = "Download the latest ES-DE systems first.") }
+            return
+        }
+        if (romRootUri == null) {
+            _uiState.update { it.copy(message = "Select the ROM root folder first so Mimir can map its systems.") }
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update { it.copy(isBusy = true, message = "Installing ES-DE custom systems…") }
+            runCatching {
+                if (esDeLatestRequested) {
+                    esDeRepository.installLatest(
+                        rootUri = rootUri,
+                        systems = systems,
+                    )
+                } else {
+                    esDeRepository.installCurrent(
+                    rootUri = rootUri,
+                    systems = systems,
+                    )
+                }
+            }
+                .onSuccess { count ->
+                    esDeLatestRequested = false
+                    _uiState.update { it.copy(isBusy = false, message = "Installed $count systems in custom_systems. Restart ES-DE to load them.") }
+                }
+                .onFailure { error ->
+                    Log.e(TAG, "Unable to install ES-DE systems", error)
+                    _uiState.update { it.copy(isBusy = false, message = error.message ?: "Unable to install ES-DE systems.") }
+                }
         }
     }
 
@@ -417,7 +555,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                     return
                 }
             }
-            ToolMode.VitaAppIds -> return
+            ToolMode.VitaAppIds, ToolMode.EsDeSystems -> return
         }
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -500,7 +638,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         }
                     }
 
-                    ToolMode.VitaAppIds -> error("Vita shortcuts are created directly from search results.")
+                    ToolMode.VitaAppIds, ToolMode.EsDeSystems -> error("This tool does not use ROM scanning.")
                 }
                 val previewCount = plan.changes.size
                 _uiState.update {
@@ -521,6 +659,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                                 ToolMode.RomZipper -> "No zip-compatible ROMs found."
                                 ToolMode.ChdConverter -> "No compatible ${currentState.selectedConverterTool.displayName} files found."
                                 ToolMode.VitaAppIds -> "No Vita shortcuts queued."
+                                ToolMode.EsDeSystems -> "No ES-DE systems loaded."
                             }
                         } else {
                             null
@@ -551,6 +690,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             ?: return
         val uri = when (plan.mode) {
             ToolMode.VitaAppIds -> current.vitaOutputUri
+            ToolMode.EsDeSystems -> null
             else -> current.selectedFolderUri
         } ?: return
         viewModelScope.launch(Dispatchers.IO) {
@@ -674,10 +814,13 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     companion object {
+        private const val TAG = "Mimir.ESDE"
         private const val KEY_URI = "rom_tree_uri"
         private const val KEY_LABEL = "rom_tree_label"
         private const val KEY_VITA_OUTPUT_URI = "vita_output_uri"
         private const val KEY_VITA_OUTPUT_LABEL = "vita_output_label"
+        private const val KEY_ESDE_URI = "esde_root_uri"
+        private const val KEY_ESDE_LABEL = "esde_root_label"
         private const val KEY_VITA_SHORTCUT_FORMAT = "vita_shortcut_format"
         private const val KEY_DARK_MODE = "dark_mode"
         private const val KEY_SCAN_HIDDEN_FOLDERS = "scan_hidden_folders"
@@ -715,12 +858,28 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         return matches.take(MAX_VITA_RESULTS)
     }
 
+    private fun mergeEsDeOverrides(
+        latest: List<EsDeSystem>,
+        existing: List<EsDeSystem>,
+    ): List<EsDeSystem> {
+        val existingByName = existing.associateBy { it.name }
+        return latest.map { system ->
+            val prior = existingByName[system.name]
+            if (prior != null && !prior.isDefault && prior.romFolder.isNotBlank()) {
+                system.copy(romFolder = prior.romFolder)
+            } else {
+                system
+            }
+        }
+    }
+
     private fun initialScanLabel(mode: ToolMode): String =
         when (mode) {
             ToolMode.MultiDiscOrganizer -> "Scanning ROM files for multi-disc games…"
             ToolMode.RomZipper -> "Scanning ROM files for zip-compatible formats…"
             ToolMode.ChdConverter -> "Scanning ROM files for ${_uiState.value.selectedConverterTool.displayName}-compatible files…"
             ToolMode.VitaAppIds -> "Scanning ROM files…"
+            ToolMode.EsDeSystems -> ""
         }
 
     private fun updateScanProgress(mode: ToolMode, scannedFiles: Int) {
@@ -730,6 +889,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             ToolMode.RomZipper -> "Scanning for zip-compatible ROMs"
             ToolMode.ChdConverter -> "Scanning for ${_uiState.value.selectedConverterTool.displayName}-compatible files"
             ToolMode.VitaAppIds -> "Scanning ROM files"
+            ToolMode.EsDeSystems -> ""
         }
         _uiState.update { it.copy(scanProgressLabel = "$activity: $scannedFiles files checked") }
     }
@@ -740,6 +900,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             ToolMode.RomZipper -> "Zipping ROMs"
             ToolMode.ChdConverter -> "Converting with ${_uiState.value.selectedConverterTool.displayName}"
             ToolMode.VitaAppIds -> "Creating shortcuts"
+            ToolMode.EsDeSystems -> "Updating ES-DE systems"
         }
         return "$activity: $completed of $total"
     }

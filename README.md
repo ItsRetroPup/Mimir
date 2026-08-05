@@ -126,6 +126,10 @@ Current behaviour:
 - detect existing shortcuts in the currently selected format
 - allow mistaken additions to be removed immediately from the same screen
 
+### ES-DE Custom Systems
+The ES-DE Systems tool downloads the latest Android custom-system definitions from
+[GlazedBelmont/es-de-android-custom-systems](https://github.com/GlazedBelmont/es-de-android-custom-systems), scans the selected ROM root for ES-DE system folders, lets users relocate each detected system with a folder picker, and installs the resulting `es_systems.xml` and `es_find_rules.xml` under the selected ES-DE folder's `custom_systems` directory. Default entries retain `%ROMPATH%/<system-folder>`; relocated entries use absolute Android storage paths. Restart ES-DE after installation so it reloads the definitions.
+
 ## Design Goals
 
 - local-first

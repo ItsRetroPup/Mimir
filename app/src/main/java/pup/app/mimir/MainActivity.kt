@@ -94,6 +94,7 @@ import pup.app.mimir.R
 
 private enum class AppSection {
     Home,
+    EsDeSystems,
     Zipper,
     Organizer,
     ChdMan,
@@ -110,6 +111,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val viewModel: MimirViewModel = viewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            var pendingEsDeSystem by remember { mutableStateOf<String?>(null) }
             val folderLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.OpenDocumentTree(),
             ) { uri ->
@@ -136,6 +138,29 @@ class MainActivity : ComponentActivity() {
                 uri ?: return@rememberLauncherForActivityResult
                 viewModel.onNszKeysSelected(uri)
             }
+            val esDeFolderLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.OpenDocumentTree(),
+            ) { uri ->
+                uri ?: return@rememberLauncherForActivityResult
+                contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+                )
+                viewModel.onEsDeFolderSelected(uri)
+            }
+            val esDeSystemFolderLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.OpenDocumentTree(),
+            ) { uri ->
+                val systemName = pendingEsDeSystem
+                pendingEsDeSystem = null
+                if (uri != null && systemName != null) {
+                    contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+                    )
+                    viewModel.onEsDeSystemFolderSelected(systemName, uri)
+                }
+            }
             MimirTheme(useDarkMode = uiState.useDarkMode) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     MimirScreen(
@@ -143,6 +168,13 @@ class MainActivity : ComponentActivity() {
                         onSelectFolder = { folderLauncher.launch(null) },
                         onSelectVitaOutput = { vitaOutputLauncher.launch(null) },
                         onSelectNszKeys = { nszKeysLauncher.launch(arrayOf("*/*")) },
+                        onSelectEsDeFolder = { esDeFolderLauncher.launch(null) },
+                        onRefreshEsDeSystems = viewModel::refreshEsDeSystems,
+                        onApplyEsDeSystems = viewModel::applyEsDeSystems,
+                        onPickEsDeSystemFolder = { systemName ->
+                            pendingEsDeSystem = systemName
+                            esDeSystemFolderLauncher.launch(viewModel.defaultEsDeFolderUri(systemName))
+                        },
                         onModeSelected = viewModel::updateMode,
                         onPresetSelected = viewModel::updatePreset,
                         onChdSystemSelected = viewModel::updateChdSystem,
@@ -273,6 +305,10 @@ private fun MimirScreen(
     onSelectFolder: () -> Unit,
     onSelectVitaOutput: () -> Unit,
     onSelectNszKeys: () -> Unit,
+    onSelectEsDeFolder: () -> Unit,
+    onRefreshEsDeSystems: () -> Unit,
+    onApplyEsDeSystems: () -> Unit,
+    onPickEsDeSystemFolder: (String) -> Unit,
     onModeSelected: (ToolMode) -> Unit,
     onPresetSelected: (FrontendPreset) -> Unit,
     onChdSystemSelected: (ChdSystem) -> Unit,
@@ -409,6 +445,21 @@ private fun MimirScreen(
                                 converterTool = uiState.selectedConverterTool,
                             )
                         }
+                        uiState.message?.let { message ->
+                            item {
+                                InfoPanel(
+                                    title = "STATUS",
+                                    body = message,
+                                    accent = if (message.contains("unable", ignoreCase = true) ||
+                                        message.contains("failed", ignoreCase = true)
+                                    ) {
+                                        MaterialTheme.colorScheme.error
+                                    } else {
+                                        MaterialTheme.colorScheme.secondary
+                                    },
+                                )
+                            }
+                        }
                         item {
                             if (uiState.selectedMode == ToolMode.VitaAppIds) {
                                 VitaControlCard(
@@ -424,6 +475,18 @@ private fun MimirScreen(
                                     onVitaShortcutFormatSelected = onVitaShortcutFormatSelected,
                                     onVitaShortcutAdd = onVitaShortcutAdd,
                                     onVitaShortcutRemove = onVitaShortcutRemove,
+                                )
+                            } else if (uiState.selectedMode == ToolMode.EsDeSystems) {
+                                EsDeSystemsCard(
+                                    rootFolderName = uiState.esDeRootName,
+                                    romRootFolderName = uiState.selectedFolderName,
+                                    systems = uiState.esDeSystems,
+                                    isBusy = uiState.isBusy,
+                                    onSelectRomRoot = onSelectFolder,
+                                    onSelectRoot = onSelectEsDeFolder,
+                                    onRefresh = onRefreshEsDeSystems,
+                                    onApply = onApplyEsDeSystems,
+                                    onPickFolder = onPickEsDeSystemFolder,
                                 )
                             } else {
                                 ControlCard(
@@ -527,7 +590,11 @@ private fun MimirScreen(
 
                     }
             }
-            if (currentSection != AppSection.Home && uiState.selectedMode != ToolMode.VitaAppIds && !uiState.isBusy) {
+            if (currentSection != AppSection.Home &&
+                uiState.selectedMode != ToolMode.VitaAppIds &&
+                uiState.selectedMode != ToolMode.EsDeSystems &&
+                !uiState.isBusy
+            ) {
                 val hasSelection = uiState.selectedChangePaths.isNotEmpty()
                 Surface(
                     modifier = Modifier
@@ -807,6 +874,7 @@ private fun HeroSection(
 ) {
     val title = when (currentSection) {
         AppSection.Home -> "Welcome, Brother"
+        AppSection.EsDeSystems -> "ES-DE Systems"
         AppSection.Organizer -> "Organizer"
         AppSection.Zipper -> "Zipper"
         AppSection.ChdMan -> "CHDMan"
@@ -818,6 +886,8 @@ private fun HeroSection(
     val body = when (currentSection) {
         AppSection.Home ->
             "Select your tool below"
+        AppSection.EsDeSystems ->
+            "Download Android custom systems and assign ROM folders per system"
         AppSection.Organizer ->
             "Organises your multi-disc ROMs into the appropriate format for your chosen frontend"
         AppSection.Zipper ->
@@ -901,6 +971,76 @@ private fun ControlCard(
                 Icon(Icons.Outlined.Folder, contentDescription = null)
                 Spacer(Modifier.size(8.dp))
                 Text("SELECT ROM FOLDER")
+            }
+        }
+    }
+}
+
+@Composable
+private fun EsDeSystemsCard(
+    rootFolderName: String,
+    romRootFolderName: String,
+    systems: List<pup.app.mimir.data.EsDeSystem>,
+    isBusy: Boolean,
+    onSelectRomRoot: () -> Unit,
+    onSelectRoot: () -> Unit,
+    onRefresh: () -> Unit,
+    onApply: () -> Unit,
+    onPickFolder: (String) -> Unit,
+) {
+    StyledCard {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Label("ES-DE CUSTOM SYSTEMS")
+            Text("Selected ES-DE folder", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Text(rootFolderName, style = MaterialTheme.typography.bodyLarge)
+            Button(onClick = onSelectRoot, enabled = !isBusy, modifier = Modifier.fillMaxWidth()) {
+                Icon(Icons.Outlined.Folder, contentDescription = null)
+                Spacer(Modifier.size(8.dp))
+                Text("SELECT ES-DE FOLDER")
+            }
+            Text("ROM root folder", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Text(romRootFolderName, style = MaterialTheme.typography.bodyLarge)
+            OutlinedButton(onClick = onSelectRomRoot, enabled = !isBusy, modifier = Modifier.fillMaxWidth()) {
+                Icon(Icons.Outlined.Folder, contentDescription = null)
+                Spacer(Modifier.size(8.dp))
+                Text("SELECT ROM ROOT")
+            }
+            OutlinedButton(
+                onClick = onRefresh,
+                enabled = !isBusy && rootFolderName != "No ES-DE folder selected",
+                modifier = Modifier.fillMaxWidth(),
+            ) { Text("DOWNLOAD LATEST XMLS") }
+            if (systems.isEmpty()) {
+                Text(
+                    "Download the latest XMLs to configure the custom Android systems. They will be installed under custom_systems.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.78f),
+                )
+            } else {
+                Text("ROM folders", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                systems.forEach { system ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(system.fullName, style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                if (system.isDefault) "Default" else system.romFolder,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
+                            )
+                        }
+                        OutlinedButton(
+                            onClick = { onPickFolder(system.name) },
+                            enabled = !isBusy,
+                        ) { Text("CHOOSE FOLDER") }
+                    }
+                }
+                Button(onClick = onApply, enabled = !isBusy, modifier = Modifier.fillMaxWidth()) {
+                    Text("INSTALL CUSTOM SYSTEMS")
+                }
             }
         }
     }
@@ -1090,6 +1230,7 @@ private fun ToolPageHeader(
     converterTool: ConverterTool,
 ) {
     val title = when (section) {
+        AppSection.EsDeSystems -> "ES-DE Systems"
         AppSection.Organizer -> "Multi-disc Organizer"
         AppSection.Zipper -> "RomZipper"
         AppSection.ChdMan -> "CHDMan"
@@ -1100,6 +1241,7 @@ private fun ToolPageHeader(
         AppSection.Home -> "Mimir"
     }
     val description = when (section) {
+        AppSection.EsDeSystems -> "Install the latest ES-DE Android custom systems into custom_systems."
         AppSection.Organizer -> "Organise multi-disc games into frontend-ready folders and playlists."
         AppSection.Zipper -> "Compress supported ROM files into .zip archives to save space."
         AppSection.ChdMan -> converterTool.description
@@ -1152,6 +1294,7 @@ private fun ToolModeCards(
     val utilities = listOf(
         ToolEntry("Multi-disc Organizer", "Group discs and create frontend-ready folders and playlists.", ToolMode.MultiDiscOrganizer, AppSection.Organizer, icon = Icons.Outlined.Archive),
         ToolEntry("Vita Shortcuts", "Create .psvita or .dpt shortcut files from the built-in Vita database.", ToolMode.VitaAppIds, AppSection.Vita, icon = Icons.Outlined.Home),
+        ToolEntry("ES-DE Systems", "Download custom systems and configure each system's ROM folder.", ToolMode.EsDeSystems, AppSection.EsDeSystems, icon = Icons.Outlined.Folder),
         ToolEntry("NSZ to NSP", "Decompress Nintendo Switch NSZ packages into NSP files.", ToolMode.ChdConverter, AppSection.Nsz, ConverterTool.NszNsp, Icons.Outlined.Archive),
     )
     val spaceSavers = listOf(
@@ -1537,6 +1680,7 @@ private fun ChangeCard(
         ToolMode.RomZipper -> "ZIP"
         ToolMode.ChdConverter -> "CHD"
         ToolMode.VitaAppIds -> "VITA"
+        ToolMode.EsDeSystems -> "ES-DE"
     }
     Card(
         modifier = modifier,
@@ -1580,6 +1724,7 @@ private fun ChangeCard(
                             ToolMode.RomZipper -> Icons.Outlined.FolderZip
                             ToolMode.ChdConverter -> Icons.Outlined.Archive
                             ToolMode.VitaAppIds -> Icons.Outlined.Home
+                            ToolMode.EsDeSystems -> Icons.Outlined.Folder
                             else -> Icons.Outlined.Folder
                         }
                         Icon(
@@ -1718,6 +1863,7 @@ private fun PreviewSummary(
                         ToolMode.MultiDiscOrganizer -> "$previewCount multi-disc sets detected; $selectedCount selected."
                         ToolMode.RomZipper -> "$previewCount ROMs matched the zip whitelist; $selectedCount selected."
                         ToolMode.ChdConverter, ToolMode.VitaAppIds -> "$previewCount items ready; $selectedCount selected."
+                        ToolMode.EsDeSystems -> "$previewCount systems ready; $selectedCount selected."
                     },
                     style = MaterialTheme.typography.headlineMedium,
                 )

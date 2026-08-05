@@ -26,6 +26,7 @@ enum class ToolMode(val displayName: String) {
     RomZipper("RomZipper"),
     ChdConverter("Converter Tools"),
     VitaAppIds("Vita App IDs"),
+    EsDeSystems("ES-DE Systems"),
 }
 
 enum class ConverterTool(
