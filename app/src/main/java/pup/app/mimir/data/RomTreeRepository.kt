@@ -64,14 +64,15 @@ class RomTreeRepository(private val context: Context) {
         rootUri: Uri,
         folderAliases: Set<String>,
         supportedExtensions: Set<String>,
+        outputExtension: String = "chd",
         onFileScanned: ((Int) -> Unit)? = null,
         shouldStop: (() -> Boolean)? = null,
     ): List<RomEntry> {
         val root = DocumentFile.fromTreeUri(context, rootUri) ?: return emptyList()
         val normalizedAliases = folderAliases.map(String::lowercase).toSet()
-        // Existing CHDs are included so the planner can mark their matching source image as an
+        // Existing outputs are included so the planner can mark their matching source image as an
         // overwrite choice. The planner itself only creates operations for supported source types.
-        val scanExtensions = supportedExtensions + "chd"
+        val scanExtensions = supportedExtensions + outputExtension
         return buildList {
             root.listFiles()
                 .sortedBy { it.name.orEmpty().lowercase() }

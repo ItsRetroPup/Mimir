@@ -26,6 +26,7 @@ enum class ToolMode(val displayName: String) {
     RomZipper("RomZipper"),
     ChdConverter("Converter Tools"),
     VitaAppIds("Vita App IDs"),
+    EsDeSystems("ES-DE Systems"),
 }
 
 enum class ConverterTool(
@@ -59,6 +60,14 @@ enum class ConverterTool(
         outputExtension = "zcci",
         folderAliases = setOf("3ds", "nintendo 3ds"),
         executableName = "libazahar.so",
+    ),
+    NszNsp(
+        displayName = "NSZ to NSP",
+        description = "Decompress Nintendo Switch NSZ packages to NSP",
+        sourceExtensions = setOf("nsz"),
+        outputExtension = "nsp",
+        folderAliases = setOf("switch", "nintendo switch"),
+        executableName = "",
     ),
 }
 

@@ -100,6 +100,20 @@ Mimir bundles the following Android ARM64 command-line backends in
   `2126.0-alpha1` revision `e11f3da49346a45c400001ea424de298649618c8` (GPL-2.0-or-later).
   The reproducible standalone-target patch and build instructions are in
   `docs/azahar-compression-cli.patch` and `docs/azahar-compression-build.md`.
+
+#### NSZ to NSP
+
+Mimir can decompress Nintendo Switch `.nsz` packages to `.nsp`. The converter uses the MIT-licensed
+NSZ 5.0.0 Python package through the embedded Chaquopy Python runtime, with Android ARM64 builds of
+`zstandard` and `pycryptodome`. Select a folder containing `.nsz` files directly or in a `switch` /
+`nintendo switch` subfolder, scan it, and choose the packages to convert. Source `.nsz` files are
+kept after a successful conversion. NSZ requires a user-provided `prod.keys` file; use the
+**Import prod.keys** action on the NSZ to NSP page. Mimir copies the selected file into app-private
+storage so it remains available after restarts and does not depend on the original document
+location.
+
+The converter runs entirely on-device. Mimir does not bundle or download Nintendo keys or game
+content. Only use it with keys and content you are legally entitled to use.
 ### PS Vita Shortcuts
 Mimir includes a built-in searchable PS Vita shortcut database.
 
@@ -111,6 +125,10 @@ Current behaviour:
 - generate `.dpt` files with a `[vita_game_id]` section followed by the game ID
 - detect existing shortcuts in the currently selected format
 - allow mistaken additions to be removed immediately from the same screen
+
+### ES-DE Custom Systems
+The ES-DE Systems tool downloads the latest Android custom-system definitions from
+[GlazedBelmont/es-de-android-custom-systems](https://github.com/GlazedBelmont/es-de-android-custom-systems), scans the selected ROM root for ES-DE system folders, lets users relocate each detected system with a folder picker, and installs the resulting `es_systems.xml` and `es_find_rules.xml` under the selected ES-DE folder's `custom_systems` directory. Default entries retain `%ROMPATH%/<system-folder>`; relocated entries use absolute Android storage paths. Restart ES-DE after installation so it reloads the definitions.
 
 ## Design Goals
 
@@ -127,6 +145,10 @@ Current behaviour:
 - Jetpack Compose
 - Gradle
 - Android SDK
+- Python 3.13 and Chaquopy (NSZ converter)
+
+Building Mimir requires a `python3.13` executable on `PATH` so Chaquopy can resolve and package the
+NSZ dependencies. On Homebrew systems, install it with `brew install python@3.13`.
 
 ## Requirements
 

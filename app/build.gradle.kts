@@ -3,6 +3,7 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
+    id("com.chaquo.python")
     id("org.jetbrains.kotlin.android")
 }
 
@@ -24,6 +25,11 @@ android {
         versionName = "0.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            // The bundled converter executables and Python dependencies are ARM64-only.
+            abiFilters += "arm64-v8a"
+        }
     }
     
     signingConfigs {
@@ -70,6 +76,18 @@ android {
         }
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+}
+
+chaquopy {
+    defaultConfig {
+        // Python 3.13 provides current Android wheels and supports 16 KiB page-size devices.
+        version = "3.13"
+        pip {
+            install("nsz==5.0.0")
+            install("zstandard==0.23.0")
+            install("pycryptodome==3.21.0")
         }
     }
 }

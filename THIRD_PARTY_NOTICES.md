@@ -41,3 +41,24 @@ For every distributed Mimir build containing this binary, distribute the complet
 Azahar source for this exact revision, its recursive submodules, and Mimir's local patch/build
 instructions, or provide a valid GPLv2 written offer for that source. The corresponding source also
 contains the copyright and license notices for Azahar's statically linked third-party components.
+
+## NSZ
+
+This app uses NSZ 5.0.0 to decompress NSZ packages to NSP.
+
+- Source: https://github.com/nicoboss/nsz
+- License: MIT; the license text is included at `app/src/main/assets/licenses/NSZ-MIT.txt`.
+
+NSZ is run using the MIT-licensed Chaquopy Python runtime and its packaged Python dependencies,
+including `zstandard`, `pycryptodome`, and `enlighten`. Their package metadata and license notices
+are supplied by their respective distributions.
+
+## ES-DE Android custom systems
+
+This app downloads and uses the Android custom-system definitions maintained by GlazedBelmont.
+
+- Source: https://github.com/GlazedBelmont/es-de-android-custom-systems
+- Attribution: GlazedBelmont
+- The upstream `es_systems.xml` and `es_find_rules.xml` files are downloaded at runtime and
+  installed in the user's ES-DE `custom_systems` directory. They remain subject to the terms of
+  the upstream repository.

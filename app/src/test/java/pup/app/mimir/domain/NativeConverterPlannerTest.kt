@@ -38,4 +38,22 @@ class NativeConverterPlannerTest {
         assertEquals(listOf("3ds/Cart.zcci", "3ds/Game.zcci"), plan.changes.map { it.detailPath })
         assertFalse(plan.changes.any { it.title == "Homebrew.3dsx" })
     }
+
+    @Test
+    fun buildsNspTargetsFromNszPackagesOnly() {
+        val plan = NativeConverterPlanner.buildPlan(
+            entries = listOf(
+                RomEntry("switch/Game.nsz", "Game.nsz", sizeBytes = 1024L),
+                RomEntry("switch/Update.NSZ", "Update.NSZ", sizeBytes = 512L),
+                RomEntry("switch/Existing.nsp", "Existing.nsp"),
+            ),
+            tool = ConverterTool.NszNsp,
+        )
+
+        assertEquals(listOf("switch/Game.nsp", "switch/Update.nsp"), plan.changes.map { it.detailPath })
+        assertEquals(
+            listOf(ConverterTool.NszNsp, ConverterTool.NszNsp),
+            plan.operations.map { (it as FileOperation.ConvertWithTool).tool },
+        )
+    }
 }
