@@ -64,6 +64,24 @@ class RomScannerTest {
     }
 
     @Test
+    fun excludesCueCompanionBinsFromPlaylist() {
+        val entries = listOf(
+            RomEntry("saturn/Panzer Dragoon Saga (Disc 1).bin", "Panzer Dragoon Saga (Disc 1).bin"),
+            RomEntry("saturn/Panzer Dragoon Saga (Disc 1).cue", "Panzer Dragoon Saga (Disc 1).cue"),
+            RomEntry("saturn/Panzer Dragoon Saga (Disc 2).bin", "Panzer Dragoon Saga (Disc 2).bin"),
+            RomEntry("saturn/Panzer Dragoon Saga (Disc 2).cue", "Panzer Dragoon Saga (Disc 2).cue"),
+        )
+
+        val plan = ChangePlanner.buildPlan(RomScanner.scan(entries), FrontendPreset.Other)
+
+        val playlist = plan.operations.single() as FileOperation.WriteTextFile
+        assertEquals(
+            "Panzer Dragoon Saga (Disc 1).cue\nPanzer Dragoon Saga (Disc 2).cue",
+            playlist.contents,
+        )
+    }
+
+    @Test
     fun buildsOtherFrontendPlaylistWithoutMovingDiscs() {
         val entries = listOf(
             RomEntry("dreamcast/Shenmue (Disc 1).chd", "Shenmue (Disc 1).chd"),
