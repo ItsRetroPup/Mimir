@@ -68,9 +68,11 @@ object ChangePlanner {
         val moves = discSet.entries.map { entry ->
             entry.sourcePath to RelativePaths.join(containerPath, entry.fileName)
         }
-        val playlistContents = moves.joinToString("\n") { (_, target) ->
-            RelativePaths.nameOf(target)
-        }
+        val playlistContents = moves
+            .filterNot { (_, target) -> RelativePaths.nameOf(target).hasExtension("bin") }
+            .joinToString("\n") { (_, target) ->
+                RelativePaths.nameOf(target)
+            }
         return InternalPlan(
             createdDirectories = listOf(containerPath),
             moves = moves,
@@ -87,10 +89,12 @@ object ChangePlanner {
         val moves = discSet.entries.map { entry ->
             entry.sourcePath to RelativePaths.join(discFolder, entry.fileName)
         }
-        val playlistContents = moves.joinToString("\n") { (_, target) ->
-            val folderName = RelativePaths.nameOf(discFolder)
-            "$folderName/${RelativePaths.nameOf(target)}"
-        }
+        val playlistContents = moves
+            .filterNot { (_, target) -> RelativePaths.nameOf(target).hasExtension("bin") }
+            .joinToString("\n") { (_, target) ->
+                val folderName = RelativePaths.nameOf(discFolder)
+                "$folderName/${RelativePaths.nameOf(target)}"
+            }
         return InternalPlan(
             createdDirectories = listOf(discFolder),
             moves = moves,
@@ -103,9 +107,9 @@ object ChangePlanner {
 
     private fun buildRootPlaylistWithoutMovesPlan(discSet: DiscGameSet): InternalPlan {
         val playlistPath = RelativePaths.join(discSet.parentPath, "${discSet.title}.m3u")
-        val playlistContents = discSet.entries.joinToString("\n") { entry ->
-            entry.fileName
-        }
+        val playlistContents = discSet.entries
+            .filterNot { it.fileName.hasExtension("bin") }
+            .joinToString("\n") { entry -> entry.fileName }
         return InternalPlan(
             createdDirectories = emptyList(),
             moves = emptyList(),
@@ -139,4 +143,7 @@ object ChangePlanner {
         val playlistPath: String?,
         val playlistContents: String?,
     )
+
+    private fun String.hasExtension(extension: String): Boolean =
+        substringAfterLast('.', missingDelimiterValue = "").equals(extension, ignoreCase = true)
 }
