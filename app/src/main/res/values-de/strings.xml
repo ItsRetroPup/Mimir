@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mimir</string><string name="home">Startseite</string><string name="go_home">Zur Startseite</string><string name="toggle_dark_mode">Dunkelmodus umschalten</string><string name="status">Status</string><string name="open_tool">%1$s öffnen</string>
-    <string name="home_intro">Pflege deine Handheld-Bibliothek. Wähle, was du erledigen möchtest: Mimir bleibt lokal und lässt dich Änderungen prüfen, bevor es schreibt.</string><string name="home_prompt">Was möchtest du tun?</string><string name="home_prepare_library">Bibliothek vorbereiten</string><string name="home_make_room">Speicherplatz schaffen</string>
+    <string name="home_intro">Willkommen bei Mimir!</string><string name="home_prompt">Wähle unten ein Tool, um loszulegen</string><string name="home_prepare_library">Nützliche Tools</string><string name="home_make_room">Speicherplatz auf deinem Gerät sparen</string>
     <string name="goal_fix_multidisc">Mehrdisc-Spiele reparieren</string><string name="tool_multidisc">Mehrdisc-Organisator</string><string name="tool_multidisc_description">Frontend-fertige Ordner und Wiedergabelisten erstellen.</string>
     <string name="goal_create_vita_shortcuts">Vita-Verknüpfungen erstellen</string><string name="tool_vita_shortcuts">Vita-Verknüpfungen</string><string name="tool_vita_shortcuts_description">.psvita- oder .dpt-Verknüpfungen aus der integrierten Datenbank erstellen.</string>
     <string name="goal_setup_esde">ES-DE einrichten</string><string name="tool_esde_systems">ES-DE-Systeme</string><string name="tool_esde_systems_description">Benutzerdefinierte Systeme installieren und ihre ROM-Ordner zuordnen.</string>

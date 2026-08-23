@@ -2,6 +2,7 @@ package pup.app.mimir.data
 
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.os.StatFs
 import android.os.storage.StorageManager
 import androidx.documentfile.provider.DocumentFile
@@ -13,12 +14,15 @@ import pup.app.mimir.domain.VitaShortcutFormat
 class RomTreeRepository(private val context: Context) {
     data class StorageInfo(val totalBytes: Long, val freeBytes: Long)
 
-    fun storageInfo(rootUri: Uri): StorageInfo? = runCatching {
-        val storageManager = context.getSystemService(StorageManager::class.java)
-        val directory = storageManager?.getStorageVolume(rootUri)?.directory ?: return null
-        val stat = StatFs(directory.path)
-        StorageInfo(totalBytes = stat.totalBytes, freeBytes = stat.availableBytes)
-    }.getOrNull()
+    fun storageInfo(rootUri: Uri): StorageInfo? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return null
+        return runCatching {
+            val storageManager = context.getSystemService(StorageManager::class.java)
+            val directory = storageManager?.getStorageVolume(rootUri)?.directory ?: return null
+            val stat = StatFs(directory.path)
+            StorageInfo(totalBytes = stat.totalBytes, freeBytes = stat.availableBytes)
+        }.getOrNull()
+    }
 
     fun loadVitaShortcutCatalog(): List<VitaApp> =
         context.assets.open("vita_shortcuts.tsv").bufferedReader().useLines { lines ->

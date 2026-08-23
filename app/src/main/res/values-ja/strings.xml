@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mimir</string><string name="home">ホーム</string><string name="go_home">ホームに戻る</string><string name="toggle_dark_mode">ダークモードを切り替え</string><string name="status">状態</string><string name="open_tool">%1$sを開く</string>
-    <string name="home_intro">携帯ゲーム機のライブラリを整えましょう。やりたいことを選んでください。Mimirは端末内で動作し、書き込む前に変更を確認できます。</string><string name="home_prompt">何をしますか？</string><string name="home_prepare_library">ライブラリを整理する</string><string name="home_make_room">空き容量を増やす</string>
+    <string name="home_intro">Mimirへようこそ！</string><string name="home_prompt">下の一覧からツールを選んで始めましょう</string><string name="home_prepare_library">便利なツール</string><string name="home_make_room">端末の空き容量を増やす</string>
     <string name="goal_fix_multidisc">複数ディスクのゲームを整理する</string><string name="tool_multidisc">複数ディスクの整理</string><string name="tool_multidisc_description">フロントエンド向けのフォルダーとプレイリストを作成します。</string>
     <string name="goal_create_vita_shortcuts">Vitaショートカットを作成する</string><string name="tool_vita_shortcuts">Vitaショートカット</string><string name="tool_vita_shortcuts_description">内蔵データベースから.psvitaまたは.dptのショートカットを作成します。</string>
     <string name="goal_setup_esde">ES-DEを設定する</string><string name="tool_esde_systems">ES-DEシステム</string><string name="tool_esde_systems_description">カスタムシステムをインストールし、ROMフォルダーを割り当てます。</string>

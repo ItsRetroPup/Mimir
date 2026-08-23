@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-23T14:28:17Z",
+  "title": "Design System: Mimir",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Workshop Violet", "canonical": "#7B1FA2", "tonalRamp": ["oklch(18% 0.08 315)", "oklch(28% 0.11 315)", "oklch(38% 0.14 315)", "oklch(48% 0.17 315)", "#7B1FA2", "oklch(68% 0.16 315)", "oklch(80% 0.10 315)", "#E0B0FF"] },
+      "secondary": { "role": "secondary", "displayName": "Orchid Signal", "canonical": "#6A1B9A", "tonalRamp": ["oklch(17% 0.07 320)", "oklch(27% 0.10 320)", "oklch(37% 0.13 320)", "#6A1B9A", "oklch(57% 0.17 320)", "oklch(68% 0.15 320)", "oklch(80% 0.10 320)", "#F5B7FF"] },
+      "background": { "role": "neutral", "displayName": "Lilac Paper", "canonical": "#FAF7FC", "tonalRamp": ["#100B14", "#19121F", "#30243A", "oklch(35% 0.04 315)", "#76677A", "#EEE5F2", "#F1EAF5", "#FAF7FC"] },
+      "surface": { "role": "neutral", "displayName": "Clean Surface", "canonical": "#FFFFFF", "tonalRamp": ["#19121F", "#30243A", "oklch(35% 0.03 315)", "#76677A", "#A99AAF", "#EEE5F2", "#F5EDF8", "#FFFFFF"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Operational Display", "purpose": "Key page-level states and large summaries." },
+      "headline": { "displayName": "Workshop Headline", "purpose": "Section titles and operational summaries." },
+      "title": { "displayName": "Task Title", "purpose": "Cards and secondary headings." },
+      "body": { "displayName": "Clear Body", "purpose": "Descriptions, folder names, and explanatory copy." },
+      "label": { "displayName": "Technical Label", "purpose": "Concise labels, metadata, and status markers." }
+    },
+    "shadows": [
+      { "name": "tonal-action-lift", "value": "6dp tonal elevation", "purpose": "Persistent bottom action surface." }
+    ],
+    "motion": [],
+    "breakpoints": [
+      { "name": "expanded-landscape", "value": "840dp width and 480dp height" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Selected Tool Card",
+      "kind": "card",
+      "refersTo": "tool-card-selected",
+      "description": "A vertical task-list item with a selected workshop-violet state.",
+      "html": "<article class=\"ds-tool-card ds-tool-card--selected\"><span class=\"ds-tool-icon\">↻</span><span><strong>Organise multi-disc games</strong><small>Create frontend-ready folders and playlists.</small></span><b>›</b></article>",
+      "css": ".ds-tool-card{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid rgba(118,103,122,.5);border-radius:12px;background:#fff;color:#1a111f;font:16px/24px sans-serif}.ds-tool-card--selected{background:rgba(123,31,162,.12);border-color:rgba(118,103,122,.9)}.ds-tool-card strong,.ds-tool-card small{display:block}.ds-tool-card small{opacity:.78;font-size:14px;line-height:20px}.ds-tool-card b{margin-left:auto;color:#7b1fa2;font-size:24px}.ds-tool-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:10px;background:#7b1fa2;color:#fff;font-size:24px}.ds-tool-card:hover{border-color:#7b1fa2}.ds-tool-card:focus-visible{outline:3px solid #7b1fa2;outline-offset:2px}"
+    },
+    {
+      "name": "Primary Action",
+      "kind": "button",
+      "refersTo": "floating-action-surface",
+      "description": "The direct next operation within a softly elevated action surface.",
+      "html": "<button class=\"ds-primary-btn\">SCAN SELECTED FOLDER</button>",
+      "css": ".ds-primary-btn{width:100%;min-height:48px;border:0;border-radius:999px;background:#7b1fa2;color:#fff;padding:0 24px;font:500 14px/20px monospace;letter-spacing:.8px;cursor:pointer}.ds-primary-btn:hover{background:#6a1b9a}.ds-primary-btn:active{transform:translateY(1px)}.ds-primary-btn:focus-visible{outline:3px solid #e0b0ff;outline-offset:2px}"
+    },
+    {
+      "name": "Option Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "A compact filter choice for non-destructive configuration.",
+      "html": "<button class=\"ds-chip\">PLAYLIST FORMAT</button>",
+      "css": ".ds-chip{min-height:40px;border:1px solid #76677a;border-radius:999px;background:#eee5f2;color:#1a111f;padding:0 16px;font:500 12px/16px monospace;letter-spacing:1px;cursor:pointer}.ds-chip:hover{border-color:#7b1fa2}.ds-chip:focus-visible{outline:3px solid #7b1fa2;outline-offset:2px}"
+    },
+    {
+      "name": "Confirmation Dialog",
+      "kind": "custom",
+      "refersTo": "material-alert-dialog",
+      "description": "A plain-language checkpoint before an irreversible file operation.",
+      "html": "<section class=\"ds-dialog\"><strong>Apply changes?</strong><p>Original files may be moved or removed as shown in the preview.</p><span><button class=\"ds-cancel\">CANCEL</button><button class=\"ds-confirm\">APPLY CHANGES</button></span></section>",
+      "css": ".ds-dialog{max-width:300px;border-radius:28px;background:#fff;color:#1a111f;padding:24px;font:16px/24px sans-serif;box-shadow:0 8px 24px rgba(26,17,31,.18)}.ds-dialog strong{font-size:20px;line-height:28px}.ds-dialog p{margin:12px 0 20px}.ds-dialog span{display:flex;justify-content:flex-end;gap:8px}.ds-dialog button{min-height:40px;border-radius:999px;padding:0 14px;font:500 12px/16px monospace;letter-spacing:.8px;cursor:pointer}.ds-cancel{border:1px solid #76677a;background:transparent;color:#7b1fa2}.ds-confirm{border:0;background:#7b1fa2;color:#fff}.ds-dialog button:focus-visible{outline:3px solid #7b1fa2;outline-offset:2px}"
+    },
+    {
+      "name": "Landscape Navigation Rail",
+      "kind": "nav",
+      "refersTo": "material-navigation-rail",
+      "description": "Expanded landscape navigation that leaves the work area as one vertical task sequence.",
+      "html": "<nav class=\"ds-rail\"><b>M</b><button class=\"ds-rail-active\">⌂<small>HOME</small></button><button>◈<small>TOOLS</small></button></nav>",
+      "css": ".ds-rail{display:grid;gap:12px;width:72px;min-height:240px;padding:16px 8px;border-radius:0 18px 18px 0;background:rgba(255,255,255,.96);color:#1a111f;text-align:center;font:500 11px/16px monospace}.ds-rail b{color:#7b1fa2;font:600 20px/24px sans-serif}.ds-rail button{display:grid;gap:3px;justify-items:center;min-height:52px;border:0;border-radius:16px;background:transparent;color:inherit;cursor:pointer}.ds-rail button:hover,.ds-rail-active{background:rgba(123,31,162,.12)!important;color:#7b1fa2!important}.ds-rail small{font:500 10px/12px monospace}.ds-rail button:focus-visible{outline:3px solid #7b1fa2;outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Violet Workshop",
+    "overview": "Mimir is a warm, approachable Android workshop for careful library maintenance. Violet connects the app's tools and decisions; generous, gently lifted surfaces make the operational work feel manageable rather than clinical. The interface is Material 3 first. It uses clear task labels, native Android controls, and deliberate confirmation points to make local file work feel trustworthy. Dark mode is a first-class violet-night scheme, never an inverted light screen.",
+    "keyCharacteristics": ["Warm violet accents on pale lilac or near-black plum surfaces.", "Landscape-first operation with a persistent navigation rail and a readable vertical task list.", "Gently lifted cards, plain-language task copy, and technical mono labels for statuses and small metadata."],
+    "rules": [
+      { "name": "Accent-Has-A-Job", "body": "Violet is for action, selection, and navigation context. Let the neutral surface do most of the visual work.", "section": "colors" },
+      { "name": "Plain-Task", "body": "Use normal language for decisions and consequences; reserve mono treatment for concise labels and technical detail.", "section": "typography" },
+      { "name": "Gentle-Lift", "body": "Elevation should clarify a control's readiness or action priority; it must not make every surface look floating.", "section": "elevation" }
+    ],
+    "dos": ["Do make landscape the reference layout: rail plus one vertical task sequence.", "Do treat dark mode as a complete violet-night palette with readable surface contrast.", "Do use primary violet to show action, navigation context, and selected work.", "Do keep destructive file operations behind clear Material confirmation dialogs."],
+    "donts": ["Don't turn the landscape workspace into a multi-column tool grid.", "Don't use violet as a full-screen fill or add decorative neon effects.", "Don't replace native Material 3 controls with iOS-like controls or custom equivalents.", "Don't use mono for paragraphs or instructional copy."]
+  }
+}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mimir</string><string name="home">Home</string><string name="go_home">Vai alla Home</string><string name="toggle_dark_mode">Attiva o disattiva la modalità scura</string><string name="status">Stato</string><string name="open_tool">Apri %1$s</string>
-    <string name="home_intro">Prenditi cura della tua libreria per console portatile. Scegli cosa vuoi fare: Mimir resta sul dispositivo e ti consente di controllare le modifiche prima di scriverle.</string><string name="home_prompt">Cosa vuoi fare?</string><string name="home_prepare_library">Prepara la tua libreria</string><string name="home_make_room">Libera spazio</string>
+    <string name="home_intro">Benvenuto in Mimir!</string><string name="home_prompt">Scegli uno strumento dall’elenco qui sotto per iniziare</string><string name="home_prepare_library">Strumenti utili</string><string name="home_make_room">Risparmia spazio sul tuo dispositivo</string>
     <string name="goal_fix_multidisc">Correggi i giochi multidisco</string><string name="tool_multidisc">Organizzatore multidisco</string><string name="tool_multidisc_description">Crea cartelle e playlist pronte per il frontend.</string>
     <string name="goal_create_vita_shortcuts">Crea collegamenti Vita</string><string name="tool_vita_shortcuts">Collegamenti Vita</string><string name="tool_vita_shortcuts_description">Crea collegamenti .psvita o .dpt dal database integrato.</string>
     <string name="goal_setup_esde">Configura ES-DE</string><string name="tool_esde_systems">Sistemi ES-DE</string><string name="tool_esde_systems_description">Installa sistemi personalizzati e associa le relative cartelle ROM.</string>

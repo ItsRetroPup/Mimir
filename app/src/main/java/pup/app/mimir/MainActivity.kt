@@ -34,7 +34,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.Coffee
 import androidx.compose.material.icons.outlined.ChevronRight
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Favorite
@@ -58,6 +57,7 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -329,6 +329,12 @@ private fun MimirTheme(
     MaterialTheme(
         colorScheme = if (useDarkMode) darkScheme else lightScheme,
         typography = typography,
+        shapes = Shapes(
+            extraSmall = RoundedCornerShape(10.dp),
+            small = RoundedCornerShape(12.dp),
+            medium = RoundedCornerShape(16.dp),
+            large = RoundedCornerShape(16.dp),
+        ),
         content = content,
     )
 }
@@ -447,7 +453,7 @@ private fun MimirScreen(
                 .fillMaxSize()
                 .background(backgroundBrush)
         ) {
-            val isExpanded = maxWidth >= 840.dp && maxHeight >= 600.dp
+            val isExpanded = maxWidth >= 840.dp && maxHeight >= 480.dp
             val progressLabel = uiState.operationProgressLabel ?: uiState.scanProgressLabel
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -993,49 +999,6 @@ private fun ChdQueueTable(
 }
 
 @Composable
-private fun HeroSection(
-    currentSection: AppSection,
-) {
-    val title = when (currentSection) {
-        AppSection.Home -> "Welcome, Brother"
-        AppSection.EsDeSystems -> "ES-DE Systems"
-        AppSection.Organizer -> "Organizer"
-        AppSection.Zipper -> "Zipper"
-        AppSection.ChdMan -> "CHDMan"
-        AppSection.Rvz -> "Dolphin RVZ"
-        AppSection.Zcci -> "Azahar ZCCI"
-        AppSection.Nsz -> "NSZ to NSP"
-        AppSection.Vita -> "Vita Shortcuts"
-    }
-    val body = when (currentSection) {
-        AppSection.Home ->
-            "Select your tool below"
-        AppSection.EsDeSystems ->
-            "Download Android custom systems and assign ROM folders per system"
-        AppSection.Organizer ->
-            "Organises your multi-disc ROMs into the appropriate format for your chosen frontend"
-        AppSection.Zipper ->
-            "Compresses compatible ROM files to .zip to save some space"
-        AppSection.ChdMan, AppSection.Rvz, AppSection.Zcci, AppSection.Nsz ->
-            "Convert compatible ROM formats while keeping the original files"
-        AppSection.Vita ->
-            "Search the built-in Vita shortcut database, queue titles, and generate scraper-friendly .psvita files on-device"
-    }
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.displaySmall,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
-        Text(
-            text = body,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.78f),
-        )
-    }
-}
-
-@Composable
 private fun SupportSection(
     onOpenYoutube: () -> Unit,
     onOpenKofi: () -> Unit,
@@ -1291,42 +1254,6 @@ private fun VitaControlCard(
                         }
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ActionCard(
-    onScan: () -> Unit,
-    onConvertSelected: () -> Unit,
-    showConvertSelected: Boolean,
-    canScan: Boolean,
-    canConvertSelected: Boolean,
-    showStopControls: Boolean,
-    canStopAfterCurrent: Boolean,
-    onStopNow: () -> Unit,
-    onStopAfterCurrent: () -> Unit,
-) {
-    StyledCard {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Button(
-                onClick = if (showConvertSelected) onConvertSelected else onScan,
-                enabled = if (showConvertSelected) canConvertSelected else canScan,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(if (showConvertSelected) "CONVERT SELECTED" else "SCAN")
-            }
-            if (showStopControls) {
-                OutlinedButton(
-                    onClick = onStopAfterCurrent,
-                    enabled = canStopAfterCurrent,
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text("STOP AFTER CURRENT CONVERSION") }
-                OutlinedButton(
-                    onClick = onStopNow,
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text("STOP NOW") }
             }
         }
     }
@@ -1726,28 +1653,6 @@ private fun ChdProgressToast(
 }
 
 @Composable
-private fun ThinProgress(progress: Float) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(4.dp)
-            .clip(RoundedCornerShape(999.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(progress)
-                .height(4.dp)
-                .background(
-                    Brush.horizontalGradient(
-                        listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
-                    )
-                )
-        )
-    }
-}
-
-@Composable
 private fun InfoPanel(
     title: String,
     body: String,
@@ -1911,7 +1816,20 @@ private fun StyledCard(content: @Composable () -> Unit) {
             .fillMaxWidth()
             .padding(vertical = 6.dp),
     ) {
-        content()
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.88f),
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            shape = MaterialTheme.shapes.medium,
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                content()
+            }
+        }
     }
 }
 

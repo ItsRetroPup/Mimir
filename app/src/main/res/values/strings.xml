@@ -7,10 +7,10 @@
     <string name="toggle_dark_mode">Toggle dark mode</string>
     <string name="status">Status</string>
     <string name="open_tool">Open %1$s</string>
-    <string name="home_intro">Care for your handheld library. Choose what you want to get done; Mimir keeps it local and lets you review changes before it writes.</string>
-    <string name="home_prompt">What do you want to do?</string>
-    <string name="home_prepare_library">Prepare your library</string>
-    <string name="home_make_room">Make room</string>
+    <string name="home_intro">Welcome to Mimir!</string>
+    <string name="home_prompt">Choose a tool from the list below to get started</string>
+    <string name="home_prepare_library">Some handy tools</string>
+    <string name="home_make_room">Save space on your device</string>
 
     <!-- Home tool cards: the goal is shown first; the backend name is supporting context. -->
     <string name="goal_fix_multidisc">Fix multi-disc games</string>

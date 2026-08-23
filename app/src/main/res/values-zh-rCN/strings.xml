@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mimir</string><string name="home">主页</string><string name="go_home">返回主页</string><string name="toggle_dark_mode">切换深色模式</string><string name="status">状态</string><string name="open_tool">打开%1$s</string>
-    <string name="home_intro">管理您的掌机游戏库。选择要完成的任务；Mimir 会在本机运行，并在写入前让您检查更改。</string><string name="home_prompt">您想做什么？</string><string name="home_prepare_library">整理游戏库</string><string name="home_make_room">释放空间</string>
+    <string name="home_intro">欢迎使用 Mimir！</string><string name="home_prompt">从下方列表中选择一个工具开始使用</string><string name="home_prepare_library">实用工具</string><string name="home_make_room">节省设备空间</string>
     <string name="goal_fix_multidisc">整理多光盘游戏</string><string name="tool_multidisc">多光盘整理工具</string><string name="tool_multidisc_description">创建适用于前端的文件夹和播放列表。</string>
     <string name="goal_create_vita_shortcuts">创建 Vita 快捷方式</string><string name="tool_vita_shortcuts">Vita 快捷方式</string><string name="tool_vita_shortcuts_description">从内置数据库创建 .psvita 或 .dpt 快捷方式。</string>
     <string name="goal_setup_esde">设置 ES-DE</string><string name="tool_esde_systems">ES-DE 系统</string><string name="tool_esde_systems_description">安装自定义系统并映射其 ROM 文件夹。</string>

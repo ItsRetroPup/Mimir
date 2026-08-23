@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mimir</string><string name="home">홈</string><string name="go_home">홈으로 이동</string><string name="toggle_dark_mode">다크 모드 전환</string><string name="status">상태</string><string name="open_tool">%1$s 열기</string>
-    <string name="home_intro">휴대용 게임 라이브러리를 관리하세요. 할 일을 선택하면 Mimir가 기기 내에서 작업하고 쓰기 전에 변경 사항을 검토할 수 있습니다.</string><string name="home_prompt">무엇을 하시겠습니까?</string><string name="home_prepare_library">라이브러리 준비</string><string name="home_make_room">공간 확보</string>
+    <string name="home_intro">Mimir에 오신 것을 환영합니다!</string><string name="home_prompt">아래 목록에서 도구를 선택하여 시작하세요</string><string name="home_prepare_library">유용한 도구</string><string name="home_make_room">기기의 저장 공간 절약</string>
     <string name="goal_fix_multidisc">여러 디스크 게임 정리</string><string name="tool_multidisc">여러 디스크 정리</string><string name="tool_multidisc_description">프런트엔드용 폴더와 재생 목록을 만듭니다.</string>
     <string name="goal_create_vita_shortcuts">Vita 바로가기 만들기</string><string name="tool_vita_shortcuts">Vita 바로가기</string><string name="tool_vita_shortcuts_description">내장 데이터베이스에서 .psvita 또는 .dpt 바로가기를 만듭니다.</string>
     <string name="goal_setup_esde">ES-DE 설정</string><string name="tool_esde_systems">ES-DE 시스템</string><string name="tool_esde_systems_description">사용자 지정 시스템을 설치하고 ROM 폴더를 연결합니다.</string>

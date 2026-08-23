@@ -6,10 +6,10 @@
     <string name="toggle_dark_mode">Activer ou désactiver le mode sombre</string>
     <string name="status">État</string>
     <string name="open_tool">Ouvrir %1$s</string>
-    <string name="home_intro">Prenez soin de votre bibliothèque pour console portable. Choisissez ce que vous voulez faire : Mimir reste local et vous permet de vérifier les modifications avant de les écrire.</string>
-    <string name="home_prompt">Que voulez-vous faire ?</string>
-    <string name="home_prepare_library">Préparer votre bibliothèque</string>
-    <string name="home_make_room">Libérer de l’espace</string>
+    <string name="home_intro">Bienvenue dans Mimir !</string>
+    <string name="home_prompt">Choisissez un outil dans la liste ci-dessous pour commencer</string>
+    <string name="home_prepare_library">Outils pratiques</string>
+    <string name="home_make_room">Libérez de l’espace sur votre appareil</string>
 
     <string name="goal_fix_multidisc">Corriger les jeux multidisques</string>
     <string name="tool_multidisc">Organiseur multidisque</string>
