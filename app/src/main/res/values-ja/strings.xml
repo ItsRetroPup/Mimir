@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mimir</string><string name="home">ホーム</string><string name="go_home">ホームに戻る</string><string name="toggle_dark_mode">ダークモードを切り替え</string><string name="status">状態</string><string name="open_tool">%1$sを開く</string>
+    <string name="home_intro">携帯ゲーム機のライブラリを整えましょう。やりたいことを選んでください。Mimirは端末内で動作し、書き込む前に変更を確認できます。</string><string name="home_prompt">何をしますか？</string><string name="home_prepare_library">ライブラリを整理する</string><string name="home_make_room">空き容量を増やす</string>
+    <string name="goal_fix_multidisc">複数ディスクのゲームを整理する</string><string name="tool_multidisc">複数ディスクの整理</string><string name="tool_multidisc_description">フロントエンド向けのフォルダーとプレイリストを作成します。</string>
+    <string name="goal_create_vita_shortcuts">Vitaショートカットを作成する</string><string name="tool_vita_shortcuts">Vitaショートカット</string><string name="tool_vita_shortcuts_description">内蔵データベースから.psvitaまたは.dptのショートカットを作成します。</string>
+    <string name="goal_setup_esde">ES-DEを設定する</string><string name="tool_esde_systems">ES-DEシステム</string><string name="tool_esde_systems_description">カスタムシステムをインストールし、ROMフォルダーを割り当てます。</string>
+    <string name="goal_convert_switch_packages">Switchパッケージを変換する</string><string name="tool_nsz_to_nsp">NSZからNSP</string><string name="tool_nsz_to_nsp_description">NSZファイルをNSPパッケージに展開します。</string>
+    <string name="goal_compress_cartridge_roms">カートリッジROMを圧縮する</string><string name="tool_romzipper">RomZipper</string><string name="tool_romzipper_description">対応するカートリッジROMを.zipファイルにアーカイブします。</string>
+    <string name="goal_compress_disc_images">ディスクイメージを圧縮する</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">PSX、PS2、PSP、Saturn、Dreamcast、Sega CDのイメージをCHDに変換します。</string>
+    <string name="goal_shrink_gamecube_wii">GameCubeとWiiのゲームを圧縮する</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">ISOイメージをRVZに変換します。</string>
+    <string name="goal_shrink_3ds">Nintendo 3DSのゲームを圧縮する</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">復号済みの3DSおよびCCIイメージをZCCIに圧縮します。</string><string name="tool_card_description">%1$s \u2022 %2$s</string>
+    <string name="no_rom_folder_selected">ROMフォルダーが選択されていません</string><string name="no_vita_output_directory_selected">Vita出力フォルダーが選択されていません</string><string name="no_esde_folder_selected">ES-DEフォルダーが選択されていません</string>
+</resources>
