@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mimir</string><string name="home">Strona główna</string><string name="go_home">Przejdź do strony głównej</string><string name="toggle_dark_mode">Przełącz tryb ciemny</string><string name="status">Stan</string><string name="open_tool">Otwórz: %1$s</string>
+    <string name="home_intro">Zadbaj o bibliotekę na konsoli przenośnej. Wybierz zadanie; Mimir działa lokalnie i pozwala sprawdzić zmiany przed ich zapisaniem.</string><string name="home_prompt">Co chcesz zrobić?</string><string name="home_prepare_library">Przygotuj bibliotekę</string><string name="home_make_room">Zwolnij miejsce</string>
+    <string name="goal_fix_multidisc">Napraw gry wielopłytowe</string><string name="tool_multidisc">Organizator wielu płyt</string><string name="tool_multidisc_description">Twórz foldery i playlisty gotowe dla frontendu.</string>
+    <string name="goal_create_vita_shortcuts">Utwórz skróty Vita</string><string name="tool_vita_shortcuts">Skróty Vita</string><string name="tool_vita_shortcuts_description">Twórz skróty .psvita lub .dpt z wbudowanej bazy danych.</string>
+    <string name="goal_setup_esde">Skonfiguruj ES-DE</string><string name="tool_esde_systems">Systemy ES-DE</string><string name="tool_esde_systems_description">Instaluj własne systemy i przypisuj ich foldery ROM.</string>
+    <string name="goal_convert_switch_packages">Konwertuj pakiety Switch</string><string name="tool_nsz_to_nsp">NSZ do NSP</string><string name="tool_nsz_to_nsp_description">Rozpakowuj pliki NSZ do pakietów NSP.</string>
+    <string name="goal_compress_cartridge_roms">Kompresuj ROM-y z kartridży</string><string name="tool_romzipper">RomZipper</string><string name="tool_romzipper_description">Archiwizuj obsługiwane ROM-y z kartridży jako pliki .zip.</string>
+    <string name="goal_compress_disc_images">Kompresuj obrazy płyt</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">Konwertuj obrazy PSX, PS2, PSP, Saturn, Dreamcast i Sega CD do CHD.</string>
+    <string name="goal_shrink_gamecube_wii">Zmniejsz gry GameCube i Wii</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">Konwertuj obrazy ISO do RVZ.</string>
+    <string name="goal_shrink_3ds">Zmniejsz gry Nintendo 3DS</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">Kompresuj odszyfrowane obrazy 3DS i CCI do ZCCI.</string><string name="tool_card_description">%1$s \u2022 %2$s</string>
+    <string name="no_rom_folder_selected">Nie wybrano folderu ROM</string><string name="no_vita_output_directory_selected">Nie wybrano folderu wyjściowego Vita</string><string name="no_esde_folder_selected">Nie wybrano folderu ES-DE</string>
+</resources>

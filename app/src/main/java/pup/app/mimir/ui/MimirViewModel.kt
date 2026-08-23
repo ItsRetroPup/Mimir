@@ -26,6 +26,7 @@ import pup.app.mimir.domain.RomZipperPlanner
 import pup.app.mimir.domain.ToolMode
 import pup.app.mimir.domain.VitaAppIdPlanner
 import pup.app.mimir.domain.VitaShortcutFormat
+import pup.app.mimir.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,9 +37,9 @@ import java.io.File
 
 data class MimirUiState(
     val selectedFolderUri: Uri? = null,
-    val selectedFolderName: String = "No ROM folder selected",
+    val selectedFolderName: String = "",
     val vitaOutputUri: Uri? = null,
-    val vitaOutputName: String = "No Vita output directory selected",
+    val vitaOutputName: String = "",
     val vitaShortcutFormat: VitaShortcutFormat = VitaShortcutFormat.Psvita,
     val vitaQuery: String = "",
     val vitaDatabaseSize: Int = 0,
@@ -51,7 +52,7 @@ data class MimirUiState(
     val selectedConverterTool: ConverterTool = ConverterTool.Chd,
     val nszKeysConfigured: Boolean = false,
     val esDeRootUri: Uri? = null,
-    val esDeRootName: String = "No ES-DE folder selected",
+    val esDeRootName: String = "",
     val esDeSystems: List<EsDeSystem> = emptyList(),
     val deleteOriginalChdFiles: Boolean = false,
     val scanHiddenFolders: Boolean = false,
@@ -91,15 +92,15 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(
         MimirUiState(
             selectedFolderUri = prefs.getString(KEY_URI, null)?.let(Uri::parse),
-            selectedFolderName = prefs.getString(KEY_LABEL, null) ?: "No ROM folder selected",
+            selectedFolderName = prefs.getString(KEY_LABEL, null) ?: application.getString(R.string.no_rom_folder_selected),
             vitaOutputUri = prefs.getString(KEY_VITA_OUTPUT_URI, null)?.let(Uri::parse),
-            vitaOutputName = prefs.getString(KEY_VITA_OUTPUT_LABEL, null) ?: "No Vita output directory selected",
+            vitaOutputName = prefs.getString(KEY_VITA_OUTPUT_LABEL, null) ?: application.getString(R.string.no_vita_output_directory_selected),
             vitaShortcutFormat = prefs.getString(KEY_VITA_SHORTCUT_FORMAT, null)
                 ?.let { storedFormat -> VitaShortcutFormat.entries.find { it.name == storedFormat } }
                 ?: VitaShortcutFormat.Psvita,
             nszKeysConfigured = nszKeysFile.isFile && nszKeysFile.length() > 0L,
             esDeRootUri = prefs.getString(KEY_ESDE_URI, null)?.let(Uri::parse),
-            esDeRootName = prefs.getString(KEY_ESDE_LABEL, null) ?: "No ES-DE folder selected",
+            esDeRootName = prefs.getString(KEY_ESDE_LABEL, null) ?: application.getString(R.string.no_esde_folder_selected),
             scanHiddenFolders = prefs.getBoolean(KEY_SCAN_HIDDEN_FOLDERS, false),
             deleteOriginalChdFiles = prefs.getBoolean(KEY_DELETE_ORIGINAL_CHD_FILES, false),
             useDarkMode = prefs.getBoolean(KEY_DARK_MODE, true),

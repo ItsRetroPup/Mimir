@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -51,6 +53,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -67,14 +71,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.annotation.StringRes
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -103,6 +113,30 @@ private enum class AppSection {
     Nsz,
     Vita,
 }
+
+private data class ToolEntry(
+    @StringRes val goal: Int,
+    @StringRes val toolName: Int,
+    @StringRes val description: Int,
+    val mode: ToolMode,
+    val section: AppSection,
+    val converter: ConverterTool? = null,
+    val icon: ImageVector,
+)
+
+private val utilities = listOf(
+    ToolEntry(R.string.goal_fix_multidisc, R.string.tool_multidisc, R.string.tool_multidisc_description, ToolMode.MultiDiscOrganizer, AppSection.Organizer, icon = Icons.Outlined.Archive),
+    ToolEntry(R.string.goal_create_vita_shortcuts, R.string.tool_vita_shortcuts, R.string.tool_vita_shortcuts_description, ToolMode.VitaAppIds, AppSection.Vita, icon = Icons.Outlined.Home),
+    ToolEntry(R.string.goal_setup_esde, R.string.tool_esde_systems, R.string.tool_esde_systems_description, ToolMode.EsDeSystems, AppSection.EsDeSystems, icon = Icons.Outlined.Folder),
+    ToolEntry(R.string.goal_convert_switch_packages, R.string.tool_nsz_to_nsp, R.string.tool_nsz_to_nsp_description, ToolMode.ChdConverter, AppSection.Nsz, ConverterTool.NszNsp, Icons.Outlined.Archive),
+)
+
+private val spaceSavers = listOf(
+    ToolEntry(R.string.goal_compress_cartridge_roms, R.string.tool_romzipper, R.string.tool_romzipper_description, ToolMode.RomZipper, AppSection.Zipper, icon = Icons.Outlined.FolderZip),
+    ToolEntry(R.string.goal_compress_disc_images, R.string.tool_chdman, R.string.tool_chdman_description, ToolMode.ChdConverter, AppSection.ChdMan, ConverterTool.Chd, Icons.Outlined.Archive),
+    ToolEntry(R.string.goal_shrink_gamecube_wii, R.string.tool_dolphin_rvz, R.string.tool_dolphin_rvz_description, ToolMode.ChdConverter, AppSection.Rvz, ConverterTool.DolphinRvz, Icons.Outlined.Archive),
+    ToolEntry(R.string.goal_shrink_3ds, R.string.tool_azahar_zcci, R.string.tool_azahar_zcci_description, ToolMode.ChdConverter, AppSection.Zcci, ConverterTool.AzaharZcci, Icons.Outlined.Archive),
+)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -339,10 +373,21 @@ private fun MimirScreen(
     }
     var currentSection by rememberSaveable { mutableStateOf(AppSection.Home) }
     var showApplyConfirmation by rememberSaveable { mutableStateOf(false) }
+    var showEsDeConfirmation by rememberSaveable { mutableStateOf(false) }
+    var pendingVitaAdd by remember { mutableStateOf<pup.app.mimir.domain.VitaApp?>(null) }
+    var pendingVitaRemove by remember { mutableStateOf<pup.app.mimir.domain.VitaApp?>(null) }
     var pendingDeleteOriginalChdFiles by rememberSaveable { mutableStateOf(false) }
     var chdSortOption by rememberSaveable { mutableStateOf(ChdSortOption.NameAscending.name) }
     val openUrl: (String) -> Unit = { url ->
         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+    }
+    val selectTool: (ToolEntry) -> Unit = { tool ->
+        onModeSelected(tool.mode)
+        tool.converter?.let(onConverterToolSelected)
+        currentSection = tool.section
+    }
+    BackHandler(enabled = currentSection != AppSection.Home) {
+        currentSection = AppSection.Home
     }
     Scaffold(
         containerColor = Color.Transparent,
@@ -366,7 +411,7 @@ private fun MimirScreen(
                             IconButton(onClick = { currentSection = AppSection.Home }) {
                                 Icon(
                                     imageVector = Icons.Outlined.Home,
-                                    contentDescription = "Go home",
+                                    contentDescription = stringResource(R.string.go_home),
                                     tint = MaterialTheme.colorScheme.primary,
                                 )
                             }
@@ -379,7 +424,7 @@ private fun MimirScreen(
                                 .clip(RoundedCornerShape(10.dp))
                         )
                         Text(
-                            text = "Mimir",
+                            text = stringResource(R.string.app_name),
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.primary,
                         )
@@ -388,7 +433,7 @@ private fun MimirScreen(
                         IconButton(onClick = { onDarkModeToggled(!uiState.useDarkMode) }) {
                             Icon(
                                 imageVector = Icons.Outlined.DarkMode,
-                                contentDescription = "Toggle dark mode",
+                                contentDescription = stringResource(R.string.toggle_dark_mode),
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                         }
@@ -402,11 +447,12 @@ private fun MimirScreen(
                 .fillMaxSize()
                 .background(backgroundBrush)
         ) {
+            val isExpanded = maxWidth >= 840.dp && maxHeight >= 600.dp
             val progressLabel = uiState.operationProgressLabel ?: uiState.scanProgressLabel
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
-                    start = 16.dp,
+                    start = if (isExpanded) 96.dp else 16.dp,
                     top = innerPadding.calculateTopPadding() + 16.dp,
                     end = 16.dp,
                     bottom = innerPadding.calculateBottomPadding() + 96.dp,
@@ -421,11 +467,7 @@ private fun MimirScreen(
                             ToolModeCards(
                                 selectedMode = uiState.selectedMode,
                                 selectedConverterTool = uiState.selectedConverterTool,
-                                onPageSelected = { section, mode, converter ->
-                                    onModeSelected(mode)
-                                    converter?.let(onConverterToolSelected)
-                                    currentSection = section
-                                },
+                                onPageSelected = selectTool,
                             )
                         }
                         item {
@@ -448,7 +490,7 @@ private fun MimirScreen(
                         uiState.message?.let { message ->
                             item {
                                 InfoPanel(
-                                    title = "STATUS",
+                                    title = stringResource(R.string.status),
                                     body = message,
                                     accent = if (message.contains("unable", ignoreCase = true) ||
                                         message.contains("failed", ignoreCase = true)
@@ -473,8 +515,8 @@ private fun MimirScreen(
                                     isBusy = uiState.isBusy,
                                     onVitaQueryChanged = onVitaQueryChanged,
                                     onVitaShortcutFormatSelected = onVitaShortcutFormatSelected,
-                                    onVitaShortcutAdd = onVitaShortcutAdd,
-                                    onVitaShortcutRemove = onVitaShortcutRemove,
+                                    onVitaShortcutAdd = { pendingVitaAdd = it },
+                                    onVitaShortcutRemove = { pendingVitaRemove = it },
                                 )
                             } else if (uiState.selectedMode == ToolMode.EsDeSystems) {
                                 EsDeSystemsCard(
@@ -485,7 +527,7 @@ private fun MimirScreen(
                                     onSelectRomRoot = onSelectFolder,
                                     onSelectRoot = onSelectEsDeFolder,
                                     onRefresh = onRefreshEsDeSystems,
-                                    onApply = onApplyEsDeSystems,
+                                    onApply = { showEsDeConfirmation = true },
                                     onPickFolder = onPickEsDeSystemFolder,
                                 )
                             } else {
@@ -589,6 +631,27 @@ private fun MimirScreen(
                         }
 
                     }
+            }
+            if (isExpanded) {
+                NavigationRail(
+                    modifier = Modifier.align(Alignment.CenterStart).fillMaxHeight(),
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f),
+                ) {
+                    NavigationRailItem(
+                        selected = currentSection == AppSection.Home,
+                        onClick = { currentSection = AppSection.Home },
+                        icon = { Icon(Icons.Outlined.Home, contentDescription = stringResource(R.string.home)) },
+                        label = { Text(stringResource(R.string.home)) },
+                    )
+                    (utilities + spaceSavers).forEach { tool ->
+                        NavigationRailItem(
+                            selected = currentSection == tool.section,
+                            onClick = { selectTool(tool) },
+                            icon = { Icon(tool.icon, contentDescription = stringResource(tool.goal)) },
+                            label = { Text(stringResource(tool.toolName)) },
+                        )
+                    }
+                }
             }
             if (currentSection != AppSection.Home &&
                 uiState.selectedMode != ToolMode.VitaAppIds &&
@@ -719,6 +782,67 @@ private fun MimirScreen(
                 OutlinedButton(onClick = { showApplyConfirmation = false }) {
                     Text("CANCEL")
                 }
+            },
+        )
+    }
+
+    if (showEsDeConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showEsDeConfirmation = false },
+            title = { Text("Install custom systems?") },
+            text = {
+                Text(
+                    "This will install ${uiState.esDeSystems.size} configured system" +
+                        if (uiState.esDeSystems.size == 1) "" else "s" +
+                        " in the selected ES-DE folder's custom_systems directory. Existing custom system files may be updated. Restart ES-DE after the install finishes.",
+                )
+            },
+            confirmButton = {
+                Button(onClick = {
+                    showEsDeConfirmation = false
+                    onApplyEsDeSystems()
+                }) { Text("INSTALL SYSTEMS") }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { showEsDeConfirmation = false }) { Text("CANCEL") }
+            },
+        )
+    }
+
+    pendingVitaAdd?.let { app ->
+        AlertDialog(
+            onDismissRequest = { pendingVitaAdd = null },
+            title = { Text("Create Vita shortcut?") },
+            text = {
+                Text(
+                    "This will create a .${uiState.vitaShortcutFormat.extension} shortcut for ${app.title} (${app.titleId}) in the selected output folder.",
+                )
+            },
+            confirmButton = {
+                Button(onClick = {
+                    pendingVitaAdd = null
+                    onVitaShortcutAdd(app)
+                }) { Text("CREATE SHORTCUT") }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { pendingVitaAdd = null }) { Text("CANCEL") }
+            },
+        )
+    }
+
+    pendingVitaRemove?.let { app ->
+        AlertDialog(
+            onDismissRequest = { pendingVitaRemove = null },
+            title = { Text("Remove Vita shortcut?") },
+            text = { Text("This will delete the shortcut for ${app.title} (${app.titleId}) from the selected output folder.") },
+            confirmButton = {
+                Button(onClick = {
+                    pendingVitaRemove = null
+                    onVitaShortcutRemove(app)
+                }) { Text("REMOVE SHORTCUT") }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { pendingVitaRemove = null }) { Text("CANCEL") }
             },
         )
     }
@@ -963,7 +1087,7 @@ private fun ControlCard(
         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Label("SYSTEM CONTROL")
             Text("Selected ROM folder", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-            Text(folderName, style = MaterialTheme.typography.bodyLarge)
+            Text(folderName, style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Button(
                 onClick = onSelectFolder,
                 modifier = Modifier.fillMaxWidth(),
@@ -992,14 +1116,14 @@ private fun EsDeSystemsCard(
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Label("ES-DE CUSTOM SYSTEMS")
             Text("Selected ES-DE folder", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-            Text(rootFolderName, style = MaterialTheme.typography.bodyLarge)
+            Text(rootFolderName, style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Button(onClick = onSelectRoot, enabled = !isBusy, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Outlined.Folder, contentDescription = null)
                 Spacer(Modifier.size(8.dp))
                 Text("SELECT ES-DE FOLDER")
             }
             Text("ROM root folder", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-            Text(romRootFolderName, style = MaterialTheme.typography.bodyLarge)
+            Text(romRootFolderName, style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
             OutlinedButton(onClick = onSelectRomRoot, enabled = !isBusy, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Outlined.Folder, contentDescription = null)
                 Spacer(Modifier.size(8.dp))
@@ -1070,7 +1194,7 @@ private fun VitaControlCard(
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.secondary,
             )
-            Text(outputFolderName, style = MaterialTheme.typography.bodyLarge)
+            Text(outputFolderName, style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Button(
                 onClick = onSelectVitaOutput,
                 modifier = Modifier.fillMaxWidth(),
@@ -1138,7 +1262,7 @@ private fun VitaControlCard(
                                     modifier = Modifier.weight(1f),
                                     verticalArrangement = Arrangement.spacedBy(4.dp),
                                 ) {
-                                    Text(app.title, style = MaterialTheme.typography.titleMedium)
+                                    Text(app.title, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
                                     Text(
                                         app.titleId,
                                         style = MaterialTheme.typography.bodySmall,
@@ -1152,7 +1276,7 @@ private fun VitaControlCard(
                                     ) {
                                         Icon(
                                             imageVector = Icons.Outlined.Delete,
-                                            contentDescription = "Delete shortcut",
+                                            contentDescription = "Delete shortcut for ${app.title}",
                                         )
                                     }
                                 } else {
@@ -1212,12 +1336,12 @@ private fun ActionCard(
 private fun HomeIntroSection() {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
-            "Mimir",
+            stringResource(R.string.app_name),
             style = MaterialTheme.typography.displaySmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
         Text(
-            "A toolkit designed to help you organise your ROMs and save space on your device.",
+            stringResource(R.string.home_intro),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.82f),
         )
@@ -1281,48 +1405,28 @@ private fun HomeFooter() {
 private fun ToolModeCards(
     selectedMode: ToolMode,
     selectedConverterTool: ConverterTool,
-    onPageSelected: (AppSection, ToolMode, ConverterTool?) -> Unit,
+    onPageSelected: (ToolEntry) -> Unit,
 ) {
-    data class ToolEntry(
-        val title: String,
-        val description: String,
-        val mode: ToolMode,
-        val section: AppSection,
-        val converter: ConverterTool? = null,
-        val icon: ImageVector,
-    )
-    val utilities = listOf(
-        ToolEntry("Multi-disc Organizer", "Group discs and create frontend-ready folders and playlists.", ToolMode.MultiDiscOrganizer, AppSection.Organizer, icon = Icons.Outlined.Archive),
-        ToolEntry("Vita Shortcuts", "Create .psvita or .dpt shortcut files from the built-in Vita database.", ToolMode.VitaAppIds, AppSection.Vita, icon = Icons.Outlined.Home),
-        ToolEntry("ES-DE Systems", "Download custom systems and configure each system's ROM folder.", ToolMode.EsDeSystems, AppSection.EsDeSystems, icon = Icons.Outlined.Folder),
-        ToolEntry("NSZ to NSP", "Decompress Nintendo Switch NSZ packages into NSP files.", ToolMode.ChdConverter, AppSection.Nsz, ConverterTool.NszNsp, Icons.Outlined.Archive),
-    )
-    val spaceSavers = listOf(
-        ToolEntry("RomZipper", "Compress supported cartridge and ROM files into .zip archives.", ToolMode.RomZipper, AppSection.Zipper, icon = Icons.Outlined.FolderZip),
-        ToolEntry("CHDMan", "Convert PSX, PS2, PSP, Saturn, Dreamcast, and Sega CD images to .chd.", ToolMode.ChdConverter, AppSection.ChdMan, ConverterTool.Chd, Icons.Outlined.Archive),
-        ToolEntry("Dolphin RVZ", "Compress GameCube and Wii ISO images into .rvz files.", ToolMode.ChdConverter, AppSection.Rvz, ConverterTool.DolphinRvz, Icons.Outlined.Archive),
-        ToolEntry("Azahar ZCCI", "Compress decrypted Nintendo 3DS and CCI images into .zcci files.", ToolMode.ChdConverter, AppSection.Zcci, ConverterTool.AzaharZcci, Icons.Outlined.Archive),
-    )
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Choose a tool", style = MaterialTheme.typography.headlineMedium)
-        Text("Utilities", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+        Text(stringResource(R.string.home_prompt), style = MaterialTheme.typography.headlineMedium)
+        Text(stringResource(R.string.home_prepare_library), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
         utilities.forEach { tool ->
             ToolListItem(
-                title = tool.title,
-                description = tool.description,
+                title = stringResource(tool.goal),
+                description = stringResource(R.string.tool_card_description, stringResource(tool.toolName), stringResource(tool.description)),
                 icon = tool.icon,
                 selected = selectedMode == tool.mode && (tool.converter == null || selectedConverterTool == tool.converter),
-                onClick = { onPageSelected(tool.section, tool.mode, tool.converter) },
+                onClick = { onPageSelected(tool) },
             )
         }
-        Text("Space Savers", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+        Text(stringResource(R.string.home_make_room), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
         spaceSavers.forEach { tool ->
             ToolListItem(
-                title = tool.title,
-                description = tool.description,
+                title = stringResource(tool.goal),
+                description = stringResource(R.string.tool_card_description, stringResource(tool.toolName), stringResource(tool.description)),
                 icon = tool.icon,
                 selected = selectedMode == tool.mode && (tool.converter == null || selectedConverterTool == tool.converter),
-                onClick = { onPageSelected(tool.section, tool.mode, tool.converter) },
+                onClick = { onPageSelected(tool) },
             )
         }
     }
@@ -1385,7 +1489,7 @@ private fun ToolListItem(
             }
             Icon(
                 imageVector = Icons.Outlined.ChevronRight,
-                contentDescription = "Open $title",
+                contentDescription = stringResource(R.string.open_tool, title),
                 tint = MaterialTheme.colorScheme.primary,
             )
         }
@@ -1650,6 +1754,7 @@ private fun InfoPanel(
     accent: Color,
 ) {
     Card(
+        modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.88f)
         ),
@@ -1756,6 +1861,8 @@ private fun ChangeCard(
                 "${change.detailLabel} • ${change.detailPath}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
             if (change.targetAlreadyExists) {
                 Text(
@@ -1767,11 +1874,15 @@ private fun ChangeCard(
 
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text("Sources", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-                change.sourceFiles.forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
+                change.sourceFiles.forEach { path ->
+                    Text(path, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                }
             }
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text("Targets", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary)
-                change.targetFiles.forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
+                change.targetFiles.forEach { path ->
+                    Text(path, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                }
             }
         }
     }
