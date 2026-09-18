@@ -1,6 +1,6 @@
 ---
 name: Mimir
-description: A warm violet Material 3 workshop for safely maintaining retro ROM libraries.
+description: A warm violet Material 3 workshop for safely maintaining retro ROM libraries across Android and desktop.
 colors:
   primary: "#7B1FA2"
   primary-dark: "#E0B0FF"
@@ -78,14 +78,14 @@ components:
 
 **Creative North Star: "The Violet Workshop"**
 
-Mimir is a warm, approachable Android workshop for careful library maintenance. Violet connects the app's tools and decisions; generous, gently lifted surfaces make the operational work feel manageable rather than clinical.
+Mimir is a warm, approachable cross-platform workshop for careful library maintenance. Violet connects the app's tools and decisions; generous, gently lifted surfaces make the operational work feel manageable rather than clinical.
 
-The interface is Material 3 first. It uses clear task labels, native Android controls, and deliberate confirmation points to make local file work feel trustworthy. Dark mode is a first-class violet-night scheme, never an inverted light screen.
+The interface is Material 3 first. It uses clear task labels, platform-appropriate controls, and deliberate confirmation points to make local file work feel trustworthy. Dark mode is a first-class violet-night scheme, never an inverted light screen.
 
 **Key Characteristics:**
 
 - Warm violet accents on pale lilac or near-black plum surfaces.
-- Landscape-first operation with a persistent navigation rail and a readable vertical task list.
+- Landscape-first operation with a persistent navigation rail on desktop and expanded Android layouts, with a readable vertical task list on every target.
 - Gently lifted cards, plain-language task copy, and technical mono labels for statuses and small metadata.
 
 ## Colors
@@ -115,9 +115,9 @@ The palette pairs a welcoming workshop violet with quiet lilac neutrals; the acc
 
 ## Typography
 
-**Display Font:** Android sans-serif.
-**Body Font:** Android sans-serif.
-**Label/Mono Font:** Android monospace.
+**Display Font:** platform sans-serif.
+**Body Font:** platform sans-serif.
+**Label/Mono Font:** platform monospace.
 
 **Character:** Semibold sans-serif headings make tools easy to scan; mono labels give filenames, status, and operation language a useful workshop character without compromising body readability.
 
@@ -135,7 +135,7 @@ The palette pairs a welcoming workshop violet with quiet lilac neutrals; the acc
 
 Landscape is the primary operating context. At expanded sizes, Mimir keeps a navigation rail on the left and increases the content inset beside it; the main content remains a single readable vertical list rather than a dense dashboard grid. This preserves predictable scanning for sequential ROM-library work.
 
-Compact portrait screens retain the same vertical task order with page padding and a bottom navigation treatment. Use 12dp between stacked content blocks, 16dp for card interiors, and 20dp for top-bar horizontal padding. The navigation rail appears from 840dp width and 480dp height, covering landscape handhelds as well as larger devices. Support system font scaling, insets, and 48dp minimum touch targets.
+Compact portrait screens retain the same vertical task order with page padding and a bottom navigation treatment. Use 12 logical pixels between stacked content blocks, 16 for card interiors, and 20 for top-bar horizontal padding. The navigation rail appears from 840 logical pixels width and 480 logical pixels height, covering landscape handhelds as well as larger devices. Support system font scaling, insets, keyboard focus, and 48 logical-pixel minimum touch targets.
 
 ## Elevation & Depth
 

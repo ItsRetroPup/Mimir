@@ -1,7 +1,7 @@
 # Building the Azahar compression CLI for Android ARM64
 
 Mimir packages Azahar's upstream Z3DS compression implementation as
-`app/src/main/jniLibs/arm64-v8a/libazahar.so`. The file is an Android PIE executable despite the
+`android/app/src/main/jniLibs/arm64-v8a/libazahar.so`. The file is an Android PIE executable despite the
 `.so` suffix, which causes Android Gradle Plugin to extract it into the native-library directory.
 
 The bundled binary is built from Azahar revision
@@ -40,7 +40,7 @@ cmake --build build-android-cli --target azahar-compress -j 6
 "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-strip" \
   --strip-unneeded build-android-cli/bin/Release/azahar-compress
 cp build-android-cli/bin/Release/azahar-compress \
-  /path/to/Mimir/app/src/main/jniLibs/arm64-v8a/libazahar.so
+  /path/to/Mimir/android/app/src/main/jniLibs/arm64-v8a/libazahar.so
 ```
 
 Verify the result with `llvm-readelf -h -l -d`. It must be an AArch64 PIE executable, request

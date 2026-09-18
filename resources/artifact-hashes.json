@@ -1,0 +1,11 @@
+{
+  "android/app/src/main/jniLibs/arm64-v8a/libazahar.so": "86e48f952750b6a5cebaf81f01c833304dabf0894c32410aa47e04cded5b4a00",
+  "android/app/src/main/jniLibs/arm64-v8a/libchdman.so": "6823f9dab7c98b3282bf1a3b9b1a08275cecbcd5a9ff2e7ea45948fbbfe877a7",
+  "android/app/src/main/jniLibs/arm64-v8a/libdolphintool.so": "0f7de5b9a0df5dec0e8762e7d272ae96db4d334f2de1e2dba8b5edc720f306a3",
+  "android/app/src/main/python/mimir_nsz.py": "9db06a1d8580e892372063beba9067a6b1d8ad07c0ae7332d9d9e5157f553726",
+  "LICENSE": "328afbefa9da997568dd840dce8f7daf86c81535bb8e743d49794cdb0e78241d",
+  "assets/licenses/Azahar-GPL-2.0.txt": "a77e81713ddfe05f9f7f3a3c46de4147f82b5fe9d6e5e24af96e36a6de53f613",
+  "assets/licenses/Dolphin-GPL-2.0.txt": "695114256e306a5e1ca407bc6e2a11877b112328dbe990253b52f59726e01b4b",
+  "assets/licenses/MAME-GPL-2.0.txt": "ba20c40872287b52eeca54d48e875879b33d841b98f8cedba3558b405467d5de",
+  "assets/licenses/NSZ-MIT.txt": "401f18b04c2da1dd952d9be660b4a078e6b6c4b47803efe121d19383ae6364a5"
+}

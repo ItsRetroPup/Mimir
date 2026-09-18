@@ -1,6 +1,6 @@
 # Building CHDMan for Android ARM64
 
-The binary in `app/src/main/jniLibs/arm64-v8a/libchdman.so` was built from
+The binary in `android/app/src/main/jniLibs/arm64-v8a/libchdman.so` was built from
 MAME revision `ecf0add29f06ba131994dca5b88c3a0edf6c2ad8` using Android NDK r28c.
 
 From a macOS host with that NDK installed, clone the official source and generate the Android ARM64
@@ -33,10 +33,10 @@ runtime into Mimir:
 make -B -j6 -C build/projects/sdl/mame/gmake-android-arm64 config=release64 \
   CPPFLAGS=-I/tmp/mimir-sdl/include CXXFLAGS=-DSDLMAME_ANDROID \
   LDFLAGS=-static-libstdc++ chdman
-mkdir -p /path/to/Mimir/app/src/main/jniLibs/arm64-v8a
-cp chdman /path/to/Mimir/app/src/main/jniLibs/arm64-v8a/libchdman.so
+mkdir -p /path/to/Mimir/android/app/src/main/jniLibs/arm64-v8a
+cp chdman /path/to/Mimir/android/app/src/main/jniLibs/arm64-v8a/libchdman.so
 $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-strip --strip-unneeded \
-  /path/to/Mimir/app/src/main/jniLibs/arm64-v8a/libchdman.so
+  /path/to/Mimir/android/app/src/main/jniLibs/arm64-v8a/libchdman.so
 ```
 
 The emitted `libchdman.so` is an Android PIE executable with its C++ runtime statically linked; the

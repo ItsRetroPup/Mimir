@@ -4,7 +4,7 @@
 
 ## Platform
 
-android
+adaptive (Android, Windows, macOS, Linux)
 
 ## Users
 
@@ -12,21 +12,22 @@ People who use emulation on retro handhelds and want to reclaim storage or autom
 
 ## Product Purpose
 
-Mimir is an open-source, on-device Android toolkit for safely organising retro ROM libraries. It helps people prepare and maintain libraries from one central app, with a preview before any change is applied.
+Mimir is an open-source, local-first toolkit for safely organising retro ROM libraries. It helps people prepare and maintain libraries from one central app, with a preview before any change is applied.
 
 ## Positioning
 
-Mimir brings ROM organisation, conversion, frontend preparation, and PS Vita shortcut creation into one simple Android app rather than requiring separate tools and manual file work.
+Mimir brings ROM organisation, conversion, frontend preparation, and PS Vita shortcut creation into one simple cross-platform app rather than requiring separate tools and manual file work.
 
 ## Operating Context
 
-Users select folders on Android devices and review planned file changes before applying them. Mimir supports ROM organisers and converters, frontend-specific M3U output rules, PS Vita shortcuts, and ES-DE custom-system setup.
+Users select folders on Android devices or desktop computers and review planned file changes before applying them. Mimir supports ROM organisers and converters, frontend-specific M3U output rules, PS Vita shortcuts, and ES-DE custom-system setup.
 
 ## Capabilities and Constraints
 
 - All file operations run locally on the device; there is no cloud sync or account system.
 - Safety comes from preview-and-confirm workflows, deterministic operations, and conflict skipping.
-- The app targets Android API 29 and above, and its bundled converter executables are ARM64-only.
+- Android targets API 29 and above with ARM64 native converter binaries; desktop targets use platform-specific converter bundles.
+- Web and iOS are out of scope because Mimir requires direct local filesystem access and bundled converter executables.
 - Frontend compatibility is prioritised, with current support for ES-DE and generic output presets.
 
 ## Brand Commitments
@@ -38,7 +39,7 @@ Users select folders on Android devices and review planned file changes before a
 ## Evidence on Hand
 
 - The repository README documents current features, supported formats, and legal constraints.
-- The repository contains the Android application, unit tests, bundled converter backends, license texts, and PS Vita shortcut data.
+- The repository contains the Flutter application, platform adapters, shared Dart core, unit tests, converter backends, license texts, and PS Vita shortcut data.
 - No testimonials, customer claims, benchmark results, or pricing information are available for use.
 
 ## Product Principles
@@ -51,4 +52,4 @@ Users select folders on Android devices and review planned file changes before a
 
 ## Accessibility & Inclusion
 
-- Follow Android’s native accessibility expectations, including Material components, system font scaling, and minimum touch-target sizes.
+- Follow each target platform’s accessibility expectations, using Material components, system font scaling, keyboard focus where available, and minimum touch-target sizes.

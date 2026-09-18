@@ -1,6 +1,6 @@
 # Building DolphinTool for Android ARM64
 
-Mimir packages DolphinTool as `app/src/main/jniLibs/arm64-v8a/libdolphintool.so`. It is an Android
+Mimir packages DolphinTool as `android/app/src/main/jniLibs/arm64-v8a/libdolphintool.so`. It is an Android
 PIE executable despite the `.so` suffix, matching the packaging approach used for CHDMan.
 
 The current binary was built from Dolphin revision `73de7b8d3e59d4bef685f582d305b65bdb85a707`.
@@ -46,7 +46,7 @@ cmake --build build-android --target dolphin-tool -j 6
 "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-strip" --strip-unneeded \
   build-android/Binaries/dolphin-tool
 cp build-android/Binaries/dolphin-tool \
-  /path/to/Mimir/app/src/main/jniLibs/arm64-v8a/libdolphintool.so
+  /path/to/Mimir/android/app/src/main/jniLibs/arm64-v8a/libdolphintool.so
 ```
 
 The output links only Android system libraries. Verify it before release with `llvm-readelf -d`.

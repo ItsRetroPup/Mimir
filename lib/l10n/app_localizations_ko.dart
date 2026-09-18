@@ -1,0 +1,562 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Korean (`ko`).
+class AppLocalizationsKo extends AppLocalizations {
+  AppLocalizationsKo([String locale = 'ko']) : super(locale);
+
+  @override
+  String get appName => 'Mimir';
+
+  @override
+  String get home => '홈';
+
+  @override
+  String get goHome => '홈으로 이동';
+
+  @override
+  String get toggleDarkMode => '다크 모드 전환';
+
+  @override
+  String get status => '상태';
+
+  @override
+  String get homeIntro => 'Mimir에 오신 것을 환영합니다!';
+
+  @override
+  String get homePrompt => '아래 목록에서 도구를 선택하여 시작하세요';
+
+  @override
+  String get homePrepareLibrary => '유용한 도구';
+
+  @override
+  String get homeMakeRoom => '기기의 저장 공간 절약';
+
+  @override
+  String get supportMimir => 'Support Mimir';
+
+  @override
+  String get supportCopy =>
+      'Mimir is, and always will be, 100% free and without ads. If you would like to show your support, please consider checking out my YouTube channel or donating.';
+
+  @override
+  String get youtube => 'YouTube';
+
+  @override
+  String get kofi => 'Ko-fi';
+
+  @override
+  String get buyMeACoffee => 'Buy Me a Coffee';
+
+  @override
+  String get goalFixMultidisc => '여러 디스크 게임 정리';
+
+  @override
+  String get toolMultidisc => '여러 디스크 정리';
+
+  @override
+  String get toolMultidiscDescription => '프런트엔드용 폴더와 재생 목록을 만듭니다.';
+
+  @override
+  String get goalCreateVitaShortcuts => 'Vita 바로가기 만들기';
+
+  @override
+  String get toolVitaShortcuts => 'Vita 바로가기';
+
+  @override
+  String get toolVitaShortcutsDescription =>
+      '내장 데이터베이스에서 .psvita 또는 .dpt 바로가기를 만듭니다.';
+
+  @override
+  String get goalSetupEsde => 'ES-DE 설정';
+
+  @override
+  String get toolEsdeSystems => 'ES-DE 시스템';
+
+  @override
+  String get toolEsdeSystemsDescription => '사용자 지정 시스템을 설치하고 ROM 폴더를 연결합니다.';
+
+  @override
+  String get goalConvertSwitchPackages => 'Switch 패키지 변환';
+
+  @override
+  String get toolNszToNsp => 'NSZ에서 NSP로';
+
+  @override
+  String get toolNszToNspDescription => 'NSZ 파일을 NSP 패키지로 압축 해제합니다.';
+
+  @override
+  String get goalCompressCartridgeRoms => '카트리지 ROM 압축';
+
+  @override
+  String get toolRomzipper => 'RomZipper';
+
+  @override
+  String get toolRomzipperDescription => '지원되는 카트리지 ROM을 .zip 파일로 보관합니다.';
+
+  @override
+  String get goalCompressDiscImages => '디스크 이미지 압축';
+
+  @override
+  String get toolChdman => 'CHDMan';
+
+  @override
+  String get toolChdmanDescription =>
+      'PSX, PS2, PSP, Saturn, Dreamcast, Sega CD 이미지를 CHD로 변환합니다.';
+
+  @override
+  String get goalShrinkGamecubeWii => 'GameCube 및 Wii 게임 줄이기';
+
+  @override
+  String get toolDolphinRvz => 'Dolphin RVZ';
+
+  @override
+  String get toolDolphinRvzDescription => 'ISO 이미지를 RVZ로 변환합니다.';
+
+  @override
+  String get goalShrink3ds => 'Nintendo 3DS 게임 줄이기';
+
+  @override
+  String get toolAzaharZcci => 'Azahar ZCCI';
+
+  @override
+  String get toolAzaharZcciDescription => '복호화된 3DS 및 CCI 이미지를 ZCCI로 압축합니다.';
+
+  @override
+  String toolCardDescription(Object tool, Object description) {
+    return '$tool • $description';
+  }
+
+  @override
+  String get noRomFolderSelected => 'ROM 폴더가 선택되지 않았습니다';
+
+  @override
+  String get noVitaOutputSelected => 'Vita 출력 폴더가 선택되지 않았습니다';
+
+  @override
+  String get noEsdeFolderSelected => 'ES-DE 폴더가 선택되지 않았습니다';
+
+  @override
+  String get selectedRomFolder => 'Selected ROM folder';
+
+  @override
+  String get selectRomFolder => 'Select ROM folder';
+
+  @override
+  String get shortcutOutputDirectory => 'Shortcut output directory';
+
+  @override
+  String get selectOutputFolder => 'Select output folder';
+
+  @override
+  String get shortcutFileType => 'Shortcut file type';
+
+  @override
+  String get cocoonHint => 'For Cocoon users, select .dpt';
+
+  @override
+  String get shortcutDatabase => 'Shortcut database';
+
+  @override
+  String titlesReady(int count) {
+    return '$count titles ready for search';
+  }
+
+  @override
+  String get searchTitleOrAppId => 'Search title or app ID';
+
+  @override
+  String get searchResults => 'Search results';
+
+  @override
+  String get quickAdd => 'Quick add';
+
+  @override
+  String deleteShortcut(Object title) {
+    return 'Delete shortcut for $title';
+  }
+
+  @override
+  String get selectedEsdeFolder => 'Selected ES-DE folder';
+
+  @override
+  String get selectEsdeFolder => 'Select ES-DE folder';
+
+  @override
+  String get romRootFolder => 'ROM root folder';
+
+  @override
+  String get selectRomRoot => 'Select ROM root';
+
+  @override
+  String get downloadLatestXmls => 'Download latest XMLs';
+
+  @override
+  String get installCustomSystems => 'Install custom systems';
+
+  @override
+  String get chooseFolder => 'Choose folder';
+
+  @override
+  String get defaultLabel => 'Default';
+
+  @override
+  String get esdeEmpty =>
+      'Download the latest XMLs to configure the custom Android systems. They will be installed under custom_systems.';
+
+  @override
+  String get esdeFolderDescription =>
+      'Install the latest ES-DE Android custom systems into custom_systems.';
+
+  @override
+  String get organizerDescription =>
+      'Organise multi-disc games into frontend-ready folders and playlists.';
+
+  @override
+  String get zipperDescription =>
+      'Compress supported ROM files into .zip archives to save space.';
+
+  @override
+  String get vitaDescription =>
+      'Create .psvita or .dpt shortcut files from the built-in Vita database.';
+
+  @override
+  String get frontEndTarget => 'Frontend target';
+
+  @override
+  String get otherFrontend => 'Other';
+
+  @override
+  String get scanHiddenFolders => 'Scan hidden folders';
+
+  @override
+  String get scanHiddenDescription =>
+      'Extract ROMs from .-prefixed folders into the system folder before organizing.';
+
+  @override
+  String get nszKeys => 'NSZ keys';
+
+  @override
+  String get nszKeysConfigured =>
+      'prod.keys is imported and will be kept in Mimir\'s private storage.';
+
+  @override
+  String get nszKeysMissing =>
+      'Import your legally obtained prod.keys file before scanning or converting NSZ packages.';
+
+  @override
+  String get importProdKeys => 'Import prod.keys';
+
+  @override
+  String get replaceProdKeys => 'Replace prod.keys';
+
+  @override
+  String get system => 'System';
+
+  @override
+  String get conversionType => 'Conversion type';
+
+  @override
+  String get compatibilityGuidance => 'Compatibility guidance';
+
+  @override
+  String get ps2Guidance =>
+      'Use CD when using NetherSX2; use DVD when using ARMSX2.';
+
+  @override
+  String get preview => 'Preview';
+
+  @override
+  String previewSummary(int count, int selected) {
+    return '$count multi-disc sets detected; $selected selected.';
+  }
+
+  @override
+  String zipPreviewSummary(int count, int selected) {
+    return '$count ROMs matched the zip whitelist; $selected selected.';
+  }
+
+  @override
+  String jobsSelected(int count, Object size) {
+    return '$count jobs selected • $size';
+  }
+
+  @override
+  String get scanSelectedFolder => 'Scan selected folder';
+
+  @override
+  String applySelected(int count) {
+    return 'Apply $count selected';
+  }
+
+  @override
+  String convertSelected(int count) {
+    return 'Convert $count selected';
+  }
+
+  @override
+  String get applyChanges => 'Apply changes';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get selectAll => 'Select all';
+
+  @override
+  String get deselectAll => 'Deselect all';
+
+  @override
+  String get conversionQueue => 'Conversion queue';
+
+  @override
+  String get sortBy => 'Sort by';
+
+  @override
+  String get storageOnDevice => 'Storage on scanned device';
+
+  @override
+  String get romHeader => 'ROM';
+
+  @override
+  String get sizeHeader => 'SIZE';
+
+  @override
+  String get outputHeader => 'OUTPUT';
+
+  @override
+  String get existingOutput =>
+      'Existing output — select individually to replace';
+
+  @override
+  String get replaceExistingOutput => 'Replace existing output?';
+
+  @override
+  String replaceOutputBody(Object path) {
+    return '$path already exists and will be overwritten if selected.';
+  }
+
+  @override
+  String get replaceOutput => 'Replace output';
+
+  @override
+  String get sourceLabel => 'Sources';
+
+  @override
+  String get targetLabel => 'Targets';
+
+  @override
+  String get noChanges => 'No changes found.';
+
+  @override
+  String get selectFolderFirst => 'Select a ROM folder first.';
+
+  @override
+  String get importKeysFirst =>
+      'Import a prod.keys file before scanning NSZ packages.';
+
+  @override
+  String get changesApplied => 'Changes applied.';
+
+  @override
+  String get operationFailed => 'Operation failed.';
+
+  @override
+  String get conversionReport => 'Conversion report';
+
+  @override
+  String get supportDescription =>
+      'Mimir is, and always will be, 100% free and without ads. If you would like to show your support, please consider checking out my YouTube channel or donating.';
+
+  @override
+  String get zipWhitelistInfo =>
+      'Supported extensions are selected by the current whitelist. Existing .zip outputs are skipped safely.';
+
+  @override
+  String get discType => 'Disc type';
+
+  @override
+  String get deleteOriginalFiles =>
+      'Delete original files after a successful conversion';
+
+  @override
+  String conflictsSkipped(int count) {
+    return '$count conflicting outputs were skipped.';
+  }
+
+  @override
+  String get applyConfirmationBody =>
+      'Mimir will execute the selected changes sequentially. Partial completion will be reported if you stop or an operation fails.';
+
+  @override
+  String get working => 'Working…';
+
+  @override
+  String get stopAfterCurrent => 'Stop after current';
+
+  @override
+  String get stopNow => 'Stop now';
+
+  @override
+  String get noMatchingTitles => 'No matching titles.';
+
+  @override
+  String systemsCount(int count) {
+    return '$count systems';
+  }
+
+  @override
+  String get prodKeysImported => 'prod.keys imported and saved on this device.';
+
+  @override
+  String get importKeysFailed => 'Unable to import prod.keys.';
+
+  @override
+  String get selectRomFolderFirst => 'Select a ROM folder first.';
+
+  @override
+  String get toolDoesNotUseRomScanning =>
+      'This tool does not use ROM scanning.';
+
+  @override
+  String get scanStopped => 'Scan stopped.';
+
+  @override
+  String get scanFailed => 'Scan failed.';
+
+  @override
+  String get operationStopped => 'Operation stopped.';
+
+  @override
+  String stoppedAfterOperations(int completed, int total) {
+    return 'Stopped after $completed of $total operations.';
+  }
+
+  @override
+  String get applyFailed => 'Apply failed.';
+
+  @override
+  String get stopping => 'Stopping…';
+
+  @override
+  String get stopAfterCurrentMessage =>
+      'Will stop after the current conversion.';
+
+  @override
+  String get selectVitaOutputFirst =>
+      'Select a Vita shortcut output folder first.';
+
+  @override
+  String unableToAddShortcut(Object title) {
+    return 'Unable to add shortcut for $title.';
+  }
+
+  @override
+  String addedShortcut(Object title) {
+    return 'Added shortcut: $title';
+  }
+
+  @override
+  String get addShortcutFailed => 'Add shortcut failed.';
+
+  @override
+  String removedShortcut(Object title) {
+    return 'Removed shortcut: $title';
+  }
+
+  @override
+  String get removeShortcutFailed => 'Remove shortcut failed.';
+
+  @override
+  String get selectEsdeFolderFirst => 'Select the ES-DE folder first.';
+
+  @override
+  String get selectRomRootForEsde =>
+      'Select the ROM root folder first so Mimir can find its systems.';
+
+  @override
+  String get downloadingEsde => 'Downloading the latest ES-DE custom systems…';
+
+  @override
+  String downloadedEsde(int count) {
+    return 'Downloaded $count ES-DE systems. Review the folders, then apply them.';
+  }
+
+  @override
+  String get downloadEsdeFailed => 'Unable to download ES-DE systems.';
+
+  @override
+  String get installingEsde => 'Installing ES-DE custom systems…';
+
+  @override
+  String installedEsde(int count) {
+    return 'Installed $count systems in custom_systems. Restart ES-DE to load them.';
+  }
+
+  @override
+  String get installEsdeFailed => 'Unable to install ES-DE systems.';
+
+  @override
+  String get noMultiDiscGames => 'No multi-disc games found.';
+
+  @override
+  String get noZipCompatibleGames => 'No zip-compatible ROMs found.';
+
+  @override
+  String noCompatibleConverterFiles(Object tool) {
+    return 'No compatible $tool files found.';
+  }
+
+  @override
+  String get noVitaShortcutsQueued => 'No Vita shortcuts queued.';
+
+  @override
+  String get noEsdeSystemsLoaded => 'No ES-DE systems loaded.';
+
+  @override
+  String get scanMultiDisc => 'Scanning for multi-disc games…';
+
+  @override
+  String get scanZipCompatible => 'Scanning for zip-compatible ROMs…';
+
+  @override
+  String scanConverter(Object tool) {
+    return 'Scanning for $tool-compatible files…';
+  }
+
+  @override
+  String get scanFiles => 'Scanning files…';
+
+  @override
+  String filesChecked(int count) {
+    return '$count files checked';
+  }
+
+  @override
+  String organizingProgress(int completed, int total) {
+    return 'Organizing ROMs: $completed of $total';
+  }
+
+  @override
+  String zippingProgress(int completed, int total) {
+    return 'Zipping ROMs: $completed of $total';
+  }
+
+  @override
+  String convertingProgress(Object tool, int completed, int total) {
+    return 'Converting with $tool: $completed of $total';
+  }
+
+  @override
+  String creatingShortcutsProgress(int completed, int total) {
+    return 'Creating shortcuts: $completed of $total';
+  }
+
+  @override
+  String updatingEsdeProgress(int completed, int total) {
+    return 'Updating ES-DE systems: $completed of $total';
+  }
+}

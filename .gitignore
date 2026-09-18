@@ -9,3 +9,25 @@ local.properties
 keystore.properties
 DESIGN/
 *.DS_Store
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/coverage/
+**/doc/api/
+*.iml
+*.ipr
+*.iws
+*.class
+*.log
+*.pyc
+*.swp
+*.symbols
+*.map.json
+
+# Platform build outputs
+/android/app/debug
+/android/app/profile
+/android/app/release

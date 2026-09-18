@@ -1,10 +1,10 @@
 <img width="512" height="512" alt="mimir1" src="https://github.com/user-attachments/assets/7edde894-cf4a-4ad8-822e-5a50af306fd8" />
 
-# Mimir Android Companion
+# Mimir
 
-Mimir is an open source Android toolkit for retro handheld owners.
+Mimir is an open source, local-first toolkit for retro handheld owners.
 
-It is built to help organise ROM libraries safely on-device, with an initial focus on multi-disc cleanup and bulk ROM preparation for Android frontends used on devices like the AYN Odin and Thor.
+It is built to help organise ROM libraries safely on-device or on desktop, with an initial focus on multi-disc cleanup and bulk ROM preparation for frontends used on devices like the AYN Odin and Thor.
 
 [![Get it on Obtainium](https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium%3A%2F%2Fadd%2Fhttps%3A%2F%2Fgithub.com%2FItsRetroPup%2FMimir)
 
@@ -80,7 +80,7 @@ toggle deletes the successfully converted source image; for `.cue` and `.gdi` in
 the same-folder track files referenced by that descriptor.
 
 Mimir bundles the Android ARM64 CHDMan executable at
-`app/src/main/jniLibs/arm64-v8a/libchdman.so`, built from the official MAME source revision
+`android/app/src/main/jniLibs/arm64-v8a/libchdman.so`, built from the official MAME source revision
 `ecf0add29f06ba131994dca5b88c3a0edf6c2ad8`. The C++ runtime is linked statically so CHDMan can be launched directly from Mimir's native-library directory. Mimir detects a
 missing executable and stops before changing files.
 
@@ -92,7 +92,7 @@ valid GPLv2 source offer.
 #### Native converter backends
 
 Mimir bundles the following Android ARM64 command-line backends in
-`app/src/main/jniLibs/arm64-v8a/`:
+`android/app/src/main/jniLibs/arm64-v8a/`:
 
 - DolphinTool: `.iso` to `.rvz`, using RVZ with 128 KiB blocks and Zstandard level 5.
   Expected binary: `libdolphintool.so` (GPL-2.0-or-later).
@@ -141,49 +141,63 @@ The ES-DE Systems tool downloads the latest Android custom-system definitions fr
 
 ## Tech Stack
 
-- Kotlin
-- Jetpack Compose
-- Gradle
-- Android SDK
+- Flutter and Dart
+- Riverpod
+- Material 3
+- Platform adapters for Android, Windows, macOS, and Linux
 - Python 3.13 and Chaquopy (NSZ converter)
 
-Building Mimir requires a `python3.13` executable on `PATH` so Chaquopy can resolve and package the
-NSZ dependencies. On Homebrew systems, install it with `brew install python@3.13`.
+## Flutter Rebuild
+
+The repository root is now the Flutter application. It targets Android, Windows, macOS, and Linux. Shared ROM scanning and planning logic is pure Dart in [`packages/mimir_core/`](packages/mimir_core); platform-specific filesystem access and converter execution live behind adapters.
+
+Web and iOS are intentionally out of scope because Mimir requires direct local filesystem access and bundled converter executables.
+
+Building the Android target requires a `python3.13` executable on `PATH` so Chaquopy can resolve and package the NSZ dependencies. On Homebrew systems, install it with `brew install python@3.13`.
 
 ## Requirements
 
-- Android `minSdk 29`
-- Java 17
-- Android Studio or Gradle CLI
+- Flutter 3.47 or newer
+- Dart 3.13 or newer
+- Android SDK / Java 17 for Android builds
+- Xcode for macOS builds
+- Visual Studio with the Desktop C++ workload for Windows builds
+- GTK development libraries and CMake for Linux builds
 
 ## Build
 
-### Debug APK
+From the repository root:
+
 ```bash
-./gradlew assembleDebug
+flutter pub get
+flutter analyze
+flutter test
 ```
 
-### Release APK
+### Android debug APK
 ```bash
-./gradlew assembleRelease
+flutter build apk --debug --target-platform android-arm64
 ```
 
-Signed release output:
-
-```text
-app/build/outputs/apk/release/app-release.apk
+### Desktop debug builds
+```bash
+flutter build windows --debug
+flutter build macos --debug
+flutter build linux --debug
 ```
+
+Desktop converter bundles are expected under `resources/bin/` for the target platform. See [`resources/README.md`](resources/README.md) and [`tool/release_check.dart`](tool/release_check.dart) before producing a release.
 
 ## Project Status
 
-Mimir is currently focused on ROM organisation workflows.
+Mimir is now a Flutter application focused on ROM organisation workflows.
 
 Current scope:
 - multi-disc normalisation
 - frontend preset output generation
 - ROM zip conversion
 - PS Vita shortcut database and on-device shortcut creation
-- Android-native UI for safe local operations
+- Flutter UI with native platform adapters for safe local operations
 
 Planned later work may include:
 - more frontend-specific rule validation
@@ -202,4 +216,4 @@ https://github.com/ItsRetroPup/Mimir
 
 ## License
 
-MIT. See [LICENSE](/Users/alex/Documents/Mimir/LICENSE).
+MIT. See [LICENSE](LICENSE).
