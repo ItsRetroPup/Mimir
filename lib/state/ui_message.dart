@@ -7,6 +7,11 @@ enum UiMessageKind {
   prodKeysImported,
   importKeysFailed,
   selectRomFolderFirst,
+  selectScummVmFolderFirst,
+  selectScummVmExecutable,
+  scummVmExecutableNotFound,
+  scummVmDesktopOnly,
+  noScummVmGames,
   importKeysFirst,
   toolDoesNotUseRomScanning,
   scanStopped,
@@ -40,11 +45,13 @@ enum UiMessageKind {
   scanZipCompatible,
   scanConverter,
   scanFiles,
+  scanScummVm,
   scanFileCount,
   organizingProgress,
   zippingProgress,
   convertingProgress,
   creatingShortcutsProgress,
+  creatingScummVmProgress,
   updatingEsdeProgress,
 }
 
@@ -68,6 +75,20 @@ class UiMessage {
 
   const UiMessage.selectRomFolderFirst()
     : this._(UiMessageKind.selectRomFolderFirst);
+
+  const UiMessage.selectScummVmFolderFirst()
+    : this._(UiMessageKind.selectScummVmFolderFirst);
+
+  const UiMessage.selectScummVmExecutable()
+    : this._(UiMessageKind.selectScummVmExecutable);
+
+  const UiMessage.scummVmExecutableNotFound()
+    : this._(UiMessageKind.scummVmExecutableNotFound);
+
+  const UiMessage.scummVmDesktopOnly()
+    : this._(UiMessageKind.scummVmDesktopOnly);
+
+  const UiMessage.noScummVmGames() : this._(UiMessageKind.noScummVmGames);
 
   const UiMessage.importKeysFirst() : this._(UiMessageKind.importKeysFirst);
 
@@ -152,6 +173,7 @@ class UiMessage {
       ToolMode.multiDiscOrganizer => UiMessageKind.scanMultiDisc,
       ToolMode.romZipper => UiMessageKind.scanZipCompatible,
       ToolMode.chdConverter => UiMessageKind.scanConverter,
+      ToolMode.scummVmLaunchers => UiMessageKind.scanScummVm,
       ToolMode.vitaAppIds || ToolMode.esDeSystems => UiMessageKind.scanFiles,
     };
     return UiMessage._(kind, mode: mode, converter: converter);
@@ -178,6 +200,7 @@ class UiMessage {
       ToolMode.multiDiscOrganizer => UiMessageKind.organizingProgress,
       ToolMode.romZipper => UiMessageKind.zippingProgress,
       ToolMode.chdConverter => UiMessageKind.convertingProgress,
+      ToolMode.scummVmLaunchers => UiMessageKind.creatingScummVmProgress,
       ToolMode.vitaAppIds => UiMessageKind.creatingShortcutsProgress,
       ToolMode.esDeSystems => UiMessageKind.updatingEsdeProgress,
     };
@@ -208,6 +231,11 @@ class UiMessage {
       UiMessageKind.prodKeysImported => l10n.prodKeysImported,
       UiMessageKind.importKeysFailed => l10n.importKeysFailed,
       UiMessageKind.selectRomFolderFirst => l10n.selectRomFolderFirst,
+      UiMessageKind.selectScummVmFolderFirst => l10n.selectScummVmFolderFirst,
+      UiMessageKind.selectScummVmExecutable => l10n.selectScummVmExecutable,
+      UiMessageKind.scummVmExecutableNotFound => l10n.scummVmExecutableNotFound,
+      UiMessageKind.scummVmDesktopOnly => l10n.scummVmDesktopOnly,
+      UiMessageKind.noScummVmGames => l10n.noScummVmGames,
       UiMessageKind.importKeysFirst => l10n.importKeysFirst,
       UiMessageKind.toolDoesNotUseRomScanning => l10n.toolDoesNotUseRomScanning,
       UiMessageKind.scanStopped => l10n.scanStopped,
@@ -247,6 +275,7 @@ class UiMessage {
       UiMessageKind.scanZipCompatible => l10n.scanZipCompatible,
       UiMessageKind.scanConverter => l10n.scanConverter(converterLabel),
       UiMessageKind.scanFiles => l10n.scanFiles,
+      UiMessageKind.scanScummVm => l10n.scanScummVm,
       UiMessageKind.scanFileCount => _scanFileCount(l10n, converterLabel),
       UiMessageKind.organizingProgress => l10n.organizingProgress(
         completed ?? 0,
@@ -265,6 +294,10 @@ class UiMessage {
         completed ?? 0,
         total ?? 0,
       ),
+      UiMessageKind.creatingScummVmProgress => l10n.creatingScummVmProgress(
+        completed ?? 0,
+        total ?? 0,
+      ),
       UiMessageKind.updatingEsdeProgress => l10n.updatingEsdeProgress(
         completed ?? 0,
         total ?? 0,
@@ -278,6 +311,7 @@ class UiMessage {
       ToolMode.romZipper => l10n.scanZipCompatible.replaceFirst('…', ''),
       ToolMode.chdConverter =>
         l10n.scanConverter(converterLabel).replaceFirst('…', ''),
+      ToolMode.scummVmLaunchers => l10n.scanScummVm.replaceFirst('…', ''),
       ToolMode.vitaAppIds ||
       ToolMode.esDeSystems => l10n.scanFiles.replaceFirst('…', ''),
       null => l10n.scanFiles.replaceFirst('…', ''),

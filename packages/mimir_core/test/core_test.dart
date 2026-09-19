@@ -37,6 +37,51 @@ void main() {
     });
   });
 
+  group('ScummVM launchers', () {
+    test('extracts an engine-qualified game id from detect output', () {
+      expect(
+        ScummVmDetector.detectedGameId('Detected game: scumm:monkey2'),
+        'scumm:monkey2',
+      );
+    });
+
+    test('accepts the abbreviated detected-game format', () {
+      expect(
+        ScummVmDetector.detectedGameId('Detected game: monkey1'),
+        'monkey1',
+      );
+    });
+
+    test('plans a named launcher inside each game folder', () {
+      final plan = ScummVmPlanner.buildPlan([
+        const ScummVmGame(
+          folderPath: 'The Secret of Monkey Island',
+          gameName: 'The Secret of Monkey Island',
+          gameId: 'scumm:monkey1',
+        ),
+        const ScummVmGame(
+          folderPath: 'Already Installed',
+          gameName: 'Already Installed',
+          gameId: 'scumm:monkey2',
+          targetAlreadyExists: true,
+        ),
+      ]);
+
+      expect(
+        plan.changes.single.detailPath,
+        'The Secret of Monkey Island/The Secret of Monkey Island.scummvm',
+      );
+      expect(
+        (plan.operations.single as WriteTextFile).contents,
+        'scumm:monkey1\n',
+      );
+      expect(plan.conflicts, [
+        'Skipped Already Installed: target already exists: '
+            'Already Installed/Already Installed.scummvm',
+      ]);
+    });
+  });
+
   group('ChangePlanner', () {
     test('builds ES-DE folder-as-file plan', () {
       final plan = ChangePlanner.buildPlan(

@@ -130,6 +130,14 @@ Current behaviour:
 The ES-DE Systems tool downloads the latest Android custom-system definitions from
 [GlazedBelmont/es-de-android-custom-systems](https://github.com/GlazedBelmont/es-de-android-custom-systems), scans the selected ROM root for ES-DE system folders, lets users relocate each detected system with a folder picker, and installs the resulting `es_systems.xml` and `es_find_rules.xml` under the selected ES-DE folder's `custom_systems` directory. Default entries retain `%ROMPATH%/<system-folder>`; relocated entries use absolute Android storage paths. Restart ES-DE after installation so it reloads the definitions.
 
+### ScummVM Launchers
+On desktop targets, the ScummVM Launchers tool scans the direct child folders of a selected
+ScummVM Games directory. It locates a local ScummVM executable in common installation locations,
+or lets you choose the app file, then runs `--path=<game-folder> --detect` for each folder. The
+preview creates `<game-name>.scummvm` beside each game with the detected game ID as its contents;
+existing launcher files are skipped safely. Detection is currently desktop-only because Android
+cannot execute a desktop ScummVM binary.
+
 ## Design Goals
 
 - local-first

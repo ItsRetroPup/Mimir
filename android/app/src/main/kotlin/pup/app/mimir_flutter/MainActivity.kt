@@ -649,6 +649,7 @@ class MainActivity : FlutterActivity() {
         "multiDiscOrganizer" -> ToolMode.MultiDiscOrganizer
         "romZipper" -> ToolMode.RomZipper
         "chdConverter" -> ToolMode.ChdConverter
+        "scummVmLaunchers" -> ToolMode.ScummVmLaunchers
         "vitaAppIds" -> ToolMode.VitaAppIds
         "esDeSystems" -> ToolMode.EsDeSystems
         else -> null

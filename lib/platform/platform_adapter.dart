@@ -2,7 +2,15 @@ import 'dart:async';
 
 import 'package:mimir_core/mimir_core.dart';
 
-enum PickerPurpose { romRoot, vitaOutput, esdeRoot, esdeSystemFolder, nszKeys }
+enum PickerPurpose {
+  romRoot,
+  vitaOutput,
+  esdeRoot,
+  esdeSystemFolder,
+  nszKeys,
+  scummVmRoot,
+  scummVmExecutable,
+}
 
 class ScanRequest {
   const ScanRequest({required this.mode, this.converterTool, this.chdSystem});
@@ -117,6 +125,15 @@ abstract interface class MimirPlatformAdapter {
     required ScanRequest request,
     bool scanHiddenFolders = false,
     void Function(int scannedFiles)? onProgress,
+    CancellationToken? cancellation,
+  });
+
+  Future<String?> findScummVmExecutable();
+
+  Future<List<ScummVmGame>> detectScummVmGames({
+    required String rootHandle,
+    required String executableHandle,
+    void Function(int completed)? onProgress,
     CancellationToken? cancellation,
   });
 

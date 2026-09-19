@@ -38,6 +38,7 @@ enum ToolMode {
   multiDiscOrganizer,
   romZipper,
   chdConverter,
+  scummVmLaunchers,
   vitaAppIds,
   esDeSystems,
 }
@@ -47,6 +48,7 @@ extension ToolModeInfo on ToolMode {
     ToolMode.multiDiscOrganizer => 'Multi-disc Organizer',
     ToolMode.romZipper => 'RomZipper',
     ToolMode.chdConverter => 'Converter Tools',
+    ToolMode.scummVmLaunchers => 'ScummVM Launchers',
     ToolMode.vitaAppIds => 'Vita App IDs',
     ToolMode.esDeSystems => 'ES-DE Systems',
   };

@@ -237,6 +237,24 @@ abstract class AppLocalizations {
   /// **'Make .psvita or .dpt shortcuts from the built-in database.'**
   String get toolVitaShortcutsDescription;
 
+  /// No description provided for @goalCreateScummVmLaunchers.
+  ///
+  /// In en, this message translates to:
+  /// **'Create ScummVM launchers'**
+  String get goalCreateScummVmLaunchers;
+
+  /// No description provided for @toolScummVmLaunchers.
+  ///
+  /// In en, this message translates to:
+  /// **'ScummVM Launchers'**
+  String get toolScummVmLaunchers;
+
+  /// No description provided for @toolScummVmLaunchersDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Detect games and create .scummvm files beside them.'**
+  String get toolScummVmLaunchersDescription;
+
   /// No description provided for @goalSetupEsde.
   ///
   /// In en, this message translates to:
@@ -363,6 +381,12 @@ abstract class AppLocalizations {
   /// **'No Vita output directory selected'**
   String get noVitaOutputSelected;
 
+  /// No description provided for @noScummVmFolderSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'No ScummVM Games folder selected'**
+  String get noScummVmFolderSelected;
+
   /// No description provided for @noEsdeFolderSelected.
   ///
   /// In en, this message translates to:
@@ -380,6 +404,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select ROM folder'**
   String get selectRomFolder;
+
+  /// No description provided for @scummVmGamesFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'ScummVM Games folder'**
+  String get scummVmGamesFolder;
+
+  /// No description provided for @selectScummVmGamesFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Games folder'**
+  String get selectScummVmGamesFolder;
+
+  /// No description provided for @scummVmExecutable.
+  ///
+  /// In en, this message translates to:
+  /// **'ScummVM executable'**
+  String get scummVmExecutable;
+
+  /// No description provided for @scummVmExecutableAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-detected on scan; choose an app if needed.'**
+  String get scummVmExecutableAuto;
+
+  /// No description provided for @selectScummVmExecutable.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the ScummVM app to run detection.'**
+  String get selectScummVmExecutable;
+
+  /// No description provided for @scummVmDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Run --detect for each game folder and create a launcher file containing its game ID.'**
+  String get scummVmDescription;
 
   /// No description provided for @shortcutOutputDirectory.
   ///
@@ -855,6 +915,24 @@ abstract class AppLocalizations {
   /// **'Select a ROM folder first.'**
   String get selectRomFolderFirst;
 
+  /// No description provided for @selectScummVmFolderFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a ScummVM Games folder first.'**
+  String get selectScummVmFolderFirst;
+
+  /// No description provided for @scummVmExecutableNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'ScummVM was not found. Choose the app file to continue.'**
+  String get scummVmExecutableNotFound;
+
+  /// No description provided for @scummVmDesktopOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'ScummVM executable detection is currently available on desktop platforms only.'**
+  String get scummVmDesktopOnly;
+
   /// No description provided for @toolDoesNotUseRomScanning.
   ///
   /// In en, this message translates to:
@@ -1011,6 +1089,12 @@ abstract class AppLocalizations {
   /// **'No Vita shortcuts queued.'**
   String get noVitaShortcutsQueued;
 
+  /// No description provided for @noScummVmGames.
+  ///
+  /// In en, this message translates to:
+  /// **'No ScummVM games detected.'**
+  String get noScummVmGames;
+
   /// No description provided for @noEsdeSystemsLoaded.
   ///
   /// In en, this message translates to:
@@ -1041,6 +1125,12 @@ abstract class AppLocalizations {
   /// **'Scanning files…'**
   String get scanFiles;
 
+  /// No description provided for @scanScummVm.
+  ///
+  /// In en, this message translates to:
+  /// **'Detecting ScummVM games…'**
+  String get scanScummVm;
+
   /// No description provided for @filesChecked.
   ///
   /// In en, this message translates to:
@@ -1070,6 +1160,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Creating shortcuts: {completed} of {total}'**
   String creatingShortcutsProgress(int completed, int total);
+
+  /// No description provided for @creatingScummVmProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating ScummVM launchers: {completed} of {total}'**
+  String creatingScummVmProgress(int completed, int total);
 
   /// No description provided for @updatingEsdeProgress.
   ///

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mimir_core/mimir_core.dart';
+import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../platform/desktop_adapter.dart';
@@ -17,6 +18,7 @@ enum AppSection {
   zipper,
   organizer,
   chdMan,
+  scummVm,
   rvz,
   zcci,
   nsz,
@@ -34,6 +36,10 @@ class AppState {
     this.currentSection = AppSection.home,
     this.romRootHandle,
     this.romRootLabel = '',
+    this.scummVmRootHandle,
+    this.scummVmRootLabel = '',
+    this.scummVmExecutableHandle,
+    this.scummVmExecutableLabel = '',
     this.vitaOutputHandle,
     this.vitaOutputLabel = '',
     this.esdeRootHandle,
@@ -73,6 +79,10 @@ class AppState {
   final AppSection currentSection;
   final String? romRootHandle;
   final String romRootLabel;
+  final String? scummVmRootHandle;
+  final String scummVmRootLabel;
+  final String? scummVmExecutableHandle;
+  final String scummVmExecutableLabel;
   final String? vitaOutputHandle;
   final String vitaOutputLabel;
   final String? esdeRootHandle;
@@ -114,6 +124,10 @@ class AppState {
     AppSection? currentSection,
     Object? romRootHandle = _unset,
     String? romRootLabel,
+    Object? scummVmRootHandle = _unset,
+    String? scummVmRootLabel,
+    Object? scummVmExecutableHandle = _unset,
+    String? scummVmExecutableLabel,
     Object? vitaOutputHandle = _unset,
     String? vitaOutputLabel,
     Object? esdeRootHandle = _unset,
@@ -155,6 +169,15 @@ class AppState {
           ? this.romRootHandle
           : romRootHandle as String?,
       romRootLabel: romRootLabel ?? this.romRootLabel,
+      scummVmRootHandle: identical(scummVmRootHandle, _unset)
+          ? this.scummVmRootHandle
+          : scummVmRootHandle as String?,
+      scummVmRootLabel: scummVmRootLabel ?? this.scummVmRootLabel,
+      scummVmExecutableHandle: identical(scummVmExecutableHandle, _unset)
+          ? this.scummVmExecutableHandle
+          : scummVmExecutableHandle as String?,
+      scummVmExecutableLabel:
+          scummVmExecutableLabel ?? this.scummVmExecutableLabel,
       vitaOutputHandle: identical(vitaOutputHandle, _unset)
           ? this.vitaOutputHandle
           : vitaOutputHandle as String?,
@@ -229,6 +252,10 @@ final appControllerProvider = NotifierProvider<AppController, AppState>(
 class SettingsStore {
   static const romRoot = 'rom_tree_uri';
   static const romRootLabel = 'rom_tree_label';
+  static const scummVmRoot = 'scummvm_games_root';
+  static const scummVmRootLabel = 'scummvm_games_root_label';
+  static const scummVmExecutable = 'scummvm_executable';
+  static const scummVmExecutableLabel = 'scummvm_executable_label';
   static const vitaOutput = 'vita_output_uri';
   static const vitaOutputLabel = 'vita_output_label';
   static const esdeRoot = 'esde_root_uri';
@@ -306,6 +333,10 @@ class AppController extends Notifier<AppState> {
     final values = await Future.wait([
       _settings.getString(SettingsStore.romRoot),
       _settings.getString(SettingsStore.romRootLabel),
+      _settings.getString(SettingsStore.scummVmRoot),
+      _settings.getString(SettingsStore.scummVmRootLabel),
+      _settings.getString(SettingsStore.scummVmExecutable),
+      _settings.getString(SettingsStore.scummVmExecutableLabel),
       _settings.getString(SettingsStore.vitaOutput),
       _settings.getString(SettingsStore.vitaOutputLabel),
       _settings.getString(SettingsStore.esdeRoot),
@@ -320,20 +351,24 @@ class AppController extends Notifier<AppState> {
     final nszKeysConfigured = await _platform.hasNszKeys();
     final format =
         VitaShortcutFormat.values
-            .where((value) => value.name == values[6])
+            .where((value) => value.name == values[10])
             .firstOrNull ??
         VitaShortcutFormat.psvita;
     state = state.copyWith(
       romRootHandle: values[0] as String?,
       romRootLabel: values[1] as String? ?? '',
-      vitaOutputHandle: values[2] as String?,
-      vitaOutputLabel: values[3] as String? ?? '',
-      esdeRootHandle: values[4] as String?,
-      esdeRootLabel: values[5] as String? ?? '',
+      scummVmRootHandle: values[2] as String?,
+      scummVmRootLabel: values[3] as String? ?? '',
+      scummVmExecutableHandle: values[4] as String?,
+      scummVmExecutableLabel: values[5] as String? ?? '',
+      vitaOutputHandle: values[6] as String?,
+      vitaOutputLabel: values[7] as String? ?? '',
+      esdeRootHandle: values[8] as String?,
+      esdeRootLabel: values[9] as String? ?? '',
       vitaShortcutFormat: format,
-      useDarkMode: values[7] as bool,
-      scanHiddenFolders: values[8] as bool,
-      deleteOriginalChdFiles: values[9] as bool,
+      useDarkMode: values[11] as bool,
+      scanHiddenFolders: values[12] as bool,
+      deleteOriginalChdFiles: values[13] as bool,
       nszKeysConfigured: nszKeysConfigured,
       vitaDatabaseSize: catalog.length,
     );
@@ -397,6 +432,10 @@ class AppController extends Notifier<AppState> {
         mode: ToolMode.chdConverter,
         converter: ConverterTool.chd,
       ),
+      AppSection.scummVm => (
+        mode: ToolMode.scummVmLaunchers,
+        converter: state.selectedConverterTool,
+      ),
       AppSection.rvz => (
         mode: ToolMode.chdConverter,
         converter: ConverterTool.dolphinRvz,
@@ -458,6 +497,43 @@ class AppController extends Notifier<AppState> {
       selectedChangePaths: {},
       storageInfo: null,
       message: null,
+    );
+  }
+
+  Future<void> selectScummVmRoot() async {
+    final handle = await _platform.pickDirectory(
+      purpose: PickerPurpose.scummVmRoot,
+      initialHandle: state.scummVmRootHandle,
+    );
+    if (handle == null) return;
+    final label = _labelForHandle(handle);
+    await _settings.setString(SettingsStore.scummVmRoot, handle);
+    await _settings.setString(SettingsStore.scummVmRootLabel, label);
+    state = state.copyWith(
+      scummVmRootHandle: handle,
+      scummVmRootLabel: label,
+      previewPlan: null,
+      selectedChangePaths: {},
+      message: null,
+    );
+  }
+
+  Future<void> selectScummVmExecutable() async {
+    final handle = await _platform.pickFile(
+      purpose: PickerPurpose.scummVmExecutable,
+    );
+    if (handle == null) return;
+    await _saveScummVmExecutable(handle);
+    state = state.copyWith(message: null);
+  }
+
+  Future<void> _saveScummVmExecutable(String handle) async {
+    final label = _labelForHandle(handle);
+    await _settings.setString(SettingsStore.scummVmExecutable, handle);
+    await _settings.setString(SettingsStore.scummVmExecutableLabel, label);
+    state = state.copyWith(
+      scummVmExecutableHandle: handle,
+      scummVmExecutableLabel: label,
     );
   }
 
@@ -646,6 +722,10 @@ class AppController extends Notifier<AppState> {
 
   Future<void> scan() async {
     final current = state;
+    if (current.selectedMode == ToolMode.scummVmLaunchers) {
+      await scanScummVmGames();
+      return;
+    }
     final root = current.romRootHandle;
     if (root == null) {
       state = state.copyWith(message: const UiMessage.selectRomFolderFirst());
@@ -704,6 +784,8 @@ class AppController extends Notifier<AppState> {
                   entries: entries,
                   tool: current.selectedConverterTool,
                 ),
+        ToolMode.scummVmLaunchers =>
+          throw const ToolDoesNotUseRomScanningException(),
         ToolMode.vitaAppIds || ToolMode.esDeSystems =>
           throw const ToolDoesNotUseRomScanningException(),
       };
@@ -740,9 +822,93 @@ class AppController extends Notifier<AppState> {
     }
   }
 
+  Future<void> scanScummVmGames() async {
+    final current = state;
+    final root = current.scummVmRootHandle;
+    if (root == null) {
+      state = state.copyWith(
+        message: const UiMessage.selectScummVmFolderFirst(),
+      );
+      return;
+    }
+    if (Platform.isAndroid) {
+      state = state.copyWith(message: const UiMessage.scummVmDesktopOnly());
+      return;
+    }
+    final cancellation = CancellationToken();
+    _activeCancellation = cancellation;
+    state = state.copyWith(
+      busy: true,
+      scanProgressLabel: UiMessage.scanStarted(ToolMode.scummVmLaunchers),
+      message: null,
+      stopRequest: StopRequest.none,
+    );
+    try {
+      var executable = current.scummVmExecutableHandle;
+      if (executable == null || !_scummVmExecutableExists(executable)) {
+        executable = await _platform.findScummVmExecutable();
+        if (executable != null) await _saveScummVmExecutable(executable);
+      }
+      if (executable == null) {
+        state = state.copyWith(
+          busy: false,
+          scanProgressLabel: null,
+          stopRequest: StopRequest.none,
+          message: const UiMessage.scummVmExecutableNotFound(),
+        );
+        await selectScummVmExecutable();
+        if (state.scummVmExecutableHandle == null) return;
+        executable = state.scummVmExecutableHandle;
+        state = state.copyWith(
+          busy: true,
+          scanProgressLabel: UiMessage.scanStarted(ToolMode.scummVmLaunchers),
+        );
+      }
+      final games = await _platform.detectScummVmGames(
+        rootHandle: root,
+        executableHandle: executable!,
+        cancellation: cancellation,
+        onProgress: (count) => state = state.copyWith(
+          scanProgressLabel: UiMessage.scanFileCount(
+            ToolMode.scummVmLaunchers,
+            null,
+            count,
+          ),
+        ),
+      );
+      if (cancellation.shouldInterruptCurrent) {
+        throw const OperationStoppedException('Scan stopped.');
+      }
+      final plan = ScummVmPlanner.buildPlan(games);
+      final selected = plan.changes.map((change) => change.detailPath).toSet();
+      state = state.copyWith(
+        busy: false,
+        scanProgressLabel: null,
+        previewPlan: plan,
+        selectedChangePaths: selected,
+        storageInfo: null,
+        message: plan.changes.isEmpty ? const UiMessage.noScummVmGames() : null,
+        stopRequest: StopRequest.none,
+      );
+    } catch (error) {
+      state = state.copyWith(
+        busy: false,
+        scanProgressLabel: null,
+        stopRequest: StopRequest.none,
+        message: _errorMessage(error, const UiMessage.scanFailed()),
+      );
+    } finally {
+      if (identical(_activeCancellation, cancellation)) {
+        _activeCancellation = null;
+      }
+    }
+  }
+
   Future<void> applyChanges() async {
     final current = state;
-    final root = current.romRootHandle;
+    final root = current.selectedMode == ToolMode.scummVmLaunchers
+        ? current.scummVmRootHandle
+        : current.romRootHandle;
     final originalPlan = current.previewPlan;
     if (root == null || originalPlan == null) return;
     var plan = originalPlan.forSelectedChanges(current.selectedChangePaths);
@@ -761,7 +927,7 @@ class AppController extends Notifier<AppState> {
         0,
         plan.operations.length,
       ),
-      operationProgress: 0,
+      operationProgress: 0.0,
       currentJobProgress: plan.mode == ToolMode.chdConverter ? 0 : null,
       currentJobLabel: null,
       completedOperations: 0,
@@ -1071,6 +1237,13 @@ class AppController extends Notifier<AppState> {
         : normalized.substring(normalized.lastIndexOf('/') + 1);
   }
 
+  bool _scummVmExecutableExists(String handle) {
+    if (File(handle).existsSync()) return true;
+    return Platform.isMacOS &&
+        handle.toLowerCase().endsWith('.app') &&
+        File(p.join(handle, 'Contents', 'MacOS', 'scummvm')).existsSync();
+  }
+
   UiMessage _initialScanLabel(AppState current) => UiMessage.scanStarted(
     current.selectedMode,
     converter: current.selectedConverterTool,
@@ -1083,6 +1256,7 @@ class AppController extends Notifier<AppState> {
         ToolMode.chdConverter => UiMessage.noCompatibleConverterFiles(
           current.selectedConverterTool,
         ),
+        ToolMode.scummVmLaunchers => const UiMessage.noScummVmGames(),
         ToolMode.vitaAppIds => const UiMessage.noVitaShortcutsQueued(),
         ToolMode.esDeSystems => const UiMessage.noEsdeSystemsLoaded(),
       };

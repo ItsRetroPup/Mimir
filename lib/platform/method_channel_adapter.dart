@@ -84,6 +84,21 @@ class MethodChannelAdapter implements MimirPlatformAdapter {
   }
 
   @override
+  Future<String?> findScummVmExecutable() async => null;
+
+  @override
+  Future<List<ScummVmGame>> detectScummVmGames({
+    required String rootHandle,
+    required String executableHandle,
+    void Function(int completed)? onProgress,
+    CancellationToken? cancellation,
+  }) {
+    throw UnsupportedError(
+      'ScummVM detection requires a desktop ScummVM executable.',
+    );
+  }
+
+  @override
   Future<StorageInfo?> storageInfo(String rootHandle) async {
     final raw = await _channel.invokeMethod<Object?>('storageInfo', {
       'rootHandle': rootHandle,

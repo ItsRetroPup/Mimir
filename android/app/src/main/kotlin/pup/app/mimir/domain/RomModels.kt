@@ -25,6 +25,7 @@ enum class ToolMode(val displayName: String) {
     MultiDiscOrganizer("Multi-disc Organizer"),
     RomZipper("RomZipper"),
     ChdConverter("Converter Tools"),
+    ScummVmLaunchers("ScummVM Launchers"),
     VitaAppIds("Vita App IDs"),
     EsDeSystems("ES-DE Systems"),
 }

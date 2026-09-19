@@ -4,7 +4,7 @@
 
 ## Platform
 
-adaptive (Android, Windows, macOS, Linux)
+adaptive
 
 ## Users
 
@@ -20,7 +20,7 @@ Mimir brings ROM organisation, conversion, frontend preparation, and PS Vita sho
 
 ## Operating Context
 
-Users select folders on Android devices or desktop computers and review planned file changes before applying them. Mimir supports ROM organisers and converters, frontend-specific M3U output rules, PS Vita shortcuts, and ES-DE custom-system setup.
+Users select folders on Android devices or desktop computers and review planned file changes before applying them. Mimir supports ROM organisers and converters, frontend-specific M3U output rules, PS Vita shortcuts, ES-DE custom-system setup, and desktop ScummVM launcher generation.
 
 ## Capabilities and Constraints
 

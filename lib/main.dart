@@ -64,6 +64,15 @@ class MimirShell extends ConsumerWidget {
     AppSection.home,
     AppSection.organizer,
     AppSection.chdMan,
+    AppSection.scummVm,
+    AppSection.vita,
+    AppSection.esDeSystems,
+  ];
+
+  static const _compactSections = [
+    AppSection.home,
+    AppSection.organizer,
+    AppSection.chdMan,
     AppSection.vita,
     AppSection.esDeSystems,
   ];
@@ -135,6 +144,11 @@ class MimirShell extends ConsumerWidget {
                     label: Text(l10n.conversionQueue),
                   ),
                   NavigationRailDestination(
+                    icon: const Icon(Icons.auto_awesome_motion_outlined),
+                    selectedIcon: const Icon(Icons.auto_awesome_motion),
+                    label: Text(l10n.toolScummVmLaunchers),
+                  ),
+                  NavigationRailDestination(
                     icon: const Icon(Icons.gamepad_outlined),
                     selectedIcon: const Icon(Icons.gamepad),
                     label: Text(l10n.toolVitaShortcuts),
@@ -161,9 +175,9 @@ class MimirShell extends ConsumerWidget {
         bottomNavigationBar: wide
             ? null
             : NavigationBar(
-                selectedIndex: railIndex,
+                selectedIndex: _compactIndex(state.currentSection),
                 onDestinationSelected: (index) =>
-                    controller.selectSection(_railSections[index]),
+                    controller.selectSection(_compactSections[index]),
                 destinations: [
                   NavigationDestination(
                     icon: const Icon(Icons.home_outlined),
@@ -203,6 +217,19 @@ class MimirShell extends ConsumerWidget {
     AppSection.rvz ||
     AppSection.zcci ||
     AppSection.nsz => 2,
+    AppSection.scummVm => 3,
+    AppSection.vita => 4,
+    AppSection.esDeSystems => 5,
+  };
+
+  int _compactIndex(AppSection section) => switch (section) {
+    AppSection.home => 0,
+    AppSection.organizer || AppSection.zipper => 1,
+    AppSection.chdMan ||
+    AppSection.rvz ||
+    AppSection.zcci ||
+    AppSection.nsz => 2,
+    AppSection.scummVm => 0,
     AppSection.vita => 3,
     AppSection.esDeSystems => 4,
   };
@@ -216,6 +243,7 @@ class MimirShell extends ConsumerWidget {
         AppSection.rvz => l10n.toolDolphinRvz,
         AppSection.zcci => l10n.toolAzaharZcci,
         AppSection.nsz => l10n.toolNszToNsp,
+        AppSection.scummVm => l10n.toolScummVmLaunchers,
         AppSection.vita => l10n.toolVitaShortcuts,
         AppSection.esDeSystems => l10n.toolEsdeSystems,
       };
@@ -235,6 +263,7 @@ class _PageBody extends ConsumerWidget {
         AppSection.home => const _HomePage(key: ValueKey('home')),
         AppSection.vita => const _VitaPage(key: ValueKey('vita')),
         AppSection.esDeSystems => const _EsDePage(key: ValueKey('esde')),
+        AppSection.scummVm => const _ScummVmPage(key: ValueKey('scummvm')),
         _ => _ToolPage(key: ValueKey(section), section: section, state: state),
       },
     );
@@ -268,6 +297,13 @@ class _HomePage extends ConsumerWidget {
             title: l10n.toolVitaShortcuts,
             description: l10n.toolVitaShortcutsDescription,
             onTap: () => controller.selectSection(AppSection.vita),
+          ),
+          _HomeTool(
+            icon: Icons.auto_awesome_motion_outlined,
+            goal: l10n.goalCreateScummVmLaunchers,
+            title: l10n.toolScummVmLaunchers,
+            description: l10n.toolScummVmLaunchersDescription,
+            onTap: () => controller.selectSection(AppSection.scummVm),
           ),
           _HomeTool(
             icon: Icons.settings_outlined,
@@ -545,6 +581,79 @@ class _ToolPage extends ConsumerWidget {
           const SizedBox(height: 16),
           FilledButton.icon(
             onPressed: state.romRootHandle == null ? null : controller.scan,
+            icon: const Icon(Icons.search),
+            label: Text(l10n.scanSelectedFolder),
+          ),
+        ],
+        if (state.message != null) ...[
+          const SizedBox(height: 12),
+          _MessageBanner(message: state.message!),
+        ],
+        if (state.previewPlan != null) ...[
+          const SizedBox(height: 18),
+          _PreviewCard(state: state, controller: controller),
+        ],
+      ],
+    );
+  }
+}
+
+class _ScummVmPage extends ConsumerWidget {
+  const _ScummVmPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(appControllerProvider);
+    final controller = ref.read(appControllerProvider.notifier);
+    final l10n = AppLocalizations.of(context);
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+      children: [
+        _IntroCard(
+          title: l10n.toolScummVmLaunchers,
+          description: l10n.scummVmDescription,
+        ),
+        const SizedBox(height: 16),
+        _FolderCard(
+          title: l10n.scummVmGamesFolder,
+          label: state.scummVmRootHandle == null
+              ? l10n.noScummVmFolderSelected
+              : state.scummVmRootLabel,
+          buttonLabel: l10n.selectScummVmGamesFolder,
+          onPressed: state.busy ? null : controller.selectScummVmRoot,
+        ),
+        const SizedBox(height: 16),
+        Card(
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 8,
+            ),
+            leading: const Icon(Icons.apps_outlined),
+            title: Text(l10n.scummVmExecutable),
+            subtitle: Text(
+              state.scummVmExecutableLabel.isEmpty
+                  ? l10n.scummVmExecutableAuto
+                  : state.scummVmExecutableLabel,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: OutlinedButton(
+              onPressed: state.busy ? null : controller.selectScummVmExecutable,
+              child: Text(l10n.selectScummVmExecutable),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        _InfoCard(icon: Icons.info_outline, text: l10n.scummVmDescription),
+        const SizedBox(height: 16),
+        _ProgressCard(state: state),
+        if (!state.busy) ...[
+          const SizedBox(height: 16),
+          FilledButton.icon(
+            onPressed: state.scummVmRootHandle == null
+                ? null
+                : controller.scanScummVmGames,
             icon: const Icon(Icons.search),
             label: Text(l10n.scanSelectedFolder),
           ),

@@ -110,4 +110,31 @@ void main() {
       throwsA(isA<ArgumentError>()),
     );
   });
+
+  test(
+    'runs ScummVM detect for each game folder and plans launchers',
+    () async {
+      final game = Directory(p.join(root.path, 'Monkey Island'))..createSync();
+      await File(p.join(game.path, 'resource.dat')).writeAsString('data');
+      final executable = File(p.join(root.path, 'fake-scummvm'))
+        ..writeAsStringSync(
+          '#!/bin/sh\nprintf "Detected game: scumm:monkey1\\n"\n',
+        );
+      await Process.run('chmod', ['+x', executable.path]);
+
+      final games = await adapter.detectScummVmGames(
+        rootHandle: root.path,
+        executableHandle: executable.path,
+      );
+      expect(games.single.gameId, 'scumm:monkey1');
+      expect(games.single.launcherPath, 'Monkey Island/Monkey Island.scummvm');
+
+      final plan = ScummVmPlanner.buildPlan(games);
+      await adapter.apply(rootHandle: root.path, plan: plan).drain();
+      expect(
+        File(p.join(game.path, 'Monkey Island.scummvm')).readAsStringSync(),
+        'scumm:monkey1\n',
+      );
+    },
+  );
 }

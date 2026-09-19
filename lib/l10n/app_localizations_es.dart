@@ -73,6 +73,16 @@ class AppLocalizationsEs extends AppLocalizations {
       'Crear accesos directos .psvita o .dpt desde la base de datos integrada.';
 
   @override
+  String get goalCreateScummVmLaunchers => 'Create ScummVM launchers';
+
+  @override
+  String get toolScummVmLaunchers => 'ScummVM Launchers';
+
+  @override
+  String get toolScummVmLaunchersDescription =>
+      'Detect games and create .scummvm files beside them.';
+
+  @override
   String get goalSetupEsde => 'Configurar ES-DE';
 
   @override
@@ -144,6 +154,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'No hay carpeta de salida de Vita seleccionada';
 
   @override
+  String get noScummVmFolderSelected => 'No ScummVM Games folder selected';
+
+  @override
   String get noEsdeFolderSelected => 'No hay carpeta de ES-DE seleccionada';
 
   @override
@@ -151,6 +164,27 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get selectRomFolder => 'Select ROM folder';
+
+  @override
+  String get scummVmGamesFolder => 'ScummVM Games folder';
+
+  @override
+  String get selectScummVmGamesFolder => 'Select Games folder';
+
+  @override
+  String get scummVmExecutable => 'ScummVM executable';
+
+  @override
+  String get scummVmExecutableAuto =>
+      'Auto-detected on scan; choose an app if needed.';
+
+  @override
+  String get selectScummVmExecutable =>
+      'Choose the ScummVM app to run detection.';
+
+  @override
+  String get scummVmDescription =>
+      'Run --detect for each game folder and create a launcher file containing its game ID.';
 
   @override
   String get shortcutOutputDirectory => 'Shortcut output directory';
@@ -425,6 +459,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get selectRomFolderFirst => 'Select a ROM folder first.';
 
   @override
+  String get selectScummVmFolderFirst => 'Select a ScummVM Games folder first.';
+
+  @override
+  String get scummVmExecutableNotFound =>
+      'ScummVM was not found. Choose the app file to continue.';
+
+  @override
+  String get scummVmDesktopOnly =>
+      'ScummVM executable detection is currently available on desktop platforms only.';
+
+  @override
   String get toolDoesNotUseRomScanning =>
       'This tool does not use ROM scanning.';
 
@@ -521,6 +566,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noVitaShortcutsQueued => 'No Vita shortcuts queued.';
 
   @override
+  String get noScummVmGames => 'No ScummVM games detected.';
+
+  @override
   String get noEsdeSystemsLoaded => 'No ES-DE systems loaded.';
 
   @override
@@ -536,6 +584,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get scanFiles => 'Scanning files…';
+
+  @override
+  String get scanScummVm => 'Detecting ScummVM games…';
 
   @override
   String filesChecked(int count) {
@@ -560,6 +611,11 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String creatingShortcutsProgress(int completed, int total) {
     return 'Creating shortcuts: $completed of $total';
+  }
+
+  @override
+  String creatingScummVmProgress(int completed, int total) {
+    return 'Creating ScummVM launchers: $completed of $total';
   }
 
   @override

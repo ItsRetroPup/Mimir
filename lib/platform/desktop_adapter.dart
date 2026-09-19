@@ -45,6 +45,8 @@ class DesktopPlatformAdapter implements MimirPlatformAdapter {
         PickerPurpose.esdeRoot => 'Select ES-DE folder',
         PickerPurpose.esdeSystemFolder => 'Select system folder',
         PickerPurpose.nszKeys => 'Select folder',
+        PickerPurpose.scummVmRoot => 'Select ScummVM Games folder',
+        PickerPurpose.scummVmExecutable => 'Select ScummVM app',
       },
     );
   }
@@ -109,6 +111,170 @@ class DesktopPlatformAdapter implements MimirPlatformAdapter {
       );
     }
     return entries;
+  }
+
+  @override
+  Future<String?> findScummVmExecutable() async {
+    final candidates = <String>[];
+    final environment = Platform.environment;
+    void add(String? value) {
+      if (value != null && value.isNotEmpty && !candidates.contains(value)) {
+        candidates.add(value);
+      }
+    }
+
+    switch (Platform.operatingSystem) {
+      case 'windows':
+        for (final variable in ['ProgramFiles', 'ProgramFiles(x86)']) {
+          final base = environment[variable];
+          if (base != null) add(p.join(base, 'ScummVM', 'scummvm.exe'));
+        }
+        final localAppData = environment['LOCALAPPDATA'];
+        if (localAppData != null) {
+          add(p.join(localAppData, 'Programs', 'ScummVM', 'scummvm.exe'));
+        }
+        final userProfile = environment['USERPROFILE'];
+        if (userProfile != null) {
+          add(
+            p.join(
+              userProfile,
+              'scoop',
+              'apps',
+              'scummvm',
+              'current',
+              'scummvm.exe',
+            ),
+          );
+        }
+        add(r'C:\ScummVM\scummvm.exe');
+        final programData = environment['ProgramData'];
+        if (programData != null) {
+          add(p.join(programData, 'chocolatey', 'bin', 'scummvm.exe'));
+        }
+        break;
+      case 'macos':
+        add('/Applications/ScummVM.app/Contents/MacOS/scummvm');
+        final home = environment['HOME'];
+        if (home != null) {
+          add(
+            p.join(
+              home,
+              'Applications',
+              'ScummVM.app',
+              'Contents',
+              'MacOS',
+              'scummvm',
+            ),
+          );
+        }
+        add('/opt/homebrew/bin/scummvm');
+        add('/usr/local/bin/scummvm');
+        break;
+      case 'linux':
+        add('/usr/bin/scummvm');
+        add('/usr/local/bin/scummvm');
+        add('/usr/games/scummvm');
+        add('/snap/bin/scummvm');
+        final home = environment['HOME'];
+        if (home != null) add(p.join(home, '.local', 'bin', 'scummvm'));
+        break;
+    }
+
+    final pathLookup = Platform.isWindows ? 'where' : 'which';
+    try {
+      final result = await Process.run(pathLookup, [
+        Platform.isWindows ? 'scummvm.exe' : 'scummvm',
+      ], runInShell: Platform.isWindows);
+      if (result.exitCode == 0) {
+        for (final line in '${result.stdout}'.split(RegExp(r'\r?\n'))) {
+          add(line.trim());
+        }
+      }
+    } on ProcessException {
+      // PATH lookup is optional; the fixed installation locations still apply.
+    }
+
+    for (final candidate in candidates) {
+      if (File(candidate).existsSync()) return candidate;
+    }
+    return null;
+  }
+
+  @override
+  Future<List<ScummVmGame>> detectScummVmGames({
+    required String rootHandle,
+    required String executableHandle,
+    void Function(int completed)? onProgress,
+    CancellationToken? cancellation,
+  }) async {
+    final root = Directory(rootHandle);
+    final executablePath = _resolveScummVmExecutable(executableHandle);
+    if (!await root.exists()) {
+      throw StateError('Unable to access selected ScummVM Games folder.');
+    }
+    if (executablePath == null) {
+      throw StateError('The selected ScummVM executable could not be read.');
+    }
+    final children = await root.list(followLinks: false).toList();
+    final folders = <Directory>[];
+    for (final child in children) {
+      _checkCancellation(cancellation);
+      if (await FileSystemEntity.type(child.path, followLinks: false) !=
+          FileSystemEntityType.directory) {
+        continue;
+      }
+      final name = p.basename(child.path);
+      if (name.startsWith('.')) continue;
+      folders.add(Directory(child.path));
+    }
+    folders.sort(
+      (a, b) => p
+          .basename(a.path)
+          .toLowerCase()
+          .compareTo(p.basename(b.path).toLowerCase()),
+    );
+
+    final games = <ScummVmGame>[];
+    for (var index = 0; index < folders.length; index++) {
+      _checkCancellation(cancellation);
+      final folder = folders[index];
+      final name = p.basename(folder.path);
+      final result = await Process.run(executablePath, [
+        '--path=${folder.path}',
+        '--detect',
+      ]);
+      final output = '${result.stdout}\n${result.stderr}';
+      if (result.exitCode != 0) {
+        throw StateError(
+          'ScummVM could not inspect "$name" (exit code ${result.exitCode}).',
+        );
+      }
+      final gameId = ScummVmDetector.detectedGameId(output);
+      final relative = p
+          .relative(folder.path, from: root.path)
+          .replaceAll(p.separator, '/');
+      final launcher = File(p.join(folder.path, '$name.scummvm'));
+      games.add(
+        ScummVmGame(
+          folderPath: relative,
+          gameName: name,
+          gameId: gameId,
+          targetAlreadyExists: launcher.existsSync(),
+        ),
+      );
+      onProgress?.call(index + 1);
+    }
+    return games;
+  }
+
+  String? _resolveScummVmExecutable(String handle) {
+    final file = File(handle);
+    if (file.existsSync()) return file.path;
+    if (Platform.isMacOS && handle.toLowerCase().endsWith('.app')) {
+      final bundled = File(p.join(handle, 'Contents', 'MacOS', 'scummvm'));
+      if (bundled.existsSync()) return bundled.path;
+    }
+    return null;
   }
 
   @override
