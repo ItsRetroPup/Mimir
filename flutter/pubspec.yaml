@@ -1,0 +1,38 @@
+name: mimir
+description: A local-first toolkit for maintaining retro ROM libraries.
+publish_to: none
+version: 0.4.0+10
+environment:
+  sdk: '>=3.10.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: ^3.0.0
+  file_selector: ^1.0.3
+  path: ^1.9.1
+  path_provider: ^2.1.5
+  shared_preferences: ^2.5.3
+  archive: ^4.0.7
+  xml: ^6.6.1
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/vita_shortcuts.tsv
+    - assets/licenses/
+    - ../app/src/main/res/values/strings.xml
+    - ../app/src/main/res/values-de/strings.xml
+    - ../app/src/main/res/values-es/strings.xml
+    - ../app/src/main/res/values-fr/strings.xml
+    - ../app/src/main/res/values-it/strings.xml
+    - ../app/src/main/res/values-ja/strings.xml
+    - ../app/src/main/res/values-ko/strings.xml
+    - ../app/src/main/res/values-pl/strings.xml
+    - ../app/src/main/res/values-pt-rBR/strings.xml
+    - ../app/src/main/res/values-zh-rCN/strings.xml
+    - ../app/src/main/res/values-zh-rTW/strings.xml

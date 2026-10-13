@@ -1,6 +1,13 @@
 <img width="512" height="512" alt="mimir1" src="https://github.com/user-attachments/assets/7edde894-cf4a-4ad8-822e-5a50af306fd8" />
 
-# Mimir Android Companion
+# Mimir
+
+The Flutter rebuild is under [`flutter/`](flutter/BUILD.md), alongside the original
+Android application. It contains shared tool logic and an adaptive workspace for
+Android and desktops. Native build validation and desktop converter bundles are
+still required before releasing it as a replacement.
+
+## Original Android Companion
 
 Mimir is an open source Android toolkit for retro handheld owners.
 
