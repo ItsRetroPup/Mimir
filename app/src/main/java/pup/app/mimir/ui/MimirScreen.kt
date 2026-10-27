@@ -101,7 +101,6 @@ internal fun MimirScreen(
     var showEsDeConfirmation by rememberSaveable { mutableStateOf(false) }
     var pendingVitaAdd by remember { mutableStateOf<pup.app.mimir.domain.VitaApp?>(null) }
     var pendingVitaRemove by remember { mutableStateOf<pup.app.mimir.domain.VitaApp?>(null) }
-    var pendingDeleteOriginalChdFiles by rememberSaveable { mutableStateOf(false) }
     var queueSortOption by rememberSaveable { mutableStateOf(QueueSortOption.NameAscending.name) }
     val openUrl: (String) -> Unit = { url ->
         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
@@ -143,7 +142,7 @@ internal fun MimirScreen(
                         }
                         Image(
                             painter = painterResource(id = R.drawable.mimir_launcher_m),
-                            contentDescription = "Mimir logo",
+                            contentDescription = stringResource(R.string.app_logo),
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(RoundedCornerShape(10.dp))
@@ -206,20 +205,15 @@ internal fun MimirScreen(
                             HomeFooter()
                         }
                     } else {
-                        item {
-                            ToolPageHeader(
-                                section = currentSection,
-                                converterTool = uiState.selectedConverterTool,
-                            )
+                        toolFor(currentSection)?.let { tool ->
+                            item { ToolPageHeader(tool) }
                         }
                         uiState.message?.let { message ->
                             item {
                                 InfoPanel(
                                     title = stringResource(R.string.status),
-                                    body = message,
-                                    accent = if (message.contains("unable", ignoreCase = true) ||
-                                        message.contains("failed", ignoreCase = true)
-                                    ) {
+                                    body = message.text,
+                                    accent = if (message.isError) {
                                         MaterialTheme.colorScheme.error
                                     } else {
                                         MaterialTheme.colorScheme.secondary
@@ -246,6 +240,7 @@ internal fun MimirScreen(
                             } else if (uiState.selectedMode == ToolMode.EsDeSystems) {
                                 EsDeSystemsCard(
                                     rootFolderName = uiState.esDeRootName,
+                                    hasRootFolder = uiState.esDeRootUri != null,
                                     romRootFolderName = uiState.selectedFolderName,
                                     systems = uiState.esDeSystems,
                                     isBusy = uiState.isBusy,
@@ -394,12 +389,7 @@ internal fun MimirScreen(
                     shape = RoundedCornerShape(16.dp),
                 ) {
                     Button(
-                        onClick = if (uiState.selectedMode == ToolMode.Converter && hasSelection) {
-                            {
-                                pendingDeleteOriginalChdFiles = uiState.deleteOriginalChdFiles
-                                showApplyConfirmation = true
-                            }
-                        } else if (hasSelection) {
+                        onClick = if (hasSelection) {
                             { showApplyConfirmation = true }
                         } else {
                             onStart
@@ -409,9 +399,10 @@ internal fun MimirScreen(
                     ) {
                         Text(
                             when {
-                                uiState.selectedMode == ToolMode.Converter && hasSelection -> "CONVERT ${uiState.selectedChangePaths.size} SELECTED"
-                                hasSelection -> "APPLY ${uiState.selectedChangePaths.size} SELECTED"
-                                else -> "SCAN SELECTED FOLDER"
+                                uiState.selectedMode == ToolMode.Converter && hasSelection ->
+                                    stringResource(R.string.action_convert_selected, uiState.selectedChangePaths.size)
+                                hasSelection -> stringResource(R.string.action_apply_selected, uiState.selectedChangePaths.size)
+                                else -> stringResource(R.string.action_scan_folder)
                             }
                         )
                     }
@@ -445,139 +436,57 @@ internal fun MimirScreen(
     }
 
     if (showApplyConfirmation) {
-        val changeCount = uiState.selectedChangePaths.size
-        val existingOutputCount = uiState.previewPlan?.changes
-            ?.count { it.targetAlreadyExists && it.detailPath in uiState.selectedChangePaths }
-            ?: 0
-        AlertDialog(
-            onDismissRequest = { showApplyConfirmation = false },
-            title = { Text(if (uiState.selectedMode == ToolMode.Converter) "Convert selected images?" else "Apply changes?") },
-            text = {
-                if (uiState.selectedMode == ToolMode.Converter) {
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        if (uiState.selectedConverterTool.replacesSource) {
-                            Text(
-                                "This will replace $changeCount selected Xbox image${if (changeCount == 1) "" else "s"} " +
-                                    "with a trimmed XISO of the same name. Each original is deleted only after its XISO " +
-                                    "is written, and Mimir cannot undo this action."
-                            )
-                        } else {
-                            Text(
-                                "This will convert $changeCount selected file${if (changeCount == 1) "" else "s"} " +
-                                    "to .${uiState.selectedConverterTool.outputExtension}. " +
-                                    (if (existingOutputCount > 0) "$existingOutputCount selected output${if (existingOutputCount == 1) "" else "s"} already exists and will be overwritten. " else "") +
-                                    "Mimir cannot undo this action."
-                            )
-                        }
-                        if (uiState.selectedConverterTool == ConverterTool.Chd) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text("Delete original files", style = MaterialTheme.typography.bodyLarge)
-                                    Text(
-                                        "Also removes same-folder tracks referenced by a .cue or .gdi file after conversion succeeds.",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
-                                    )
-                                }
-                                Switch(
-                                    checked = pendingDeleteOriginalChdFiles,
-                                    onCheckedChange = { pendingDeleteOriginalChdFiles = it },
-                                )
-                            }
-                        }
-                    }
-                } else {
-                    Text(
-                        "This will apply $changeCount planned changes to your selected ROM folder. " +
-                            "Original files may be moved or removed as shown in the preview, and Mimir cannot undo this action."
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        if (uiState.selectedMode == ToolMode.Converter && uiState.selectedConverterTool == ConverterTool.Chd) {
-                            onDeleteOriginalChdFilesChanged(pendingDeleteOriginalChdFiles)
-                        }
-                        showApplyConfirmation = false
-                        onApply()
-                    },
-                    enabled = !uiState.isBusy && changeCount > 0,
-                ) {
-                    Text(if (uiState.selectedMode == ToolMode.Converter) "START CONVERSIONS" else "APPLY CHANGES")
-                }
-            },
-            dismissButton = {
-                OutlinedButton(onClick = { showApplyConfirmation = false }) {
-                    Text("CANCEL")
-                }
+        val isChdConversion = uiState.selectedMode == ToolMode.Converter &&
+            uiState.selectedConverterTool == ConverterTool.Chd
+        ApplyConfirmationDialog(
+            mode = uiState.selectedMode,
+            converterTool = uiState.selectedConverterTool,
+            changeCount = uiState.selectedChangePaths.size,
+            existingOutputCount = uiState.previewPlan?.changes
+                ?.count { it.targetAlreadyExists && it.detailPath in uiState.selectedChangePaths }
+                ?: 0,
+            deleteOriginalChdFiles = uiState.deleteOriginalChdFiles,
+            enabled = !uiState.isBusy,
+            onDismiss = { showApplyConfirmation = false },
+            onConfirm = { deleteOriginals ->
+                if (isChdConversion) onDeleteOriginalChdFilesChanged(deleteOriginals)
+                showApplyConfirmation = false
+                onApply()
             },
         )
     }
 
     if (showEsDeConfirmation) {
-        AlertDialog(
-            onDismissRequest = { showEsDeConfirmation = false },
-            title = { Text("Install custom systems?") },
-            text = {
-                Text(
-                    "This will install ${uiState.esDeSystems.size} configured system" +
-                        if (uiState.esDeSystems.size == 1) "" else "s" +
-                        " in the selected ES-DE folder's custom_systems directory. Existing custom system files may be updated. Restart ES-DE after the install finishes.",
-                )
-            },
-            confirmButton = {
-                Button(onClick = {
-                    showEsDeConfirmation = false
-                    onApplyEsDeSystems()
-                }) { Text("INSTALL SYSTEMS") }
-            },
-            dismissButton = {
-                OutlinedButton(onClick = { showEsDeConfirmation = false }) { Text("CANCEL") }
+        EsDeInstallDialog(
+            systemCount = uiState.esDeSystems.size,
+            onDismiss = { showEsDeConfirmation = false },
+            onConfirm = {
+                showEsDeConfirmation = false
+                onApplyEsDeSystems()
             },
         )
     }
 
     pendingVitaAdd?.let { app ->
-        AlertDialog(
-            onDismissRequest = { pendingVitaAdd = null },
-            title = { Text("Create Vita shortcut?") },
-            text = {
-                Text(
-                    "This will create a .${uiState.vitaShortcutFormat.extension} shortcut for ${app.title} (${app.titleId}) in the selected output folder.",
-                )
-            },
-            confirmButton = {
-                Button(onClick = {
-                    pendingVitaAdd = null
-                    onVitaShortcutAdd(app)
-                }) { Text("CREATE SHORTCUT") }
-            },
-            dismissButton = {
-                OutlinedButton(onClick = { pendingVitaAdd = null }) { Text("CANCEL") }
+        VitaShortcutAddDialog(
+            app = app,
+            format = uiState.vitaShortcutFormat,
+            onDismiss = { pendingVitaAdd = null },
+            onConfirm = {
+                pendingVitaAdd = null
+                onVitaShortcutAdd(app)
             },
         )
     }
 
     pendingVitaRemove?.let { app ->
-        AlertDialog(
-            onDismissRequest = { pendingVitaRemove = null },
-            title = { Text("Remove Vita shortcut?") },
-            text = { Text("This will delete the shortcut for ${app.title} (${app.titleId}) from the selected output folder.") },
-            confirmButton = {
-                Button(onClick = {
-                    pendingVitaRemove = null
-                    onVitaShortcutRemove(app)
-                }) { Text("REMOVE SHORTCUT") }
-            },
-            dismissButton = {
-                OutlinedButton(onClick = { pendingVitaRemove = null }) { Text("CANCEL") }
+        VitaShortcutRemoveDialog(
+            app = app,
+            onDismiss = { pendingVitaRemove = null },
+            onConfirm = {
+                pendingVitaRemove = null
+                onVitaShortcutRemove(app)
             },
         )
     }
-
 }

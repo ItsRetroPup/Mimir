@@ -11,4 +11,233 @@
     <string name="goal_shrink_gamecube_wii">GameCube- und Wii-Spiele verkleinern</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">ISO-Images in RVZ konvertieren.</string>
     <string name="goal_shrink_3ds">Nintendo-3DS-Spiele verkleinern</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">Entschlüsselte 3DS- und CCI-Images in ZCCI komprimieren.</string><string name="goal_shrink_xbox">Xbox-Spiele verkleinern</string><string name="tool_xbox_xiso">Xbox XISO</string><string name="tool_xbox_xiso_description">Redump-Xbox-ISOs für Hakux und xemu zu XISO kürzen.</string><string name="tool_card_description">%1$s \u2022 %2$s</string>
     <string name="no_rom_folder_selected">Kein ROM-Ordner ausgewählt</string><string name="no_vita_output_directory_selected">Kein Vita-Ausgabeordner ausgewählt</string><string name="no_esde_folder_selected">Kein ES-DE-Ordner ausgewählt</string>
+
+    <!-- Tool screens, dialogs and status messages. -->
+    <string name="action_cancel">ABBRECHEN</string>
+    <string name="sort_name_ascending">Name A–Z</string>
+    <string name="sort_name_descending">Name Z–A</string>
+    <string name="sort_size_largest">Größte zuerst</string>
+    <string name="sort_size_smallest">Kleinste zuerst</string>
+    <string name="queue_title">KONVERTIERUNGSWARTESCHLANGE</string>
+    <string name="action_select_all">ALLE AUSWÄHLEN</string>
+    <string name="action_deselect_all">AUSWAHL AUFHEBEN</string>
+    <string name="queue_sort_by">Sortieren nach</string>
+    <string name="storage_title">Speicher auf dem gescannten Gerät</string>
+    <string name="storage_body">%1$s von %2$s frei. Diese Warteschlange benötigt etwa %3$s Arbeitsspeicherplatz.</string>
+    <string name="storage_low_warning">Warnung: Möglicherweise ist nicht genug freier Speicher vorhanden, um die ausgewählte Warteschlange zu konvertieren. Hebe die Auswahl einiger Einträge auf oder schaffe zuerst Platz.</string>
+    <string name="queue_column_rom">ROM</string>
+    <string name="queue_column_size">GRÖSSE</string>
+    <string name="queue_column_output">AUSGABE</string>
+    <string name="queue_existing_output">Ausgabe vorhanden – zum Ersetzen einzeln auswählen</string>
+    <string name="replace_output_title">Vorhandene Ausgabe ersetzen?</string>
+    <string name="replace_output_body_selected">%1$s ist bereits vorhanden und wird bei Auswahl überschrieben.</string>
+    <string name="action_replace_output">AUSGABE ERSETZEN</string>
+    <string name="report_space_saved">Netto eingesparter Speicher: %1$s.</string>
+    <string name="report_size_increase">Netto-Größenzunahme: %1$s.</string>
+    <string name="report_no_size_change">Keine Netto-Größenänderung.</string>
+    <string name="report_title">Konvertierungsbericht</string>
+    <plurals name="report_completed">
+        <item quantity="one">%1$d von %2$d Konvertierung abgeschlossen.</item>
+        <item quantity="other">%1$d von %2$d Konvertierungen abgeschlossen.</item>
+    </plurals>
+    <string name="report_stopped">Vom Nutzer gestoppt.</string>
+    <string name="progress_converting">%1$s wird konvertiert: %2$d %%</string>
+    <string name="progress_selected_image">Ausgewähltes Image</string>
+    <string name="progress_queue">Warteschlange: Auftrag %1$d von %2$d</string>
+    <string name="action_stop_after_current">NACH AKTUELLER KONVERTIERUNG STOPPEN</string>
+    <string name="action_stop_now">JETZT STOPPEN</string>
+    <string name="support_title">MIMIR UNTERSTÜTZEN</string>
+    <string name="support_body" formatted="false">Mimir ist und bleibt zu 100 % kostenlos und werbefrei. Wenn du mich unterstützen möchtest, schau gern bei meinem YouTube-Kanal vorbei oder spende.</string>
+    <string name="home_footer">Entwickelt von RetroPup</string>
+    <string name="app_logo">Mimir-Logo</string>
+    <string name="action_convert_selected">%1$d AUSGEWÄHLTE KONVERTIEREN</string>
+    <string name="action_apply_selected">%1$d AUSGEWÄHLTE ANWENDEN</string>
+    <string name="action_scan_folder">AUSGEWÄHLTEN ORDNER SCANNEN</string>
+    <string name="apply_title_convert">Ausgewählte Images konvertieren?</string>
+    <string name="apply_title_changes">Änderungen anwenden?</string>
+    <plurals name="apply_body_changes">
+        <item quantity="one">Dadurch wird %1$d geplante Änderung auf deinen ausgewählten ROM-Ordner angewendet. Originaldateien können wie in der Vorschau gezeigt verschoben oder entfernt werden, und Mimir kann dies nicht rückgängig machen.</item>
+        <item quantity="other">Dadurch werden %1$d geplante Änderungen auf deinen ausgewählten ROM-Ordner angewendet. Originaldateien können wie in der Vorschau gezeigt verschoben oder entfernt werden, und Mimir kann dies nicht rückgängig machen.</item>
+    </plurals>
+    <plurals name="apply_body_replace_xiso">
+        <item quantity="one">Dadurch wird %1$d ausgewähltes Xbox-Image durch ein gekürztes XISO mit demselben Namen ersetzt. Das Original wird erst gelöscht, nachdem sein XISO geschrieben wurde, und Mimir kann dies nicht rückgängig machen.</item>
+        <item quantity="other">Dadurch werden %1$d ausgewählte Xbox-Images durch gekürzte XISOs mit demselben Namen ersetzt. Jedes Original wird erst gelöscht, nachdem sein XISO geschrieben wurde, und Mimir kann dies nicht rückgängig machen.</item>
+    </plurals>
+    <plurals name="apply_body_convert">
+        <item quantity="one">Dadurch wird %1$d ausgewählte Datei in .%2$s konvertiert.</item>
+        <item quantity="other">Dadurch werden %1$d ausgewählte Dateien in .%2$s konvertiert.</item>
+    </plurals>
+    <plurals name="apply_body_overwrite">
+        <item quantity="one">%1$d ausgewählte Ausgabe ist bereits vorhanden und wird überschrieben.</item>
+        <item quantity="other">%1$d ausgewählte Ausgaben sind bereits vorhanden und werden überschrieben.</item>
+    </plurals>
+    <string name="apply_body_cannot_undo">Mimir kann dies nicht rückgängig machen.</string>
+    <string name="apply_delete_originals">Originaldateien löschen</string>
+    <string name="apply_delete_originals_detail">Entfernt nach erfolgreicher Konvertierung auch Tracks im selben Ordner, auf die eine .cue- oder .gdi-Datei verweist.</string>
+    <string name="action_start_conversions">KONVERTIERUNGEN STARTEN</string>
+    <string name="action_apply_changes">ÄNDERUNGEN ANWENDEN</string>
+    <string name="esde_install_title">Benutzerdefinierte Systeme installieren?</string>
+    <plurals name="esde_install_body">
+        <item quantity="one">Dadurch wird %1$d konfiguriertes System im Verzeichnis custom_systems des ausgewählten ES-DE-Ordners installiert. Vorhandene benutzerdefinierte Systemdateien können aktualisiert werden. Starte ES-DE nach der Installation neu.</item>
+        <item quantity="other">Dadurch werden %1$d konfigurierte Systeme im Verzeichnis custom_systems des ausgewählten ES-DE-Ordners installiert. Vorhandene benutzerdefinierte Systemdateien können aktualisiert werden. Starte ES-DE nach der Installation neu.</item>
+    </plurals>
+    <string name="action_install_systems">SYSTEME INSTALLIEREN</string>
+    <string name="vita_add_title">Vita-Verknüpfung erstellen?</string>
+    <string name="vita_add_body">Dadurch wird eine .%1$s-Verknüpfung für %2$s (%3$s) im ausgewählten Ausgabeordner erstellt.</string>
+    <string name="action_create_shortcut">VERKNÜPFUNG ERSTELLEN</string>
+    <string name="vita_remove_title">Vita-Verknüpfung entfernen?</string>
+    <string name="vita_remove_body">Dadurch wird die Verknüpfung für %1$s (%2$s) aus dem ausgewählten Ausgabeordner gelöscht.</string>
+    <string name="action_remove_shortcut">VERKNÜPFUNG ENTFERNEN</string>
+    <plurals name="chip_discs">
+        <item quantity="one">%1$d DISC</item>
+        <item quantity="other">%1$d DISCS</item>
+    </plurals>
+    <string name="preview_existing_output">Eine passende .%1$s-Datei ist bereits vorhanden. Wähle diesen Eintrag aus, um sie zu ersetzen.</string>
+    <string name="preview_sources">Quellen</string>
+    <string name="preview_targets">Ziele</string>
+    <string name="replace_output_body_convert">%1$s ist bereits vorhanden und wird überschrieben, wenn du dieses Image konvertierst.</string>
+    <string name="preview_title">VORSCHAU</string>
+    <plurals name="preview_jobs_selected">
+        <item quantity="one">%1$d Auftrag ausgewählt • %2$s</item>
+        <item quantity="other">%1$d Aufträge ausgewählt • %2$s</item>
+    </plurals>
+    <plurals name="preview_multidisc_summary">
+        <item quantity="one">%1$d Multi-Disc-Set erkannt; %2$d ausgewählt.</item>
+        <item quantity="other">%1$d Multi-Disc-Sets erkannt; %2$d ausgewählt.</item>
+    </plurals>
+    <plurals name="preview_zip_summary">
+        <item quantity="one">%1$d ROM passt zur ZIP-Liste; %2$d ausgewählt.</item>
+        <item quantity="other">%1$d ROMs passen zur ZIP-Liste; %2$d ausgewählt.</item>
+    </plurals>
+    <plurals name="preview_items_summary">
+        <item quantity="one">%1$d Eintrag bereit; %2$d ausgewählt.</item>
+        <item quantity="other">%1$d Einträge bereit; %2$d ausgewählt.</item>
+    </plurals>
+    <plurals name="preview_systems_summary">
+        <item quantity="one">%1$d System bereit; %2$d ausgewählt.</item>
+        <item quantity="other">%1$d Systeme bereit; %2$d ausgewählt.</item>
+    </plurals>
+    <string name="action_apply">ANWENDEN</string>
+    <string name="control_title">SYSTEMSTEUERUNG</string>
+    <string name="control_selected_rom_folder">Ausgewählter ROM-Ordner</string>
+    <string name="action_select_rom_folder">ROM-ORDNER AUSWÄHLEN</string>
+    <string name="esde_title">ES-DE BENUTZERDEFINIERTE SYSTEME</string>
+    <string name="esde_selected_folder">Ausgewählter ES-DE-Ordner</string>
+    <string name="action_select_esde_folder">ES-DE-ORDNER AUSWÄHLEN</string>
+    <string name="esde_rom_root">ROM-Stammordner</string>
+    <string name="action_select_rom_root">ROM-STAMMORDNER AUSWÄHLEN</string>
+    <string name="action_download_xmls">NEUESTE XMLS HERUNTERLADEN</string>
+    <string name="esde_download_hint">Lade die neuesten XMLs herunter, um die benutzerdefinierten Android-Systeme zu konfigurieren. Sie werden unter custom_systems installiert.</string>
+    <string name="esde_rom_folders">ROM-Ordner</string>
+    <string name="esde_default_folder">Standard</string>
+    <string name="action_choose_folder">ORDNER WÄHLEN</string>
+    <string name="action_install_custom_systems">BENUTZERDEFINIERTE SYSTEME INSTALLIEREN</string>
+    <string name="vita_title">VITA-VERKNÜPFUNGEN</string>
+    <string name="vita_output_directory">Ausgabeordner für Verknüpfungen</string>
+    <string name="action_select_output_folder">AUSGABEORDNER AUSWÄHLEN</string>
+    <string name="vita_file_type">Dateityp der Verknüpfung</string>
+    <string name="vita_cocoon_hint">Wähle für Cocoon .dpt</string>
+    <string name="vita_database">Verknüpfungsdatenbank</string>
+    <plurals name="vita_database_size">
+        <item quantity="one">%1$d Titel für die Suche bereit</item>
+        <item quantity="other">%1$d Titel für die Suche bereit</item>
+    </plurals>
+    <string name="vita_search_label">Titel oder App-ID suchen</string>
+    <string name="vita_search_results">Suchergebnisse</string>
+    <string name="vita_delete_shortcut">Verknüpfung für %1$s löschen</string>
+    <string name="action_quick_add">SCHNELL HINZUFÜGEN</string>
+    <string name="organizer_frontend_target">FRONTEND-ZIEL</string>
+    <string name="preset_other">Andere</string>
+    <string name="organizer_scan_hidden">Versteckte Ordner scannen</string>
+    <string name="organizer_scan_hidden_detail">ROMs vor dem Organisieren aus Ordnern mit vorangestelltem Punkt in den Systemordner verschieben.</string>
+    <string name="nsz_keys_title">NSZ-Schlüssel</string>
+    <string name="nsz_keys_configured">prod.keys ist importiert und wird im privaten Speicher von Mimir aufbewahrt.</string>
+    <string name="nsz_keys_missing">Importiere deine legal erworbene prod.keys-Datei, bevor du NSZ-Pakete scannst oder konvertierst.</string>
+    <string name="action_replace_keys">PROD.KEYS ERSETZEN</string>
+    <string name="action_import_keys">PROD.KEYS IMPORTIEREN</string>
+    <string name="chd_system">System</string>
+    <string name="chd_conversion_type">Konvertierungsart</string>
+    <string name="chd_compatibility_title">Kompatibilitätshinweis</string>
+    <string name="chd_compatibility_body">Verwende CD für NetherSX2 und DVD für ARMSX2.</string>
+    <string name="msg_rom_path_unresolved">Der Pfad des ausgewählten ROM-Ordners konnte nicht ermittelt werden.</string>
+    <string name="msg_select_esde_first">Wähle zuerst den ES-DE-Ordner aus.</string>
+    <string name="msg_select_rom_root_find">Wähle zuerst den ROM-Stammordner aus, damit Mimir seine Systeme finden kann.</string>
+    <string name="msg_esde_downloading">Neueste benutzerdefinierte ES-DE-Systeme werden heruntergeladen …</string>
+    <plurals name="msg_esde_downloaded">
+        <item quantity="one">%1$d ES-DE-System heruntergeladen. Prüfe den Ordner und wende ihn dann an.</item>
+        <item quantity="other">%1$d ES-DE-Systeme heruntergeladen. Prüfe die Ordner und wende sie dann an.</item>
+    </plurals>
+    <string name="msg_esde_download_failed">ES-DE-Systeme konnten nicht heruntergeladen werden.</string>
+    <string name="msg_esde_download_first">Lade zuerst die neuesten ES-DE-Systeme herunter.</string>
+    <string name="msg_select_rom_root_map">Wähle zuerst den ROM-Stammordner aus, damit Mimir seine Systeme zuordnen kann.</string>
+    <string name="msg_esde_installing">Benutzerdefinierte ES-DE-Systeme werden installiert …</string>
+    <plurals name="msg_esde_installed">
+        <item quantity="one">%1$d System in custom_systems installiert. Starte ES-DE neu, um es zu laden.</item>
+        <item quantity="other">%1$d Systeme in custom_systems installiert. Starte ES-DE neu, um sie zu laden.</item>
+    </plurals>
+    <string name="msg_esde_install_failed">ES-DE-Systeme konnten nicht installiert werden.</string>
+    <string name="msg_stopping">Wird gestoppt …</string>
+    <string name="msg_stop_after_current">Stoppt nach der aktuellen Konvertierung.</string>
+    <string name="msg_select_vita_output_first">Wähle zuerst einen Ausgabeordner für Vita-Verknüpfungen aus.</string>
+    <string name="msg_vita_add_unable">Verknüpfung für %1$s konnte nicht hinzugefügt werden.</string>
+    <string name="msg_vita_added">Verknüpfung hinzugefügt: %1$s</string>
+    <string name="msg_vita_add_failed">Hinzufügen der Verknüpfung fehlgeschlagen.</string>
+    <string name="msg_vita_removed">Verknüpfung entfernt: %1$s</string>
+    <string name="msg_vita_remove_failed">Entfernen der Verknüpfung fehlgeschlagen.</string>
+    <string name="msg_keys_directory_failed">Mimirs NSZ-Schlüsselordner konnte nicht vorbereitet werden.</string>
+    <string name="msg_keys_unreadable">Die ausgewählte prod.keys-Datei konnte nicht gelesen werden.</string>
+    <string name="msg_keys_empty">Die ausgewählte prod.keys-Datei ist leer.</string>
+    <string name="msg_keys_finish_failed">Der Import von prod.keys konnte nicht abgeschlossen werden.</string>
+    <string name="msg_keys_imported">prod.keys importiert und auf diesem Gerät gespeichert.</string>
+    <string name="msg_keys_import_failed">prod.keys konnte nicht importiert werden.</string>
+    <string name="msg_select_rom_folder_first">Wähle zuerst einen ROM-Ordner aus.</string>
+    <string name="msg_import_keys_first">Importiere eine prod.keys-Datei, bevor du NSZ-Pakete scannst.</string>
+    <plurals name="scan_checking_multidisc">
+        <item quantity="one">%1$d ROM-Datei wird auf Multi-Disc-Spiele geprüft …</item>
+        <item quantity="other">%1$d ROM-Dateien werden auf Multi-Disc-Spiele geprüft …</item>
+    </plurals>
+    <plurals name="scan_checking_zip">
+        <item quantity="one">%1$d ROM-Datei wird auf ZIP-kompatible Formate geprüft …</item>
+        <item quantity="other">%1$d ROM-Dateien werden auf ZIP-kompatible Formate geprüft …</item>
+    </plurals>
+    <plurals name="scan_checking_chd">
+        <item quantity="one">%1$d %2$s-Image wird für die CHD-Konvertierung geprüft …</item>
+        <item quantity="other">%1$d %2$s-Images werden für die CHD-Konvertierung geprüft …</item>
+    </plurals>
+    <plurals name="scan_checking_tool">
+        <item quantity="one">%1$d Datei wird für die %2$s-Konvertierung geprüft …</item>
+        <item quantity="other">%1$d Dateien werden für die %2$s-Konvertierung geprüft …</item>
+    </plurals>
+    <string name="msg_none_multidisc">Keine Multi-Disc-Spiele gefunden.</string>
+    <string name="msg_none_zip">Keine ZIP-kompatiblen ROMs gefunden.</string>
+    <string name="msg_none_converter">Keine kompatiblen %1$s-Dateien gefunden.</string>
+    <string name="msg_none_vita">Keine Vita-Verknüpfungen in der Warteschlange.</string>
+    <string name="msg_none_esde">Keine ES-DE-Systeme geladen.</string>
+    <string name="msg_scan_stopped">Scan gestoppt.</string>
+    <string name="msg_scan_failed">Scan fehlgeschlagen.</string>
+    <plurals name="msg_stopped_after">
+        <item quantity="one">Nach %1$d von %2$d Konvertierung gestoppt.</item>
+        <item quantity="other">Nach %1$d von %2$d Konvertierungen gestoppt.</item>
+    </plurals>
+    <string name="msg_changes_applied">Änderungen angewendet.</string>
+    <string name="msg_conversion_stopped">Konvertierung gestoppt.</string>
+    <string name="msg_apply_failed">Anwenden fehlgeschlagen.</string>
+    <string name="scan_start_multidisc">ROM-Dateien werden nach Multi-Disc-Spielen durchsucht …</string>
+    <string name="scan_start_zip">ROM-Dateien werden nach ZIP-kompatiblen Formaten durchsucht …</string>
+    <string name="scan_start_tool">ROM-Dateien werden nach %1$s-kompatiblen Dateien durchsucht …</string>
+    <string name="scan_start_files">ROM-Dateien werden gescannt …</string>
+    <string name="scan_activity_multidisc">Suche nach Multi-Disc-Spielen</string>
+    <string name="scan_activity_zip">Suche nach ZIP-kompatiblen ROMs</string>
+    <string name="scan_activity_tool">Suche nach %1$s-kompatiblen Dateien</string>
+    <string name="scan_activity_files">ROM-Dateien werden gescannt</string>
+    <plurals name="scan_files_checked">
+        <item quantity="one">%1$s: %2$d Datei geprüft</item>
+        <item quantity="other">%1$s: %2$d Dateien geprüft</item>
+    </plurals>
+    <string name="apply_activity_organizing">ROMs werden organisiert</string>
+    <string name="apply_activity_zipping">ROMs werden gezippt</string>
+    <string name="apply_activity_converting">Konvertierung mit %1$s</string>
+    <string name="apply_activity_shortcuts">Verknüpfungen werden erstellt</string>
+    <string name="apply_activity_esde">ES-DE-Systeme werden aktualisiert</string>
+    <string name="apply_progress">%1$s: %2$d von %3$d</string>
 </resources>

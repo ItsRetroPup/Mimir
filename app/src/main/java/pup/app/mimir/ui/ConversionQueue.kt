@@ -1,5 +1,6 @@
 package pup.app.mimir.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,14 +25,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import pup.app.mimir.R
 import pup.app.mimir.domain.OperationPlan
 
-internal enum class QueueSortOption(val label: String) {
-    NameAscending("Name A–Z"),
-    NameDescending("Name Z–A"),
-    SizeLargest("Size largest"),
-    SizeSmallest("Size smallest"),
+internal enum class QueueSortOption(@StringRes val label: Int) {
+    NameAscending(R.string.sort_name_ascending),
+    NameDescending(R.string.sort_name_descending),
+    SizeLargest(R.string.sort_size_largest),
+    SizeSmallest(R.string.sort_size_smallest),
 }
 
 internal fun formatBytes(bytes: Long): String {
@@ -85,30 +89,34 @@ internal fun ConversionQueueTable(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Label("CONVERSION QUEUE")
+                Label(stringResource(R.string.queue_title))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = onSelectAll, enabled = enabled) { Text("SELECT ALL") }
-                    OutlinedButton(onClick = onDeselectAll, enabled = enabled) { Text("DESELECT ALL") }
+                    OutlinedButton(onClick = onSelectAll, enabled = enabled) { Text(stringResource(R.string.action_select_all)) }
+                    OutlinedButton(onClick = onDeselectAll, enabled = enabled) { Text(stringResource(R.string.action_deselect_all)) }
                 }
             }
-            Text("Sort by", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Text(stringResource(R.string.queue_sort_by), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             ChoiceRow(
                 options = QueueSortOption.entries,
                 selected = sortOption,
                 enabled = enabled,
-                label = { it.label },
+                label = { stringResource(it.label) },
                 onSelect = onSortOptionChanged,
             )
             if (storageInfo != null) {
                 InfoPanel(
-                    title = "Storage on scanned device",
-                    body = "${formatBytes(storageInfo.freeBytes)} free of ${formatBytes(storageInfo.totalBytes)}. " +
-                        "This queue needs about ${formatBytes(selectedBytes)} of working space.",
+                    title = stringResource(R.string.storage_title),
+                    body = stringResource(
+                        R.string.storage_body,
+                        formatBytes(storageInfo.freeBytes),
+                        formatBytes(storageInfo.totalBytes),
+                        formatBytes(selectedBytes),
+                    ),
                     accent = if (lowSpace) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary,
                 )
                 if (lowSpace) {
                     Text(
-                        "Warning: there may not be enough free space to convert the selected queue. Deselect some items or free space first.",
+                        stringResource(R.string.storage_low_warning),
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                     )
@@ -119,9 +127,9 @@ internal fun ConversionQueueTable(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text("", modifier = Modifier.size(40.dp))
-                Text("ROM", modifier = Modifier.weight(1.4f), style = MaterialTheme.typography.labelMedium)
-                Text("SIZE", modifier = Modifier.weight(0.65f), style = MaterialTheme.typography.labelMedium)
-                Text("OUTPUT", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.queue_column_rom), modifier = Modifier.weight(1.4f), style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.queue_column_size), modifier = Modifier.weight(0.65f), style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.queue_column_output), modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium)
             }
             sortedChanges.forEach { change ->
                 Row(
@@ -143,7 +151,7 @@ internal fun ConversionQueueTable(
                     Column(modifier = Modifier.weight(1.4f)) {
                         Text(change.title, style = MaterialTheme.typography.bodyMedium)
                         if (change.targetAlreadyExists) {
-                            Text("Existing output — select individually to replace", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                            Text(stringResource(R.string.queue_existing_output), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                         }
                     }
                     Text(formatBytes(change.sourceSizeBytes), modifier = Modifier.weight(0.65f), style = MaterialTheme.typography.bodySmall)
@@ -155,16 +163,16 @@ internal fun ConversionQueueTable(
     pendingOverwrite?.let { change ->
         AlertDialog(
             onDismissRequest = { pendingOverwrite = null },
-            title = { Text("Replace existing output?") },
-            text = { Text("${change.targetFiles.singleOrNull() ?: change.detailPath} already exists and will be overwritten if selected.") },
+            title = { Text(stringResource(R.string.replace_output_title)) },
+            text = { Text(stringResource(R.string.replace_output_body_selected, change.targetFiles.singleOrNull() ?: change.detailPath)) },
             confirmButton = {
                 Button(onClick = {
                     pendingOverwrite = null
                     onChangeSelection(change.detailPath, true)
-                }) { Text("REPLACE OUTPUT") }
+                }) { Text(stringResource(R.string.action_replace_output)) }
             },
             dismissButton = {
-                OutlinedButton(onClick = { pendingOverwrite = null }) { Text("CANCEL") }
+                OutlinedButton(onClick = { pendingOverwrite = null }) { Text(stringResource(R.string.action_cancel)) }
             },
         )
     }
@@ -173,15 +181,17 @@ internal fun ConversionQueueTable(
 @Composable
 internal fun ConversionReportCard(report: pup.app.mimir.ui.ConversionReport) {
     val sizeSummary = when {
-        report.spaceSavedBytes > 0L -> "Net space saved: ${formatBytes(report.spaceSavedBytes)}."
-        report.spaceSavedBytes < 0L -> "Net size increase: ${formatBytes(-report.spaceSavedBytes)}."
-        else -> "No net size change."
+        report.spaceSavedBytes > 0L -> stringResource(R.string.report_space_saved, formatBytes(report.spaceSavedBytes))
+        report.spaceSavedBytes < 0L -> stringResource(R.string.report_size_increase, formatBytes(-report.spaceSavedBytes))
+        else -> stringResource(R.string.report_no_size_change)
     }
     InfoPanel(
-        title = "Conversion report",
-        body = "Completed ${report.completed} of ${report.total} conversions. " +
-            sizeSummary +
-            if (report.stopped) " Stopped by user." else "",
+        title = stringResource(R.string.report_title),
+        body = listOfNotNull(
+            pluralStringResource(R.plurals.report_completed, report.total, report.completed, report.total),
+            sizeSummary,
+            stringResource(R.string.report_stopped).takeIf { report.stopped },
+        ).joinToString(" "),
         accent = MaterialTheme.colorScheme.secondary,
     )
 }
@@ -210,7 +220,11 @@ internal fun ConversionProgressToast(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                "Converting ${currentJobLabel ?: "selected image"}: ${(currentJobProgress * 100).toInt()}%",
+                stringResource(
+                    R.string.progress_converting,
+                    currentJobLabel ?: stringResource(R.string.progress_selected_image),
+                    (currentJobProgress * 100).toInt(),
+                ),
                 style = MaterialTheme.typography.bodyMedium,
             )
             LinearProgressIndicator(
@@ -221,7 +235,7 @@ internal fun ConversionProgressToast(
             )
             if (report.total > 1) {
                 Text(
-                    "Queue: job $currentJob of ${report.total}",
+                    stringResource(R.string.progress_queue, currentJob, report.total),
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 LinearProgressIndicator(
@@ -235,12 +249,12 @@ internal fun ConversionProgressToast(
                 onClick = onStopAfterCurrent,
                 enabled = canStopAfterCurrent,
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("STOP AFTER CURRENT CONVERSION") }
+            ) { Text(stringResource(R.string.action_stop_after_current)) }
             OutlinedButton(
                 onClick = onStopNow,
                 enabled = stopNowEnabled,
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("STOP NOW") }
+            ) { Text(stringResource(R.string.action_stop_now)) }
         }
     }
 }

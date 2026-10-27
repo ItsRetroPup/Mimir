@@ -79,6 +79,9 @@ internal val spaceSavers = listOf(
     ToolEntry(R.string.goal_shrink_xbox, R.string.tool_xbox_xiso, R.string.tool_xbox_xiso_description, ToolMode.Converter, AppSection.Xiso, ConverterTool.XboxXiso, Icons.Outlined.Archive),
 )
 
+/** The tool shown in [section], or null for the home screen. */
+internal fun toolFor(section: AppSection): ToolEntry? = (utilities + spaceSavers).firstOrNull { it.section == section }
+
 @Composable
 internal fun SupportSection(
     onOpenYoutube: () -> Unit,
@@ -87,9 +90,9 @@ internal fun SupportSection(
 ) {
     StyledCard {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Label("SUPPORT MIMIR")
+            Label(stringResource(R.string.support_title))
             Text(
-                "Mimir is, and always will be, 100% free and without ads. If you would like to show your support, please consider checking out my YouTube channel or donating.",
+                stringResource(R.string.support_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.82f),
             )
@@ -139,38 +142,11 @@ internal fun HomeIntroSection() {
 }
 
 @Composable
-internal fun ToolPageHeader(
-    section: AppSection,
-    converterTool: ConverterTool,
-) {
-    val title = when (section) {
-        AppSection.EsDeSystems -> "ES-DE Systems"
-        AppSection.Organizer -> "Multi-disc Organizer"
-        AppSection.Zipper -> "RomZipper"
-        AppSection.ChdMan -> "CHDMan"
-        AppSection.Rvz -> "Dolphin RVZ"
-        AppSection.Zcci -> "Azahar ZCCI"
-        AppSection.Nsz -> "NSZ to NSP"
-        AppSection.Xiso -> "Xbox XISO"
-        AppSection.Vita -> "Vita Shortcuts"
-        AppSection.Home -> "Mimir"
-    }
-    val description = when (section) {
-        AppSection.EsDeSystems -> "Install the latest ES-DE Android custom systems into custom_systems."
-        AppSection.Organizer -> "Organise multi-disc games into frontend-ready folders and playlists."
-        AppSection.Zipper -> "Compress supported ROM files into .zip archives to save space."
-        AppSection.ChdMan -> converterTool.description
-        AppSection.Rvz -> converterTool.description
-        AppSection.Zcci -> converterTool.description
-        AppSection.Nsz -> converterTool.description
-        AppSection.Xiso -> converterTool.description
-        AppSection.Vita -> "Create .psvita or .dpt shortcut files from the built-in Vita database."
-        AppSection.Home -> ""
-    }
+internal fun ToolPageHeader(tool: ToolEntry) {
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(title, style = MaterialTheme.typography.headlineMedium)
+        Text(stringResource(tool.toolName), style = MaterialTheme.typography.headlineMedium)
         Text(
-            description,
+            stringResource(tool.description),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.78f),
         )
@@ -186,7 +162,7 @@ internal fun HomeFooter() {
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            "Built by RetroPup",
+            stringResource(R.string.home_footer),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.64f),
         )

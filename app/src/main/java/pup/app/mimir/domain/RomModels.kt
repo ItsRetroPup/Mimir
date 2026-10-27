@@ -43,7 +43,6 @@ sealed interface ConverterBackend {
 
 enum class ConverterTool(
     val displayName: String,
-    val description: String,
     val sourceExtensions: Set<String>,
     val outputExtension: String,
     val folderAliases: Set<String>,
@@ -53,7 +52,6 @@ enum class ConverterTool(
 ) {
     Chd(
         displayName = "CHDMan",
-        description = "Disc images to space-saving CHD files",
         sourceExtensions = emptySet(),
         outputExtension = "chd",
         folderAliases = emptySet(),
@@ -62,7 +60,6 @@ enum class ConverterTool(
     ),
     DolphinRvz(
         displayName = "Dolphin RVZ",
-        description = "GameCube and Wii ISO images to RVZ",
         sourceExtensions = setOf("iso"),
         outputExtension = "rvz",
         folderAliases = setOf("gamecube", "gc", "nintendo gamecube", "wii", "nintendo wii"),
@@ -71,7 +68,6 @@ enum class ConverterTool(
     ),
     AzaharZcci(
         displayName = "Azahar ZCCI",
-        description = "Decrypted 3DS/CCI images to compressed ZCCI",
         sourceExtensions = setOf("3ds", "cci"),
         outputExtension = "zcci",
         folderAliases = setOf("3ds", "nintendo 3ds"),
@@ -80,7 +76,6 @@ enum class ConverterTool(
     ),
     NszNsp(
         displayName = "NSZ to NSP",
-        description = "Decompress Nintendo Switch NSZ packages to NSP",
         sourceExtensions = setOf("nsz"),
         outputExtension = "nsp",
         folderAliases = setOf("switch", "nintendo switch"),
@@ -89,7 +84,6 @@ enum class ConverterTool(
     ),
     XboxXiso(
         displayName = "Xbox XISO",
-        description = "Trim Redump Xbox ISOs to XISO for Hakux and xemu",
         sourceExtensions = setOf("iso"),
         outputExtension = "iso",
         folderAliases = setOf("xbox", "microsoft xbox"),

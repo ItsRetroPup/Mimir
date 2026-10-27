@@ -33,8 +33,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import pup.app.mimir.R
 import pup.app.mimir.domain.ConverterTool
 import pup.app.mimir.domain.FileOperation
 import pup.app.mimir.domain.OperationPlan
@@ -51,7 +54,7 @@ internal fun ChangeCard(
 ) {
     var showOverwriteWarning by rememberSaveable(change.detailPath) { mutableStateOf(false) }
     val chipText = when (plan.mode) {
-        ToolMode.MultiDiscOrganizer -> "${change.sourceFiles.size} DISCS"
+        ToolMode.MultiDiscOrganizer -> pluralStringResource(R.plurals.chip_discs, change.sourceFiles.size, change.sourceFiles.size)
         ToolMode.RomZipper -> "ZIP"
         ToolMode.Converter -> change.operations
             .firstNotNullOfOrNull { (it as? FileOperation.ConvertWithTool)?.tool?.badge }
@@ -138,20 +141,20 @@ internal fun ChangeCard(
             )
             if (change.targetAlreadyExists) {
                 Text(
-                    "A matching .chd already exists. Select this item to replace it.",
+                    stringResource(R.string.preview_existing_output, change.detailPath.substringAfterLast('.')),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                 )
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("Sources", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(R.string.preview_sources), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
                 change.sourceFiles.forEach { path ->
                     Text(path, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 }
             }
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("Targets", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary)
+                Text(stringResource(R.string.preview_targets), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary)
                 change.targetFiles.forEach { path ->
                     Text(path, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 }
@@ -161,16 +164,16 @@ internal fun ChangeCard(
     if (showOverwriteWarning) {
         AlertDialog(
             onDismissRequest = { showOverwriteWarning = false },
-            title = { Text("Replace existing output?") },
-            text = { Text("${change.targetFiles.singleOrNull() ?: change.detailPath} already exists and will be overwritten if you convert this image.") },
+            title = { Text(stringResource(R.string.replace_output_title)) },
+            text = { Text(stringResource(R.string.replace_output_body_convert, change.targetFiles.singleOrNull() ?: change.detailPath)) },
             confirmButton = {
                 Button(onClick = {
                     showOverwriteWarning = false
                     onSelectedChange(true)
-                }) { Text("REPLACE OUTPUT") }
+                }) { Text(stringResource(R.string.action_replace_output)) }
             },
             dismissButton = {
-                OutlinedButton(onClick = { showOverwriteWarning = false }) { Text("CANCEL") }
+                OutlinedButton(onClick = { showOverwriteWarning = false }) { Text(stringResource(R.string.action_cancel)) }
             },
         )
     }
@@ -190,20 +193,20 @@ internal fun PreviewSummary(
         .sumOf { it.sourceSizeBytes }
     StyledCard {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Label("PREVIEW")
+            Label(stringResource(R.string.preview_title))
             if (plan.mode == ToolMode.Converter) {
                 Text(
-                    "$selectedCount ${if (selectedCount == 1) "job" else "jobs"} selected • ${formatQueueSize(selectedSize)}",
+                    pluralStringResource(R.plurals.preview_jobs_selected, selectedCount, selectedCount, formatQueueSize(selectedSize)),
                     style = MaterialTheme.typography.headlineMedium,
                 )
             } else {
                 Text(
                     when (plan.mode) {
-                        ToolMode.MultiDiscOrganizer -> "$previewCount multi-disc sets detected; $selectedCount selected."
-                        ToolMode.RomZipper -> "$previewCount ROMs matched the zip whitelist; $selectedCount selected."
-                        ToolMode.Converter, ToolMode.VitaAppIds -> "$previewCount items ready; $selectedCount selected."
-                        ToolMode.EsDeSystems -> "$previewCount systems ready; $selectedCount selected."
-                    },
+                        ToolMode.MultiDiscOrganizer -> R.plurals.preview_multidisc_summary
+                        ToolMode.RomZipper -> R.plurals.preview_zip_summary
+                        ToolMode.Converter, ToolMode.VitaAppIds -> R.plurals.preview_items_summary
+                        ToolMode.EsDeSystems -> R.plurals.preview_systems_summary
+                    }.let { pluralStringResource(it, previewCount, previewCount, selectedCount) },
                     style = MaterialTheme.typography.headlineMedium,
                 )
                 Button(
@@ -211,18 +214,9 @@ internal fun PreviewSummary(
                     enabled = !isBusy && selectedCount > 0,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("APPLY")
+                    Text(stringResource(R.string.action_apply))
                 }
             }
         }
     }
-}
-
-internal fun FileOperation.describe(): String = when (this) {
-    is FileOperation.CreateDirectory -> "Create folder $relativePath"
-    is FileOperation.MoveFile -> "Move $sourcePath -> $targetPath"
-    is FileOperation.WriteTextFile -> "Write playlist $relativePath"
-    is FileOperation.ZipFile -> "Zip $sourcePath -> $targetPath"
-    is FileOperation.ConvertToChd -> "Create ${discType.displayName} CHD $sourcePath -> $targetPath"
-    is FileOperation.ConvertWithTool -> "Convert with ${tool.displayName} $sourcePath -> $targetPath"
 }

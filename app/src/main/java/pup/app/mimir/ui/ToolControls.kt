@@ -26,8 +26,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import pup.app.mimir.R
 import pup.app.mimir.domain.ChdDiscType
 import pup.app.mimir.domain.ChdSystem
 import pup.app.mimir.domain.ConverterTool
@@ -41,8 +44,8 @@ internal fun ControlCard(
 ) {
     StyledCard {
         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Label("SYSTEM CONTROL")
-            Text("Selected ROM folder", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Label(stringResource(R.string.control_title))
+            Text(stringResource(R.string.control_selected_rom_folder), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             Text(folderName, style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Button(
                 onClick = onSelectFolder,
@@ -50,7 +53,7 @@ internal fun ControlCard(
             ) {
                 Icon(Icons.Outlined.Folder, contentDescription = null)
                 Spacer(Modifier.size(8.dp))
-                Text("SELECT ROM FOLDER")
+                Text(stringResource(R.string.action_select_rom_folder))
             }
         }
     }
@@ -59,6 +62,7 @@ internal fun ControlCard(
 @Composable
 internal fun EsDeSystemsCard(
     rootFolderName: String,
+    hasRootFolder: Boolean,
     romRootFolderName: String,
     systems: List<pup.app.mimir.data.EsDeSystem>,
     isBusy: Boolean,
@@ -70,34 +74,34 @@ internal fun EsDeSystemsCard(
 ) {
     StyledCard {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Label("ES-DE CUSTOM SYSTEMS")
-            Text("Selected ES-DE folder", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Label(stringResource(R.string.esde_title))
+            Text(stringResource(R.string.esde_selected_folder), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             Text(rootFolderName, style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Button(onClick = onSelectRoot, enabled = !isBusy, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Outlined.Folder, contentDescription = null)
                 Spacer(Modifier.size(8.dp))
-                Text("SELECT ES-DE FOLDER")
+                Text(stringResource(R.string.action_select_esde_folder))
             }
-            Text("ROM root folder", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Text(stringResource(R.string.esde_rom_root), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             Text(romRootFolderName, style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
             OutlinedButton(onClick = onSelectRomRoot, enabled = !isBusy, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Outlined.Folder, contentDescription = null)
                 Spacer(Modifier.size(8.dp))
-                Text("SELECT ROM ROOT")
+                Text(stringResource(R.string.action_select_rom_root))
             }
             OutlinedButton(
                 onClick = onRefresh,
-                enabled = !isBusy && rootFolderName != "No ES-DE folder selected",
+                enabled = !isBusy && hasRootFolder,
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("DOWNLOAD LATEST XMLS") }
+            ) { Text(stringResource(R.string.action_download_xmls)) }
             if (systems.isEmpty()) {
                 Text(
-                    "Download the latest XMLs to configure the custom Android systems. They will be installed under custom_systems.",
+                    stringResource(R.string.esde_download_hint),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.78f),
                 )
             } else {
-                Text("ROM folders", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(R.string.esde_rom_folders), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
                 systems.forEach { system ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -107,7 +111,7 @@ internal fun EsDeSystemsCard(
                         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             Text(system.fullName, style = MaterialTheme.typography.bodyLarge)
                             Text(
-                                if (system.isDefault) "Default" else system.romFolder,
+                                if (system.isDefault) stringResource(R.string.esde_default_folder) else system.romFolder,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
                             )
@@ -115,11 +119,11 @@ internal fun EsDeSystemsCard(
                         OutlinedButton(
                             onClick = { onPickFolder(system.name) },
                             enabled = !isBusy,
-                        ) { Text("CHOOSE FOLDER") }
+                        ) { Text(stringResource(R.string.action_choose_folder)) }
                     }
                 }
                 Button(onClick = onApply, enabled = !isBusy, modifier = Modifier.fillMaxWidth()) {
-                    Text("INSTALL CUSTOM SYSTEMS")
+                    Text(stringResource(R.string.action_install_custom_systems))
                 }
             }
         }
@@ -144,9 +148,9 @@ internal fun VitaControlCard(
 ) {
     StyledCard {
         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Label("VITA SHORTCUTS")
+            Label(stringResource(R.string.vita_title))
             Text(
-                "Shortcut output directory",
+                stringResource(R.string.vita_output_directory),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.secondary,
             )
@@ -157,10 +161,10 @@ internal fun VitaControlCard(
             ) {
                 Icon(Icons.Outlined.Folder, contentDescription = null)
                 Spacer(Modifier.size(8.dp))
-                Text("SELECT OUTPUT FOLDER")
+                Text(stringResource(R.string.action_select_output_folder))
             }
             Text(
-                "Shortcut file type",
+                stringResource(R.string.vita_file_type),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.secondary,
             )
@@ -175,26 +179,26 @@ internal fun VitaControlCard(
                 }
             }
             Text(
-                "For Cocoon users, select .dpt",
+                stringResource(R.string.vita_cocoon_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
             )
             Text(
-                "Shortcut database",
+                stringResource(R.string.vita_database),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
-            Text("$databaseSize titles ready for search", style = MaterialTheme.typography.bodyLarge)
+            Text(pluralStringResource(R.plurals.vita_database_size, databaseSize, databaseSize), style = MaterialTheme.typography.bodyLarge)
             OutlinedTextField(
                 value = vitaQuery,
                 onValueChange = onVitaQueryChanged,
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Search title or app ID") },
+                label = { Text(stringResource(R.string.vita_search_label)) },
                 singleLine = true,
             )
             if (vitaQuery.isNotBlank()) {
                 Text(
-                    "Search results",
+                    stringResource(R.string.vita_search_results),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -232,7 +236,7 @@ internal fun VitaControlCard(
                                     ) {
                                         Icon(
                                             imageVector = Icons.Outlined.Delete,
-                                            contentDescription = "Delete shortcut for ${app.title}",
+                                            contentDescription = stringResource(R.string.vita_delete_shortcut, app.title),
                                         )
                                     }
                                 } else {
@@ -240,7 +244,7 @@ internal fun VitaControlCard(
                                         onClick = { onVitaShortcutAdd(app) },
                                         enabled = !isBusy,
                                     ) {
-                                        Text("QUICK ADD")
+                                        Text(stringResource(R.string.action_quick_add))
                                     }
                                 }
                             }
@@ -262,12 +266,12 @@ internal fun OrganizerPresetCard(
 ) {
     StyledCard {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Label("FRONTEND TARGET")
+            Label(stringResource(R.string.organizer_frontend_target))
             ChoiceRow(
                 options = FrontendPreset.entries,
                 selected = selectedPreset,
                 enabled = enabled,
-                label = { it.displayName },
+                label = { if (it == FrontendPreset.Other) stringResource(R.string.preset_other) else it.displayName },
                 onSelect = onPresetSelected,
             )
             Row(
@@ -276,9 +280,9 @@ internal fun OrganizerPresetCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Scan hidden folders", style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.organizer_scan_hidden), style = MaterialTheme.typography.bodyLarge)
                     Text(
-                        "Extract ROMs from .-prefixed folders into the system folder before organizing.",
+                        stringResource(R.string.organizer_scan_hidden_detail),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                     )
@@ -300,18 +304,18 @@ internal fun NszKeysCard(
 ) {
     StyledCard {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("NSZ keys", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.nsz_keys_title), style = MaterialTheme.typography.titleMedium)
             Text(
                 if (configured) {
-                    "prod.keys is imported and will be kept in Mimir's private storage."
+                    stringResource(R.string.nsz_keys_configured)
                 } else {
-                    "Import your legally obtained prod.keys file before scanning or converting NSZ packages."
+                    stringResource(R.string.nsz_keys_missing)
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.78f),
             )
             Button(onClick = onSelect, enabled = enabled, modifier = Modifier.fillMaxWidth()) {
-                Text(if (configured) "REPLACE PROD.KEYS" else "IMPORT PROD.KEYS")
+                Text(stringResource(if (configured) R.string.action_replace_keys else R.string.action_import_keys))
             }
         }
     }
@@ -330,7 +334,7 @@ internal fun ConverterToolsOptionsCard(
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (selectedTool == ConverterTool.Chd) {
                 Text(
-                    "System",
+                    stringResource(R.string.chd_system),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -343,7 +347,7 @@ internal fun ConverterToolsOptionsCard(
                 )
                 if (system == ChdSystem.PlayStation2) {
                     Text(
-                        "Conversion type",
+                        stringResource(R.string.chd_conversion_type),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
                     )
@@ -355,8 +359,8 @@ internal fun ConverterToolsOptionsCard(
                         onSelect = onDiscTypeSelected,
                     )
                     InfoPanel(
-                        title = "Compatibility guidance",
-                        body = "Use CD when using NetherSX2; use DVD when using ARMSX2.",
+                        title = stringResource(R.string.chd_compatibility_title),
+                        body = stringResource(R.string.chd_compatibility_body),
                         accent = MaterialTheme.colorScheme.secondary,
                     )
                 }

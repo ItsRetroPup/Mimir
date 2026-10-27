@@ -11,4 +11,212 @@
     <string name="goal_shrink_gamecube_wii">壓縮 GameCube 和 Wii 遊戲</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">將 ISO 映像轉換為 RVZ。</string>
     <string name="goal_shrink_3ds">壓縮 Nintendo 3DS 遊戲</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">將已解密的 3DS 和 CCI 映像壓縮為 ZCCI。</string><string name="goal_shrink_xbox">壓縮 Xbox 遊戲</string><string name="tool_xbox_xiso">Xbox XISO</string><string name="tool_xbox_xiso_description">將 Redump Xbox ISO 裁剪為適用於 Hakux 和 xemu 的 XISO。</string><string name="tool_card_description">%1$s \u2022 %2$s</string>
     <string name="no_rom_folder_selected">未選擇 ROM 資料夾</string><string name="no_vita_output_directory_selected">未選擇 Vita 輸出資料夾</string><string name="no_esde_folder_selected">未選擇 ES-DE 資料夾</string>
+
+    <!-- Tool screens, dialogs and status messages. -->
+    <string name="action_cancel">取消</string>
+    <string name="sort_name_ascending">名稱 A–Z</string>
+    <string name="sort_name_descending">名稱 Z–A</string>
+    <string name="sort_size_largest">由大到小</string>
+    <string name="sort_size_smallest">由小到大</string>
+    <string name="queue_title">轉換佇列</string>
+    <string name="action_select_all">全選</string>
+    <string name="action_deselect_all">取消全選</string>
+    <string name="queue_sort_by">排序方式</string>
+    <string name="storage_title">已掃描裝置的儲存空間</string>
+    <string name="storage_body">可用 %1$s，共 %2$s。此佇列約需 %3$s 的工作空間。</string>
+    <string name="storage_low_warning">警告：可用空間可能不足以轉換所選佇列。請先取消選取部分項目或釋放空間。</string>
+    <string name="queue_column_rom">ROM</string>
+    <string name="queue_column_size">大小</string>
+    <string name="queue_column_output">輸出</string>
+    <string name="queue_existing_output">已有輸出 — 單獨選取以取代</string>
+    <string name="replace_output_title">要取代現有輸出嗎？</string>
+    <string name="replace_output_body_selected">%1$s 已存在，選取後將被覆寫。</string>
+    <string name="action_replace_output">取代輸出</string>
+    <string name="report_space_saved">淨節省空間：%1$s。</string>
+    <string name="report_size_increase">淨增加大小：%1$s。</string>
+    <string name="report_no_size_change">大小沒有淨變化。</string>
+    <string name="report_title">轉換報告</string>
+    <plurals name="report_completed">
+        <item quantity="other">已完成 %1$d / %2$d 項轉換。</item>
+    </plurals>
+    <string name="report_stopped">已由使用者停止。</string>
+    <string name="progress_converting">正在轉換 %1$s：%2$d%%</string>
+    <string name="progress_selected_image">所選映像檔</string>
+    <string name="progress_queue">佇列：第 %1$d / %2$d 項工作</string>
+    <string name="action_stop_after_current">目前轉換完成後停止</string>
+    <string name="action_stop_now">立即停止</string>
+    <string name="support_title">支持 MIMIR</string>
+    <string name="support_body" formatted="false">Mimir 現在和未來都完全免費且沒有廣告。如果你想表達支持，歡迎看看我的 YouTube 頻道或贊助。</string>
+    <string name="home_footer">由 RetroPup 打造</string>
+    <string name="app_logo">Mimir 標誌</string>
+    <string name="action_convert_selected">轉換所選 %1$d 項</string>
+    <string name="action_apply_selected">套用所選 %1$d 項</string>
+    <string name="action_scan_folder">掃描所選資料夾</string>
+    <string name="apply_title_convert">要轉換所選映像檔嗎？</string>
+    <string name="apply_title_changes">要套用變更嗎？</string>
+    <plurals name="apply_body_changes">
+        <item quantity="other">將對所選 ROM 資料夾套用 %1$d 項預定變更。原始檔案可能會依預覽所示被移動或移除，且 Mimir 無法復原此操作。</item>
+    </plurals>
+    <plurals name="apply_body_replace_xiso">
+        <item quantity="other">將以同名的精簡 XISO 取代所選的 %1$d 個 Xbox 映像檔。每個原始檔案只會在其 XISO 寫入完成後刪除，且 Mimir 無法復原此操作。</item>
+    </plurals>
+    <plurals name="apply_body_convert">
+        <item quantity="other">將把所選的 %1$d 個檔案轉換為 .%2$s。</item>
+    </plurals>
+    <plurals name="apply_body_overwrite">
+        <item quantity="other">所選輸出中有 %1$d 個已存在，將被覆寫。</item>
+    </plurals>
+    <string name="apply_body_cannot_undo">Mimir 無法復原此操作。</string>
+    <string name="apply_delete_originals">刪除原始檔案</string>
+    <string name="apply_delete_originals_detail">轉換成功後，一併刪除 .cue 或 .gdi 檔案所參照、位於同一資料夾的音軌。</string>
+    <string name="action_start_conversions">開始轉換</string>
+    <string name="action_apply_changes">套用變更</string>
+    <string name="esde_install_title">要安裝自訂系統嗎？</string>
+    <plurals name="esde_install_body">
+        <item quantity="other">將在所選 ES-DE 資料夾的 custom_systems 目錄中安裝 %1$d 個已設定的系統。現有的自訂系統檔案可能會被更新。安裝完成後請重新啟動 ES-DE。</item>
+    </plurals>
+    <string name="action_install_systems">安裝系統</string>
+    <string name="vita_add_title">要建立 Vita 捷徑嗎？</string>
+    <string name="vita_add_body">將在所選輸出資料夾中為 %2$s (%3$s) 建立 .%1$s 捷徑。</string>
+    <string name="action_create_shortcut">建立捷徑</string>
+    <string name="vita_remove_title">要移除 Vita 捷徑嗎？</string>
+    <string name="vita_remove_body">將從所選輸出資料夾中刪除 %1$s (%2$s) 的捷徑。</string>
+    <string name="action_remove_shortcut">移除捷徑</string>
+    <plurals name="chip_discs">
+        <item quantity="other">%1$d 張光碟</item>
+    </plurals>
+    <string name="preview_existing_output">已存在相符的 .%1$s 檔案。選取此項目即可取代。</string>
+    <string name="preview_sources">來源</string>
+    <string name="preview_targets">目標</string>
+    <string name="replace_output_body_convert">%1$s 已存在，轉換此映像檔時將被覆寫。</string>
+    <string name="preview_title">預覽</string>
+    <plurals name="preview_jobs_selected">
+        <item quantity="other">已選取 %1$d 項工作 • %2$s</item>
+    </plurals>
+    <plurals name="preview_multidisc_summary">
+        <item quantity="other">偵測到 %1$d 組多光碟遊戲；已選取 %2$d 組。</item>
+    </plurals>
+    <plurals name="preview_zip_summary">
+        <item quantity="other">%1$d 個 ROM 符合 ZIP 允許清單；已選取 %2$d 個。</item>
+    </plurals>
+    <plurals name="preview_items_summary">
+        <item quantity="other">%1$d 個項目已就緒；已選取 %2$d 個。</item>
+    </plurals>
+    <plurals name="preview_systems_summary">
+        <item quantity="other">%1$d 個系統已就緒；已選取 %2$d 個。</item>
+    </plurals>
+    <string name="action_apply">套用</string>
+    <string name="control_title">系統控制</string>
+    <string name="control_selected_rom_folder">所選 ROM 資料夾</string>
+    <string name="action_select_rom_folder">選取 ROM 資料夾</string>
+    <string name="esde_title">ES-DE 自訂系統</string>
+    <string name="esde_selected_folder">所選 ES-DE 資料夾</string>
+    <string name="action_select_esde_folder">選取 ES-DE 資料夾</string>
+    <string name="esde_rom_root">ROM 根資料夾</string>
+    <string name="action_select_rom_root">選取 ROM 根目錄</string>
+    <string name="action_download_xmls">下載最新 XML</string>
+    <string name="esde_download_hint">下載最新的 XML 以設定 Android 自訂系統。它們將安裝在 custom_systems 下。</string>
+    <string name="esde_rom_folders">ROM 資料夾</string>
+    <string name="esde_default_folder">預設</string>
+    <string name="action_choose_folder">選擇資料夾</string>
+    <string name="action_install_custom_systems">安裝自訂系統</string>
+    <string name="vita_title">VITA 捷徑</string>
+    <string name="vita_output_directory">捷徑輸出資料夾</string>
+    <string name="action_select_output_folder">選取輸出資料夾</string>
+    <string name="vita_file_type">捷徑檔案類型</string>
+    <string name="vita_cocoon_hint">Cocoon 使用者請選擇 .dpt</string>
+    <string name="vita_database">捷徑資料庫</string>
+    <plurals name="vita_database_size">
+        <item quantity="other">%1$d 款遊戲可供搜尋</item>
+    </plurals>
+    <string name="vita_search_label">搜尋標題或應用程式 ID</string>
+    <string name="vita_search_results">搜尋結果</string>
+    <string name="vita_delete_shortcut">刪除 %1$s 的捷徑</string>
+    <string name="action_quick_add">快速新增</string>
+    <string name="organizer_frontend_target">目標前端</string>
+    <string name="preset_other">其他</string>
+    <string name="organizer_scan_hidden">掃描隱藏資料夾</string>
+    <string name="organizer_scan_hidden_detail">整理前，將名稱以 . 開頭的資料夾中的 ROM 移到系統資料夾。</string>
+    <string name="nsz_keys_title">NSZ 金鑰</string>
+    <string name="nsz_keys_configured">prod.keys 已匯入，並將保存在 Mimir 的私人儲存空間中。</string>
+    <string name="nsz_keys_missing">在掃描或轉換 NSZ 套件之前，請匯入你合法取得的 prod.keys 檔案。</string>
+    <string name="action_replace_keys">取代 PROD.KEYS</string>
+    <string name="action_import_keys">匯入 PROD.KEYS</string>
+    <string name="chd_system">系統</string>
+    <string name="chd_conversion_type">轉換類型</string>
+    <string name="chd_compatibility_title">相容性提示</string>
+    <string name="chd_compatibility_body">使用 NetherSX2 時選擇 CD；使用 ARMSX2 時選擇 DVD。</string>
+    <string name="msg_rom_path_unresolved">無法解析所選 ROM 資料夾的路徑。</string>
+    <string name="msg_select_esde_first">請先選取 ES-DE 資料夾。</string>
+    <string name="msg_select_rom_root_find">請先選取 ROM 根資料夾，讓 Mimir 能找到其中的系統。</string>
+    <string name="msg_esde_downloading">正在下載最新的 ES-DE 自訂系統…</string>
+    <plurals name="msg_esde_downloaded">
+        <item quantity="other">已下載 %1$d 個 ES-DE 系統。請檢查資料夾後再套用。</item>
+    </plurals>
+    <string name="msg_esde_download_failed">無法下載 ES-DE 系統。</string>
+    <string name="msg_esde_download_first">請先下載最新的 ES-DE 系統。</string>
+    <string name="msg_select_rom_root_map">請先選取 ROM 根資料夾，讓 Mimir 能對應其中的系統。</string>
+    <string name="msg_esde_installing">正在安裝 ES-DE 自訂系統…</string>
+    <plurals name="msg_esde_installed">
+        <item quantity="other">已在 custom_systems 中安裝 %1$d 個系統。請重新啟動 ES-DE 以載入。</item>
+    </plurals>
+    <string name="msg_esde_install_failed">無法安裝 ES-DE 系統。</string>
+    <string name="msg_stopping">正在停止…</string>
+    <string name="msg_stop_after_current">將在目前轉換完成後停止。</string>
+    <string name="msg_select_vita_output_first">請先選取 Vita 捷徑輸出資料夾。</string>
+    <string name="msg_vita_add_unable">無法為 %1$s 新增捷徑。</string>
+    <string name="msg_vita_added">已新增捷徑：%1$s</string>
+    <string name="msg_vita_add_failed">新增捷徑失敗。</string>
+    <string name="msg_vita_removed">已移除捷徑：%1$s</string>
+    <string name="msg_vita_remove_failed">移除捷徑失敗。</string>
+    <string name="msg_keys_directory_failed">無法準備 Mimir 的 NSZ 金鑰資料夾。</string>
+    <string name="msg_keys_unreadable">無法讀取所選的 prod.keys 檔案。</string>
+    <string name="msg_keys_empty">所選的 prod.keys 檔案是空的。</string>
+    <string name="msg_keys_finish_failed">無法完成 prod.keys 的匯入。</string>
+    <string name="msg_keys_imported">prod.keys 已匯入並儲存在此裝置上。</string>
+    <string name="msg_keys_import_failed">無法匯入 prod.keys。</string>
+    <string name="msg_select_rom_folder_first">請先選取 ROM 資料夾。</string>
+    <string name="msg_import_keys_first">掃描 NSZ 套件之前，請先匯入 prod.keys 檔案。</string>
+    <plurals name="scan_checking_multidisc">
+        <item quantity="other">正在檢查 %1$d 個 ROM 檔案中的多光碟遊戲…</item>
+    </plurals>
+    <plurals name="scan_checking_zip">
+        <item quantity="other">正在檢查 %1$d 個 ROM 檔案中可壓縮為 ZIP 的格式…</item>
+    </plurals>
+    <plurals name="scan_checking_chd">
+        <item quantity="other">正在檢查 %1$d 個 %2$s 映像檔能否轉換為 CHD…</item>
+    </plurals>
+    <plurals name="scan_checking_tool">
+        <item quantity="other">正在檢查 %1$d 個檔案能否以 %2$s 轉換…</item>
+    </plurals>
+    <string name="msg_none_multidisc">找不到多光碟遊戲。</string>
+    <string name="msg_none_zip">找不到可壓縮為 ZIP 的 ROM。</string>
+    <string name="msg_none_converter">找不到相容於 %1$s 的檔案。</string>
+    <string name="msg_none_vita">佇列中沒有 Vita 捷徑。</string>
+    <string name="msg_none_esde">尚未載入 ES-DE 系統。</string>
+    <string name="msg_scan_stopped">掃描已停止。</string>
+    <string name="msg_scan_failed">掃描失敗。</string>
+    <plurals name="msg_stopped_after">
+        <item quantity="other">已在完成 %1$d / %2$d 項轉換後停止。</item>
+    </plurals>
+    <string name="msg_changes_applied">已套用變更。</string>
+    <string name="msg_conversion_stopped">轉換已停止。</string>
+    <string name="msg_apply_failed">套用失敗。</string>
+    <string name="scan_start_multidisc">正在掃描 ROM 檔案中的多光碟遊戲…</string>
+    <string name="scan_start_zip">正在掃描 ROM 檔案中可壓縮為 ZIP 的格式…</string>
+    <string name="scan_start_tool">正在掃描 ROM 檔案中相容於 %1$s 的檔案…</string>
+    <string name="scan_start_files">正在掃描 ROM 檔案…</string>
+    <string name="scan_activity_multidisc">正在掃描多光碟遊戲</string>
+    <string name="scan_activity_zip">正在掃描可壓縮為 ZIP 的 ROM</string>
+    <string name="scan_activity_tool">正在掃描相容於 %1$s 的檔案</string>
+    <string name="scan_activity_files">正在掃描 ROM 檔案</string>
+    <plurals name="scan_files_checked">
+        <item quantity="other">%1$s：已檢查 %2$d 個檔案</item>
+    </plurals>
+    <string name="apply_activity_organizing">正在整理 ROM</string>
+    <string name="apply_activity_zipping">正在將 ROM 壓縮為 ZIP</string>
+    <string name="apply_activity_converting">正在以 %1$s 轉換</string>
+    <string name="apply_activity_shortcuts">正在建立捷徑</string>
+    <string name="apply_activity_esde">正在更新 ES-DE 系統</string>
+    <string name="apply_progress">%1$s：%2$d / %3$d</string>
 </resources>

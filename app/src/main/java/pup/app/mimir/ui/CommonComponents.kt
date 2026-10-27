@@ -124,7 +124,7 @@ internal fun <T> ChoiceRow(
     options: Iterable<T>,
     selected: T,
     enabled: Boolean,
-    label: (T) -> String,
+    label: @Composable (T) -> String,
     onSelect: (T) -> Unit,
 ) {
     FlowRow(
