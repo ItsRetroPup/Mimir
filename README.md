@@ -57,7 +57,7 @@ Zip naming behaviour:
 
 Mimir's Converter Tools page provides one scan, review, overwrite, progress, and cancellation flow
 for each supported converter. Every conversion retains the source image unless the CHD delete-source
-option is selected.
+option is selected, except Xbox XISO, which replaces each source image with its XISO under the same name.
 
 #### CHDMan
 

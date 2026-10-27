@@ -1700,7 +1700,9 @@ private fun ChangeCard(
     val chipText = when (plan.mode) {
         ToolMode.MultiDiscOrganizer -> "${change.sourceFiles.size} DISCS"
         ToolMode.RomZipper -> "ZIP"
-        ToolMode.ChdConverter -> "CHD"
+        ToolMode.ChdConverter -> change.operations
+            .firstNotNullOfOrNull { (it as? FileOperation.ConvertWithTool)?.tool?.badge }
+            ?: ConverterTool.Chd.badge
         ToolMode.VitaAppIds -> "VITA"
         ToolMode.EsDeSystems -> "ES-DE"
     }

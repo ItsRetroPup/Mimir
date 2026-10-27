@@ -36,6 +36,8 @@ enum class ConverterTool(
     val outputExtension: String,
     val folderAliases: Set<String>,
     val executableName: String,
+    /** Short output label shown on queued conversions. */
+    val badge: String,
 ) {
     Chd(
         displayName = "CHDMan",
@@ -44,6 +46,7 @@ enum class ConverterTool(
         outputExtension = "chd",
         folderAliases = emptySet(),
         executableName = "libchdman.so",
+        badge = "CHD",
     ),
     DolphinRvz(
         displayName = "Dolphin RVZ",
@@ -52,6 +55,7 @@ enum class ConverterTool(
         outputExtension = "rvz",
         folderAliases = setOf("gamecube", "gc", "nintendo gamecube", "wii", "nintendo wii"),
         executableName = "libdolphintool.so",
+        badge = "RVZ",
     ),
     AzaharZcci(
         displayName = "Azahar ZCCI",
@@ -60,6 +64,7 @@ enum class ConverterTool(
         outputExtension = "zcci",
         folderAliases = setOf("3ds", "nintendo 3ds"),
         executableName = "libazahar.so",
+        badge = "ZCCI",
     ),
     NszNsp(
         displayName = "NSZ to NSP",
@@ -68,6 +73,7 @@ enum class ConverterTool(
         outputExtension = "nsp",
         folderAliases = setOf("switch", "nintendo switch"),
         executableName = "",
+        badge = "NSP",
     ),
     XboxXiso(
         displayName = "Xbox XISO",
@@ -76,6 +82,7 @@ enum class ConverterTool(
         outputExtension = "iso",
         folderAliases = setOf("xbox", "microsoft xbox"),
         executableName = "",
+        badge = "XISO",
     ),
 }
 
