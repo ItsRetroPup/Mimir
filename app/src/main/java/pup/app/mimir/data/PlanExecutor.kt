@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.documentfile.provider.DocumentFile
-import pup.app.mimir.domain.ConverterTool
 import pup.app.mimir.domain.FileOperation
 import pup.app.mimir.domain.OperationPlan
 import pup.app.mimir.domain.RelativePaths
@@ -116,7 +115,7 @@ class PlanExecutor(private val context: Context) {
                     }
                 }
 
-                is FileOperation.ConvertWithTool -> if (operation.tool == ConverterTool.XboxXiso) {
+                is FileOperation.ConvertWithTool -> if (operation.tool.replacesSource) {
                     val sourceBytesBefore = sourceSize(root, operation.sourcePath)
                     val outputBytes = xisoRunner.convertInPlace(
                         root = root,

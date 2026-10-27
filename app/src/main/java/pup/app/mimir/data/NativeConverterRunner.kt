@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
+import pup.app.mimir.domain.ConverterBackend
 import pup.app.mimir.domain.ConverterTool
 import pup.app.mimir.domain.FileOperation
 import java.io.File
@@ -21,10 +22,12 @@ class NativeConverterRunner(private val context: Context) {
         cancellation: OperationCancellation? = null,
         onProgress: ((Float) -> Unit)? = null,
     ): ConversionResult {
-        if (operation.tool == ConverterTool.NszNsp) {
-            return convertNsz(root, operation, cancellation, onProgress)
+        val executableName = when (val backend = operation.tool.backend) {
+            is ConverterBackend.NativeExecutable -> backend.fileName
+            ConverterBackend.EmbeddedPython -> return convertNsz(root, operation, cancellation, onProgress)
+            ConverterBackend.InPlaceKotlin -> error("${operation.tool.displayName} conversions are run by XisoRunner.")
         }
-        val executable = File(context.applicationInfo.nativeLibraryDir, operation.tool.executableName)
+        val executable = File(context.applicationInfo.nativeLibraryDir, executableName)
         require(executable.isFile && executable.canExecute()) {
             "${operation.tool.displayName} is not bundled for this device's CPU architecture."
         }
@@ -146,9 +149,8 @@ class NativeConverterRunner(private val context: Context) {
         ConverterTool.AzaharZcci -> listOf(
             executable.absolutePath, "-c", source.absolutePath, "-o", workspace.absolutePath,
         )
-        ConverterTool.NszNsp -> error("NSZ conversions are run by embedded Python.")
-        ConverterTool.XboxXiso -> error("XISO conversions are run by XisoRunner.")
-        ConverterTool.Chd -> error("CHD conversions are run by CHDMan.")
+        ConverterTool.Chd, ConverterTool.NszNsp, ConverterTool.XboxXiso ->
+            error("${tool.displayName} is not run through NativeConverterRunner's command line.")
     }
 
     private companion object {

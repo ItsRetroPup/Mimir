@@ -29,13 +29,25 @@ enum class ToolMode(val displayName: String) {
     EsDeSystems("ES-DE Systems"),
 }
 
+/** How a converter runs on the device. */
+sealed interface ConverterBackend {
+    /** A bundled ARM64 executable in the app's native library directory. */
+    data class NativeExecutable(val fileName: String) : ConverterBackend
+
+    /** The NSZ Python package running in the embedded Chaquopy runtime. */
+    data object EmbeddedPython : ConverterBackend
+
+    /** Kotlin code that streams the source and replaces it under the same name. */
+    data object InPlaceKotlin : ConverterBackend
+}
+
 enum class ConverterTool(
     val displayName: String,
     val description: String,
     val sourceExtensions: Set<String>,
     val outputExtension: String,
     val folderAliases: Set<String>,
-    val executableName: String,
+    val backend: ConverterBackend,
     /** Short output label shown on queued conversions. */
     val badge: String,
 ) {
@@ -45,7 +57,7 @@ enum class ConverterTool(
         sourceExtensions = emptySet(),
         outputExtension = "chd",
         folderAliases = emptySet(),
-        executableName = "libchdman.so",
+        backend = ConverterBackend.NativeExecutable("libchdman.so"),
         badge = "CHD",
     ),
     DolphinRvz(
@@ -54,7 +66,7 @@ enum class ConverterTool(
         sourceExtensions = setOf("iso"),
         outputExtension = "rvz",
         folderAliases = setOf("gamecube", "gc", "nintendo gamecube", "wii", "nintendo wii"),
-        executableName = "libdolphintool.so",
+        backend = ConverterBackend.NativeExecutable("libdolphintool.so"),
         badge = "RVZ",
     ),
     AzaharZcci(
@@ -63,7 +75,7 @@ enum class ConverterTool(
         sourceExtensions = setOf("3ds", "cci"),
         outputExtension = "zcci",
         folderAliases = setOf("3ds", "nintendo 3ds"),
-        executableName = "libazahar.so",
+        backend = ConverterBackend.NativeExecutable("libazahar.so"),
         badge = "ZCCI",
     ),
     NszNsp(
@@ -72,7 +84,7 @@ enum class ConverterTool(
         sourceExtensions = setOf("nsz"),
         outputExtension = "nsp",
         folderAliases = setOf("switch", "nintendo switch"),
-        executableName = "",
+        backend = ConverterBackend.EmbeddedPython,
         badge = "NSP",
     ),
     XboxXiso(
@@ -81,9 +93,13 @@ enum class ConverterTool(
         sourceExtensions = setOf("iso"),
         outputExtension = "iso",
         folderAliases = setOf("xbox", "microsoft xbox"),
-        executableName = "",
+        backend = ConverterBackend.InPlaceKotlin,
         badge = "XISO",
     ),
+    ;
+
+    /** True when the converted image replaces its source under the same name. */
+    val replacesSource: Boolean get() = backend == ConverterBackend.InPlaceKotlin
 }
 
 enum class ChdDiscType(

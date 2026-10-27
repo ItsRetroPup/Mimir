@@ -738,7 +738,7 @@ private fun MimirScreen(
             text = {
                 if (uiState.selectedMode == ToolMode.Converter) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        if (uiState.selectedConverterTool == ConverterTool.XboxXiso) {
+                        if (uiState.selectedConverterTool.replacesSource) {
                             Text(
                                 "This will replace $changeCount selected Xbox image${if (changeCount == 1) "" else "s"} " +
                                     "with a trimmed XISO of the same name. Each original is deleted only after its XISO " +
