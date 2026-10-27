@@ -1,5 +1,9 @@
 package pup.app.mimir.ui
 
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.PaddingValues
@@ -170,19 +174,25 @@ internal fun VitaShortcutRemoveDialog(
 }
 
 /** About Mimir, opened from the footer link on home: who makes it and how to support it. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun AboutDialog(onOpenUrl: (String) -> Unit, onDismiss: () -> Unit) {
     val palette = LocalMimirPalette.current
     AlertDialog(
         onDismissRequest = onDismiss,
-        icon = { MimirMark(Modifier.size(48.dp)) },
         title = { Text(stringResource(R.string.about_mimir)) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // The Thor's screen is short: links wrap side by side, and the body scrolls if it must.
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
                 Text(stringResource(R.string.support_body), style = MaterialTheme.typography.bodyMedium, color = palette.textMuted)
-                SupportLink("YouTube", Icons.Outlined.Subscriptions) { onOpenUrl(YOUTUBE_CHANNEL_URL) }
-                SupportLink("Ko-fi", Icons.Outlined.Favorite) { onOpenUrl(KOFI_URL) }
-                SupportLink("Buy Me a Coffee", Icons.Outlined.Coffee) { onOpenUrl(BUY_ME_A_COFFEE_URL) }
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    SupportLink("YouTube", Icons.Outlined.Subscriptions) { onOpenUrl(YOUTUBE_CHANNEL_URL) }
+                    SupportLink("Ko-fi", Icons.Outlined.Favorite) { onOpenUrl(KOFI_URL) }
+                    SupportLink("Buy Me a Coffee", Icons.Outlined.Coffee) { onOpenUrl(BUY_ME_A_COFFEE_URL) }
+                }
                 Text(stringResource(R.string.home_footer), style = MaterialTheme.typography.labelMedium, color = palette.textMuted)
             }
         },
