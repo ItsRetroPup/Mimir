@@ -5,6 +5,7 @@ plugins {
     id("com.android.application")
     id("com.chaquo.python")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 val keystoreProperties = Properties()
@@ -65,10 +66,6 @@ android {
         compose = true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
-    }
-
     packaging {
         jniLibs {
             // CHDMan is launched as a process from nativeLibraryDir, so its executable must be extracted.
@@ -93,7 +90,7 @@ chaquopy {
 }
 
 dependencies {
-    val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
+    val composeBom = platform("androidx.compose:compose-bom:2024.12.01")
 
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.activity:activity-compose:1.9.1")
@@ -109,7 +106,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.compose.material3:material3")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 

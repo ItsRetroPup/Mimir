@@ -1,5 +1,7 @@
 package pup.app.mimir.ui
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -9,13 +11,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -24,10 +27,25 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import pup.app.mimir.R
@@ -168,16 +186,13 @@ internal fun VitaControlCard(
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.secondary,
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                VitaShortcutFormat.entries.forEach { format ->
-                    FilterChip(
-                        selected = shortcutFormat == format,
-                        onClick = { onVitaShortcutFormatSelected(format) },
-                        label = { Text(format.displayName) },
-                        enabled = !isBusy,
-                    )
-                }
-            }
+            ChoiceRow(
+                options = VitaShortcutFormat.entries,
+                selected = shortcutFormat,
+                enabled = !isBusy,
+                label = { it.displayName },
+                onSelect = onVitaShortcutFormatSelected,
+            )
             Text(
                 stringResource(R.string.vita_cocoon_hint),
                 style = MaterialTheme.typography.bodySmall,
@@ -189,12 +204,10 @@ internal fun VitaControlCard(
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(pluralStringResource(R.plurals.vita_database_size, databaseSize, databaseSize), style = MaterialTheme.typography.bodyLarge)
-            OutlinedTextField(
-                value = vitaQuery,
-                onValueChange = onVitaQueryChanged,
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(stringResource(R.string.vita_search_label)) },
-                singleLine = true,
+            SearchField(
+                query = vitaQuery,
+                onQueryChanged = onVitaQueryChanged,
+                label = stringResource(R.string.vita_search_label),
             )
             if (vitaQuery.isNotBlank()) {
                 Text(
@@ -367,4 +380,57 @@ internal fun ConverterToolsOptionsCard(
             }
         }
     }
+}
+
+/**
+ * A search box that a controller can move across without opening the keyboard: it stays read-only
+ * until activated with A/Enter or a tap, and drops back to read-only when focus leaves.
+ */
+@Composable
+private fun SearchField(
+    query: String,
+    onQueryChanged: (String) -> Unit,
+    label: String,
+) {
+    val keyboard = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+    val interactionSource = remember { MutableInteractionSource() }
+    var editing by remember { mutableStateOf(false) }
+    LaunchedEffect(interactionSource) {
+        interactionSource.interactions.collect { interaction ->
+            if (interaction is PressInteraction.Release) editing = true
+        }
+    }
+    LaunchedEffect(editing) {
+        if (editing) keyboard?.show()
+    }
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChanged,
+        readOnly = !editing,
+        modifier = Modifier
+            .fillMaxWidth()
+            .onFocusChanged { if (!it.isFocused) editing = false }
+            .onPreviewKeyEvent { event ->
+                when {
+                    !editing && event.type == KeyEventType.KeyUp &&
+                        event.key in setOf(Key.DirectionCenter, Key.ButtonA, Key.Enter, Key.NumPadEnter) -> {
+                        editing = true
+                        true
+                    }
+                    // A single-line field would otherwise keep Up/Down to move its cursor, trapping
+                    // the controller once the keyboard has been closed.
+                    event.type == KeyEventType.KeyDown && event.key == Key.DirectionUp ->
+                        focusManager.moveFocus(FocusDirection.Up)
+                    event.type == KeyEventType.KeyDown && event.key == Key.DirectionDown ->
+                        focusManager.moveFocus(FocusDirection.Down)
+                    else -> false
+                }
+            },
+        label = { Text(label) },
+        singleLine = true,
+        interactionSource = interactionSource,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(onSearch = { keyboard?.hide() }),
+    )
 }

@@ -2,11 +2,16 @@ package pup.app.mimir.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RippleConfiguration
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -14,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MimirTheme(
     useDarkMode: Boolean,
@@ -114,6 +120,19 @@ internal fun MimirTheme(
             medium = RoundedCornerShape(16.dp),
             large = RoundedCornerShape(16.dp),
         ),
-        content = content,
-    )
+    ) {
+        // Controller and keyboard focus must be obvious on a handheld; Material's default focus
+        // layer is barely visible, so every ripple-based control gets a much stronger one.
+        CompositionLocalProvider(
+            LocalRippleConfiguration provides RippleConfiguration(rippleAlpha = FocusRippleAlpha),
+            content = content,
+        )
+    }
 }
+
+private val FocusRippleAlpha = RippleAlpha(
+    draggedAlpha = 0.16f,
+    focusedAlpha = 0.32f,
+    hoveredAlpha = 0.08f,
+    pressedAlpha = 0.16f,
+)

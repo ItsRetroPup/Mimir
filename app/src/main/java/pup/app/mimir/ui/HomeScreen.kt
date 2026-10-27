@@ -30,10 +30,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -96,12 +99,13 @@ internal fun SupportSection(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.82f),
             )
+            val firstLink = remember { FocusRequester() }
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().enterFocusAt(firstLink),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                SupportLinkButton("YouTube", Icons.Outlined.Subscriptions, onOpenYoutube)
+                SupportLinkButton("YouTube", Icons.Outlined.Subscriptions, onOpenYoutube, Modifier.focusRequester(firstLink))
                 SupportLinkButton("Ko-fi", Icons.Outlined.Favorite, onOpenKofi)
                 SupportLinkButton("Buy Me a Coffee", Icons.Outlined.Coffee, onOpenBuyMeACoffee)
             }
@@ -114,9 +118,11 @@ internal fun SupportLinkButton(
     label: String,
     icon: ImageVector,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     TextButton(
         onClick = onClick,
+        modifier = modifier,
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
     ) {
         Icon(imageVector = icon, contentDescription = label)
@@ -173,6 +179,8 @@ internal fun HomeFooter() {
 internal fun ToolModeCards(
     selectedMode: ToolMode,
     selectedConverterTool: ConverterTool,
+    returnSection: AppSection?,
+    returnFocus: FocusRequester,
     onPageSelected: (ToolEntry) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -185,6 +193,7 @@ internal fun ToolModeCards(
                 icon = tool.icon,
                 selected = selectedMode == tool.mode && (tool.converter == null || selectedConverterTool == tool.converter),
                 onClick = { onPageSelected(tool) },
+                modifier = if (tool.section == returnSection) Modifier.focusRequester(returnFocus) else Modifier,
             )
         }
         Text(stringResource(R.string.home_make_room), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
@@ -195,6 +204,7 @@ internal fun ToolModeCards(
                 icon = tool.icon,
                 selected = selectedMode == tool.mode && (tool.converter == null || selectedConverterTool == tool.converter),
                 onClick = { onPageSelected(tool) },
+                modifier = if (tool.section == returnSection) Modifier.focusRequester(returnFocus) else Modifier,
             )
         }
     }
@@ -207,9 +217,10 @@ internal fun ToolListItem(
     icon: ImageVector,
     selected: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().focusRing(),
         onClick = onClick,
         colors = CardDefaults.cardColors(
             containerColor = if (selected) {
