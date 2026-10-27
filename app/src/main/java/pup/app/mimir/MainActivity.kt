@@ -111,6 +111,7 @@ private enum class AppSection {
     Rvz,
     Zcci,
     Nsz,
+    Xiso,
     Vita,
 }
 
@@ -136,6 +137,7 @@ private val spaceSavers = listOf(
     ToolEntry(R.string.goal_compress_disc_images, R.string.tool_chdman, R.string.tool_chdman_description, ToolMode.ChdConverter, AppSection.ChdMan, ConverterTool.Chd, Icons.Outlined.Archive),
     ToolEntry(R.string.goal_shrink_gamecube_wii, R.string.tool_dolphin_rvz, R.string.tool_dolphin_rvz_description, ToolMode.ChdConverter, AppSection.Rvz, ConverterTool.DolphinRvz, Icons.Outlined.Archive),
     ToolEntry(R.string.goal_shrink_3ds, R.string.tool_azahar_zcci, R.string.tool_azahar_zcci_description, ToolMode.ChdConverter, AppSection.Zcci, ConverterTool.AzaharZcci, Icons.Outlined.Archive),
+    ToolEntry(R.string.goal_shrink_xbox, R.string.tool_xbox_xiso, R.string.tool_xbox_xiso_description, ToolMode.ChdConverter, AppSection.Xiso, ConverterTool.XboxXiso, Icons.Outlined.Archive),
 )
 
 class MainActivity : ComponentActivity() {
@@ -736,12 +738,20 @@ private fun MimirScreen(
             text = {
                 if (uiState.selectedMode == ToolMode.ChdConverter) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text(
-                            "This will convert $changeCount selected file${if (changeCount == 1) "" else "s"} " +
-                                "to .${uiState.selectedConverterTool.outputExtension}. " +
-                                (if (existingChdCount > 0) "$existingChdCount selected output${if (existingChdCount == 1) "" else "s"} already exists and will be overwritten. " else "") +
-                                "Mimir cannot undo this action."
-                        )
+                        if (uiState.selectedConverterTool == ConverterTool.XboxXiso) {
+                            Text(
+                                "This will replace $changeCount selected Xbox image${if (changeCount == 1) "" else "s"} " +
+                                    "with a trimmed XISO of the same name. Each original is deleted only after its XISO " +
+                                    "is written, and Mimir cannot undo this action."
+                            )
+                        } else {
+                            Text(
+                                "This will convert $changeCount selected file${if (changeCount == 1) "" else "s"} " +
+                                    "to .${uiState.selectedConverterTool.outputExtension}. " +
+                                    (if (existingChdCount > 0) "$existingChdCount selected output${if (existingChdCount == 1) "" else "s"} already exists and will be overwritten. " else "") +
+                                    "Mimir cannot undo this action."
+                            )
+                        }
                         if (uiState.selectedConverterTool == ConverterTool.Chd) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -1288,6 +1298,7 @@ private fun ToolPageHeader(
         AppSection.Rvz -> "Dolphin RVZ"
         AppSection.Zcci -> "Azahar ZCCI"
         AppSection.Nsz -> "NSZ to NSP"
+        AppSection.Xiso -> "Xbox XISO"
         AppSection.Vita -> "Vita Shortcuts"
         AppSection.Home -> "Mimir"
     }
@@ -1299,6 +1310,7 @@ private fun ToolPageHeader(
         AppSection.Rvz -> converterTool.description
         AppSection.Zcci -> converterTool.description
         AppSection.Nsz -> converterTool.description
+        AppSection.Xiso -> converterTool.description
         AppSection.Vita -> "Create .psvita or .dpt shortcut files from the built-in Vita database."
         AppSection.Home -> ""
     }

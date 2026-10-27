@@ -9,6 +9,6 @@
     <string name="goal_compress_cartridge_roms">壓縮卡帶 ROM</string><string name="tool_romzipper">RomZipper</string><string name="tool_romzipper_description">將支援的卡帶 ROM 封存為 .zip 檔案。</string>
     <string name="goal_compress_disc_images">壓縮光碟映像</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">將 PSX、PS2、PSP、Saturn、Dreamcast 和 Sega CD 映像轉換為 CHD。</string>
     <string name="goal_shrink_gamecube_wii">壓縮 GameCube 和 Wii 遊戲</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">將 ISO 映像轉換為 RVZ。</string>
-    <string name="goal_shrink_3ds">壓縮 Nintendo 3DS 遊戲</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">將已解密的 3DS 和 CCI 映像壓縮為 ZCCI。</string><string name="tool_card_description">%1$s \u2022 %2$s</string>
+    <string name="goal_shrink_3ds">壓縮 Nintendo 3DS 遊戲</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">將已解密的 3DS 和 CCI 映像壓縮為 ZCCI。</string><string name="goal_shrink_xbox">壓縮 Xbox 遊戲</string><string name="tool_xbox_xiso">Xbox XISO</string><string name="tool_xbox_xiso_description">將 Redump Xbox ISO 裁剪為適用於 Hakux 和 xemu 的 XISO。</string><string name="tool_card_description">%1$s \u2022 %2$s</string>
     <string name="no_rom_folder_selected">未選擇 ROM 資料夾</string><string name="no_vita_output_directory_selected">未選擇 Vita 輸出資料夾</string><string name="no_esde_folder_selected">未選擇 ES-DE 資料夾</string>
 </resources>

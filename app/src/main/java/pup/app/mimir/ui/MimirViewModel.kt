@@ -623,7 +623,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                             }
                             else -> {
                                 val tool = currentState.selectedConverterTool
-                                val entries = repository.scanChdTree(
+                                val scannedEntries = repository.scanChdTree(
                                     rootUri = requireNotNull(romUri),
                                     folderAliases = tool.folderAliases,
                                     supportedExtensions = tool.sourceExtensions,
@@ -632,7 +632,16 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                                     shouldStop = cancellation::shouldInterruptCurrentOperation,
                                 )
                                 _uiState.update {
-                                    it.copy(scanProgressLabel = "Checking ${entries.size} files for ${tool.displayName} conversion…")
+                                    it.copy(scanProgressLabel = "Checking ${scannedEntries.size} files for ${tool.displayName} conversion…")
+                                }
+                                val entries = if (tool == ConverterTool.XboxXiso) {
+                                    repository.filterXboxImagesNeedingXiso(
+                                        rootUri = requireNotNull(romUri),
+                                        entries = scannedEntries,
+                                        shouldStop = cancellation::shouldInterruptCurrentOperation,
+                                    )
+                                } else {
+                                    scannedEntries
                                 }
                                 NativeConverterPlanner.buildPlan(entries, tool)
                             }

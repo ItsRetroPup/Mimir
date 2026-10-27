@@ -101,6 +101,19 @@ Mimir bundles the following Android ARM64 command-line backends in
   The reproducible standalone-target patch and build instructions are in
   `docs/azahar-compression-cli.patch` and `docs/azahar-compression-build.md`.
 
+#### Xbox XISO
+
+Mimir can trim original Xbox Redump `.iso` dumps to XISO for Hakux and xemu. Select a folder
+containing `.iso` files directly or in an `xbox` / `microsoft xbox` subfolder. The scan only lists
+images that still contain the Redump video partition (XGD1, XGD2, or XGD3); existing XISOs and
+non-Xbox ISOs are left out.
+
+The conversion rewrites the XDVDFS game partition with directories and files packed contiguously,
+matching `extract-xiso -r`, and keeps the original file name. It is implemented in Kotlin and reads
+the source in place, so no cache copy of the image is needed. Each XISO is written to a temporary
+`.mimir-xiso` file beside its source; the original is deleted and the XISO renamed only after the
+write succeeds. Make sure the storage has room for one extra XISO while converting.
+
 #### NSZ to NSP
 
 Mimir can decompress Nintendo Switch `.nsz` packages to `.nsp`. The converter uses the MIT-licensed

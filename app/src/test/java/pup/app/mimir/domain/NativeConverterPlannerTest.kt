@@ -56,4 +56,22 @@ class NativeConverterPlannerTest {
             plan.operations.map { (it as FileOperation.ConvertWithTool).tool },
         )
     }
+
+    @Test
+    fun xisoReplacesSourceWithoutMarkingItAsAnOverwrite() {
+        val plan = NativeConverterPlanner.buildPlan(
+            entries = listOf(
+                RomEntry("xbox/Halo.iso", "Halo.iso", sizeBytes = 7_825_162_240L),
+                RomEntry("xbox/Readme.txt", "Readme.txt"),
+            ),
+            tool = ConverterTool.XboxXiso,
+        )
+
+        val change = plan.changes.single()
+        assertEquals("xbox/Halo.iso", change.detailPath)
+        assertFalse(change.targetAlreadyExists)
+        val operation = plan.operations.single() as FileOperation.ConvertWithTool
+        assertEquals("xbox/Halo.iso", operation.sourcePath)
+        assertEquals("xbox/Halo.iso", operation.targetPath)
+    }
 }

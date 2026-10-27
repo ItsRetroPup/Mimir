@@ -28,7 +28,9 @@ object NativeConverterPlanner {
                     detailPath = targetPath,
                     operations = listOf(operation),
                     sourceSizeBytes = entry.sizeBytes,
-                    targetAlreadyExists = targetPath.lowercase() in existingPaths,
+                    // XISO conversion replaces its source under the same name, which is not an overwrite.
+                    targetAlreadyExists = targetPath.lowercase() in existingPaths &&
+                        !targetPath.equals(entry.relativePath, ignoreCase = true),
                 )
             }
         return OperationPlan(

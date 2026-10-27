@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.documentfile.provider.DocumentFile
+import pup.app.mimir.domain.ConverterTool
 import pup.app.mimir.domain.FileOperation
 import pup.app.mimir.domain.OperationPlan
 import pup.app.mimir.domain.RelativePaths
@@ -13,6 +14,7 @@ import java.util.zip.ZipOutputStream
 class PlanExecutor(private val context: Context) {
     private val chdmanRunner = ChdmanRunner(context)
     private val nativeConverterRunner = NativeConverterRunner(context)
+    private val xisoRunner = XisoRunner(context)
     fun apply(
         rootUri: Uri,
         plan: OperationPlan,
@@ -114,7 +116,16 @@ class PlanExecutor(private val context: Context) {
                     }
                 }
 
-                is FileOperation.ConvertWithTool -> {
+                is FileOperation.ConvertWithTool -> if (operation.tool == ConverterTool.XboxXiso) {
+                    val sourceBytesBefore = sourceSize(root, operation.sourcePath)
+                    val outputBytes = xisoRunner.convertInPlace(
+                        root = root,
+                        operation = operation,
+                        cancellation = cancellation,
+                        onProgress = onCurrentOperationProgress,
+                    )
+                    spaceSavedBytes += sourceBytesBefore - outputBytes
+                } else {
                     val conversion = nativeConverterRunner.convert(
                         root = root,
                         operation = operation,

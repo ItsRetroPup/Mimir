@@ -154,6 +154,7 @@ class NativeConverterRunner(private val context: Context) {
             executable.absolutePath, "-c", source.absolutePath, "-o", workspace.absolutePath,
         )
         ConverterTool.NszNsp -> error("NSZ conversions are run by embedded Python.")
+        ConverterTool.XboxXiso -> error("XISO conversions are run by XisoRunner.")
         ConverterTool.Chd -> error("CHD conversions are run by CHDMan.")
     }
 

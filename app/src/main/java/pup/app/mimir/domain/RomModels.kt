@@ -69,6 +69,14 @@ enum class ConverterTool(
         folderAliases = setOf("switch", "nintendo switch"),
         executableName = "",
     ),
+    XboxXiso(
+        displayName = "Xbox XISO",
+        description = "Trim Redump Xbox ISOs to XISO for Hakux and xemu",
+        sourceExtensions = setOf("iso"),
+        outputExtension = "iso",
+        folderAliases = setOf("xbox", "microsoft xbox"),
+        executableName = "",
+    ),
 }
 
 enum class ChdDiscType(

@@ -110,6 +110,23 @@ class RomTreeRepository(private val context: Context) {
         }
     }
 
+    /** Keeps the Xbox disc images that still carry a Redump video partition. */
+    fun filterXboxImagesNeedingXiso(
+        rootUri: Uri,
+        entries: List<RomEntry>,
+        shouldStop: (() -> Boolean)? = null,
+    ): List<RomEntry> {
+        val root = DocumentFile.fromTreeUri(context, rootUri) ?: return emptyList()
+        val xisoRunner = XisoRunner(context)
+        return entries.filter { entry ->
+            if (shouldStop?.invoke() == true) throw OperationStoppedException("Scan stopped by user.")
+            if (!entry.fileName.endsWith(".iso", ignoreCase = true)) return@filter true
+            val file = findFile(root, entry.relativePath) ?: return@filter false
+            val offset = xisoRunner.partitionOffset(file)
+            offset != null && offset != 0L
+        }
+    }
+
     fun loadExistingVitaShortcuts(
         rootUri: Uri,
         format: VitaShortcutFormat,
