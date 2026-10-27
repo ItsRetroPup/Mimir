@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
@@ -38,6 +39,7 @@ internal fun ApplyConfirmationDialog(
     onDismiss: () -> Unit,
     onConfirm: (deleteOriginalChdFiles: Boolean) -> Unit,
 ) {
+    val palette = LocalMimirPalette.current
     val isConversion = mode == ToolMode.Converter
     val offersDeleteOriginals = isConversion && converterTool == ConverterTool.Chd
     var deleteOriginals by rememberSaveable { mutableStateOf(deleteOriginalChdFiles) }
@@ -80,7 +82,12 @@ internal fun ApplyConfirmationDialog(
             }
         },
         confirmButton = {
-            Button(onClick = { onConfirm(deleteOriginals) }, enabled = enabled && changeCount > 0) {
+            InkButton(
+                onClick = { onConfirm(deleteOriginals) },
+                enabled = enabled && changeCount > 0,
+                containerColor = palette.caution,
+                contentColor = palette.onCaution,
+            ) {
                 Text(stringResource(if (isConversion) R.string.action_start_conversions else R.string.action_apply_changes))
             }
         },
@@ -101,7 +108,7 @@ internal fun EsDeInstallDialog(
         title = { Text(stringResource(R.string.esde_install_title)) },
         text = { Text(pluralStringResource(R.plurals.esde_install_body, systemCount, systemCount)) },
         confirmButton = {
-            Button(onClick = onConfirm) { Text(stringResource(R.string.action_install_systems)) }
+            InkButton(onClick = onConfirm) { Text(stringResource(R.string.action_install_systems)) }
         },
         dismissButton = {
             OutlinedButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
@@ -121,7 +128,7 @@ internal fun VitaShortcutAddDialog(
         title = { Text(stringResource(R.string.vita_add_title)) },
         text = { Text(stringResource(R.string.vita_add_body, format.extension, app.title, app.titleId)) },
         confirmButton = {
-            Button(onClick = onConfirm) { Text(stringResource(R.string.action_create_shortcut)) }
+            InkButton(onClick = onConfirm) { Text(stringResource(R.string.action_create_shortcut)) }
         },
         dismissButton = {
             OutlinedButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
@@ -140,7 +147,11 @@ internal fun VitaShortcutRemoveDialog(
         title = { Text(stringResource(R.string.vita_remove_title)) },
         text = { Text(stringResource(R.string.vita_remove_body, app.title, app.titleId)) },
         confirmButton = {
-            Button(onClick = onConfirm) { Text(stringResource(R.string.action_remove_shortcut)) }
+            InkButton(
+                onClick = onConfirm,
+                containerColor = LocalMimirPalette.current.caution,
+                contentColor = LocalMimirPalette.current.onCaution,
+            ) { Text(stringResource(R.string.action_remove_shortcut)) }
         },
         dismissButton = {
             OutlinedButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }

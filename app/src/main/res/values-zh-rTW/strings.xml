@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Mimir</string><string name="home">首頁</string><string name="go_home">返回首頁</string><string name="toggle_dark_mode">切換深色模式</string><string name="status">狀態</string><string name="open_tool">開啟%1$s</string>
-    <string name="home_intro">歡迎使用 Mimir！</string><string name="home_prompt">從下方清單中選擇工具開始使用</string><string name="home_prepare_library">實用工具</string><string name="home_make_room">節省裝置空間</string>
-    <string name="goal_fix_multidisc">整理多光碟遊戲</string><string name="tool_multidisc">多光碟整理工具</string><string name="tool_multidisc_description">建立適用於前端的資料夾和播放清單。</string>
+    <string name="app_name">Mimir</string><string name="go_home">返回首頁</string><string name="toggle_dark_mode">切換深色模式</string><string name="open_tool">開啟%1$s</string>
+<string name="home_prompt">從下方清單中選擇工具開始使用</string>    <string name="goal_fix_multidisc">整理多光碟遊戲</string><string name="tool_multidisc">多光碟整理工具</string><string name="tool_multidisc_description">建立適用於前端的資料夾和播放清單。</string>
     <string name="goal_create_vita_shortcuts">建立 Vita 捷徑</string><string name="tool_vita_shortcuts">Vita 捷徑</string><string name="tool_vita_shortcuts_description">從內建資料庫建立 .psvita 或 .dpt 捷徑。</string>
     <string name="goal_setup_esde">設定 ES-DE</string><string name="tool_esde_systems">ES-DE 系統</string><string name="tool_esde_systems_description">安裝自訂系統並對應其 ROM 資料夾。</string>
     <string name="goal_convert_switch_packages">轉換 Switch 套件</string><string name="tool_nsz_to_nsp">NSZ 轉 NSP</string><string name="tool_nsz_to_nsp_description">將 NSZ 檔案解壓縮為 NSP 套件。</string>
     <string name="goal_compress_cartridge_roms">壓縮卡帶 ROM</string><string name="tool_romzipper">RomZipper</string><string name="tool_romzipper_description">將支援的卡帶 ROM 封存為 .zip 檔案。</string>
     <string name="goal_compress_disc_images">壓縮光碟映像</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">將 PSX、PS2、PSP、Saturn、Dreamcast 和 Sega CD 映像轉換為 CHD。</string>
     <string name="goal_shrink_gamecube_wii">壓縮 GameCube 和 Wii 遊戲</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">將 ISO 映像轉換為 RVZ。</string>
-    <string name="goal_shrink_3ds">壓縮 Nintendo 3DS 遊戲</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">將已解密的 3DS 和 CCI 映像壓縮為 ZCCI。</string><string name="goal_shrink_xbox">壓縮 Xbox 遊戲</string><string name="tool_xbox_xiso">Xbox XISO</string><string name="tool_xbox_xiso_description">將 Redump Xbox ISO 裁剪為適用於 Hakux 和 xemu 的 XISO。</string><string name="tool_card_description">%1$s \u2022 %2$s</string>
-    <string name="no_rom_folder_selected">未選擇 ROM 資料夾</string><string name="no_vita_output_directory_selected">未選擇 Vita 輸出資料夾</string><string name="no_esde_folder_selected">未選擇 ES-DE 資料夾</string>
+    <string name="goal_shrink_3ds">壓縮 Nintendo 3DS 遊戲</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">將已解密的 3DS 和 CCI 映像壓縮為 ZCCI。</string><string name="goal_shrink_xbox">壓縮 Xbox 遊戲</string><string name="tool_xbox_xiso">Xbox XISO</string><string name="tool_xbox_xiso_description">將 Redump Xbox ISO 裁剪為適用於 Hakux 和 xemu 的 XISO。</string>    <string name="no_rom_folder_selected">未選擇 ROM 資料夾</string><string name="no_vita_output_directory_selected">未選擇 Vita 輸出資料夾</string><string name="no_esde_folder_selected">未選擇 ES-DE 資料夾</string>
 
     <!-- Tool screens, dialogs and status messages. -->
     <string name="action_cancel">取消</string>
@@ -18,16 +16,10 @@
     <string name="sort_name_descending">名稱 Z–A</string>
     <string name="sort_size_largest">由大到小</string>
     <string name="sort_size_smallest">由小到大</string>
-    <string name="queue_title">轉換佇列</string>
     <string name="action_select_all">全選</string>
     <string name="action_deselect_all">取消全選</string>
-    <string name="queue_sort_by">排序方式</string>
-    <string name="storage_title">已掃描裝置的儲存空間</string>
     <string name="storage_body">可用 %1$s，共 %2$s。此佇列約需 %3$s 的工作空間。</string>
     <string name="storage_low_warning">警告：可用空間可能不足以轉換所選佇列。請先取消選取部分項目或釋放空間。</string>
-    <string name="queue_column_rom">ROM</string>
-    <string name="queue_column_size">大小</string>
-    <string name="queue_column_output">輸出</string>
     <string name="queue_existing_output">已有輸出 — 單獨選取以取代</string>
     <string name="replace_output_title">要取代現有輸出嗎？</string>
     <string name="replace_output_body_selected">%1$s 已存在，選取後將被覆寫。</string>
@@ -45,13 +37,9 @@
     <string name="progress_queue">佇列：第 %1$d / %2$d 項工作</string>
     <string name="action_stop_after_current">目前轉換完成後停止</string>
     <string name="action_stop_now">立即停止</string>
-    <string name="support_title">支持 MIMIR</string>
     <string name="support_body" formatted="false">Mimir 現在和未來都完全免費且沒有廣告。如果你想表達支持，歡迎看看我的 YouTube 頻道或贊助。</string>
     <string name="home_footer">由 RetroPup 打造</string>
     <string name="app_logo">Mimir 標誌</string>
-    <string name="action_convert_selected">轉換所選 %1$d 項</string>
-    <string name="action_apply_selected">套用所選 %1$d 項</string>
-    <string name="action_scan_folder">掃描所選資料夾</string>
     <string name="apply_title_convert">要轉換所選映像檔嗎？</string>
     <string name="apply_title_changes">要套用變更嗎？</string>
     <plurals name="apply_body_changes">
@@ -89,7 +77,6 @@
     <string name="preview_sources">來源</string>
     <string name="preview_targets">目標</string>
     <string name="replace_output_body_convert">%1$s 已存在，轉換此映像檔時將被覆寫。</string>
-    <string name="preview_title">預覽</string>
     <plurals name="preview_jobs_selected">
         <item quantity="other">已選取 %1$d 項工作 • %2$s</item>
     </plurals>
@@ -105,24 +92,14 @@
     <plurals name="preview_systems_summary">
         <item quantity="other">%1$d 個系統已就緒；已選取 %2$d 個。</item>
     </plurals>
-    <string name="action_apply">套用</string>
-    <string name="control_title">系統控制</string>
     <string name="control_selected_rom_folder">所選 ROM 資料夾</string>
-    <string name="action_select_rom_folder">選取 ROM 資料夾</string>
-    <string name="esde_title">ES-DE 自訂系統</string>
     <string name="esde_selected_folder">所選 ES-DE 資料夾</string>
-    <string name="action_select_esde_folder">選取 ES-DE 資料夾</string>
     <string name="esde_rom_root">ROM 根資料夾</string>
-    <string name="action_select_rom_root">選取 ROM 根目錄</string>
-    <string name="action_download_xmls">下載最新 XML</string>
     <string name="esde_download_hint">下載最新的 XML 以設定 Android 自訂系統。它們將安裝在 custom_systems 下。</string>
     <string name="esde_rom_folders">ROM 資料夾</string>
     <string name="esde_default_folder">預設</string>
     <string name="action_choose_folder">選擇資料夾</string>
-    <string name="action_install_custom_systems">安裝自訂系統</string>
-    <string name="vita_title">VITA 捷徑</string>
     <string name="vita_output_directory">捷徑輸出資料夾</string>
-    <string name="action_select_output_folder">選取輸出資料夾</string>
     <string name="vita_file_type">捷徑檔案類型</string>
     <string name="vita_cocoon_hint">Cocoon 使用者請選擇 .dpt</string>
     <string name="vita_database">捷徑資料庫</string>
@@ -140,11 +117,10 @@
     <string name="nsz_keys_title">NSZ 金鑰</string>
     <string name="nsz_keys_configured">prod.keys 已匯入，並將保存在 Mimir 的私人儲存空間中。</string>
     <string name="nsz_keys_missing">在掃描或轉換 NSZ 套件之前，請匯入你合法取得的 prod.keys 檔案。</string>
-    <string name="action_replace_keys">取代 PROD.KEYS</string>
-    <string name="action_import_keys">匯入 PROD.KEYS</string>
+    <string name="action_replace_keys">取代 prod.keys</string>
+    <string name="action_import_keys">匯入 prod.keys</string>
     <string name="chd_system">系統</string>
     <string name="chd_conversion_type">轉換類型</string>
-    <string name="chd_compatibility_title">相容性提示</string>
     <string name="chd_compatibility_body">使用 NetherSX2 時選擇 CD；使用 ARMSX2 時選擇 DVD。</string>
     <string name="msg_rom_path_unresolved">無法解析所選 ROM 資料夾的路徑。</string>
     <string name="msg_select_esde_first">請先選取 ES-DE 資料夾。</string>
@@ -219,4 +195,38 @@
     <string name="apply_activity_shortcuts">正在建立捷徑</string>
     <string name="apply_activity_esde">正在更新 ES-DE 系統</string>
     <string name="apply_progress">%1$s：%2$d / %3$d</string>
+
+    <!-- Memory-card shell: home, legend bar and empty states. -->
+    <string name="about_mimir">關於 Mimir</string>
+    <string name="info_reads">讀取</string>
+    <string name="info_writes">寫入</string>
+    <string name="legend_open">開啟</string>
+    <string name="legend_theme">主題</string>
+    <string name="legend_select">選取</string>
+    <string name="legend_back">返回</string>
+    <string name="legend_download">下載</string>
+    <string name="legend_install">安裝</string>
+    <string name="legend_scan">掃描資料夾</string>
+    <plurals name="legend_convert">
+        <item quantity="other">轉換 %1$d 項</item>
+    </plurals>
+    <plurals name="legend_apply">
+        <item quantity="other">套用 %1$d 項</item>
+    </plurals>
+    <string name="storage_free_header">可用 %1$s</string>
+    <string name="vita_search_hint">輸入遊戲標題或標題 ID，例如 PCSB01256。</string>
+    <string name="data_no_folder_title">選擇 ROM 資料夾</string>
+    <string name="data_no_folder_body">選擇 Mimir 要讀取的資料夾，然後進行掃描。</string>
+    <string name="data_not_scanned_title">可以開始掃描</string>
+    <string name="data_not_scanned_body">按 X 或點選「掃描資料夾」來檢視 %1$s。</string>
+    <string name="data_nothing_found_title">沒有需要變更的內容</string>
+    <string name="data_nothing_found_body">Mimir 在該資料夾中找不到此工具可處理的檔案。</string>
+
+    <!-- Legend labels with nothing selected. -->
+    <string name="legend_convert_idle">轉換</string>
+    <string name="legend_apply_idle">套用</string>
+
+    <!-- Memory-card slot names. -->
+    <string name="slot_utilities">插槽 1 · 實用工具</string>
+    <string name="slot_space_savers">插槽 2 · 節省空間</string>
 </resources>

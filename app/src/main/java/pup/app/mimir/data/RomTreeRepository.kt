@@ -3,6 +3,7 @@ package pup.app.mimir.data
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.StatFs
 import android.os.storage.StorageManager
 import androidx.documentfile.provider.DocumentFile
@@ -23,6 +24,12 @@ class RomTreeRepository(private val context: Context) {
             StorageInfo(totalBytes = stat.totalBytes, freeBytes = stat.availableBytes)
         }.getOrNull()
     }
+
+    /** Space on the device's shared storage, for the header readout before any folder is picked. */
+    fun primaryStorageInfo(): StorageInfo? = runCatching {
+        val stat = StatFs(Environment.getExternalStorageDirectory().path)
+        StorageInfo(totalBytes = stat.totalBytes, freeBytes = stat.availableBytes)
+    }.getOrNull()
 
     fun loadVitaShortcutCatalog(): List<VitaApp> =
         context.assets.open("vita_shortcuts.tsv").bufferedReader().useLines { lines ->

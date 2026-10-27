@@ -1,37 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Mimir</string><string name="home">Inicio</string><string name="go_home">Ir al inicio</string><string name="toggle_dark_mode">Activar o desactivar el modo oscuro</string><string name="status">Estado</string><string name="open_tool">Abrir %1$s</string>
-    <string name="home_intro">¡Te damos la bienvenida a Mimir!</string><string name="home_prompt">Elige una herramienta de la lista de abajo para empezar</string><string name="home_prepare_library">Herramientas útiles</string><string name="home_make_room">Ahorra espacio en tu dispositivo</string>
-    <string name="goal_fix_multidisc">Corregir juegos multidisco</string><string name="tool_multidisc">Organizador multidisco</string><string name="tool_multidisc_description">Crear carpetas y listas de reproducción listas para el frontend.</string>
+    <string name="app_name">Mimir</string><string name="go_home">Ir al inicio</string><string name="toggle_dark_mode">Activar o desactivar el modo oscuro</string><string name="open_tool">Abrir %1$s</string>
+<string name="home_prompt">Elige una herramienta de la lista de abajo para empezar</string>    <string name="goal_fix_multidisc">Corregir juegos multidisco</string><string name="tool_multidisc">Organizador multidisco</string><string name="tool_multidisc_description">Crear carpetas y listas de reproducción listas para el frontend.</string>
     <string name="goal_create_vita_shortcuts">Crear accesos directos de Vita</string><string name="tool_vita_shortcuts">Accesos directos de Vita</string><string name="tool_vita_shortcuts_description">Crear accesos directos .psvita o .dpt desde la base de datos integrada.</string>
     <string name="goal_setup_esde">Configurar ES-DE</string><string name="tool_esde_systems">Sistemas ES-DE</string><string name="tool_esde_systems_description">Instalar sistemas personalizados y asignar sus carpetas de ROM.</string>
     <string name="goal_convert_switch_packages">Convertir paquetes de Switch</string><string name="tool_nsz_to_nsp">NSZ a NSP</string><string name="tool_nsz_to_nsp_description">Descomprimir archivos NSZ en paquetes NSP.</string>
     <string name="goal_compress_cartridge_roms">Comprimir ROM de cartucho</string><string name="tool_romzipper">RomZipper</string><string name="tool_romzipper_description">Archivar ROM de cartucho compatibles como archivos .zip.</string>
     <string name="goal_compress_disc_images">Comprimir imágenes de disco</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">Convertir imágenes de PSX, PS2, PSP, Saturn, Dreamcast y Sega CD a CHD.</string>
     <string name="goal_shrink_gamecube_wii">Reducir juegos de GameCube y Wii</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">Convertir imágenes ISO a RVZ.</string>
-    <string name="goal_shrink_3ds">Reducir juegos de Nintendo 3DS</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">Comprimir imágenes 3DS y CCI descifradas a ZCCI.</string><string name="goal_shrink_xbox">Reducir juegos de Xbox</string><string name="tool_xbox_xiso">Xbox XISO</string><string name="tool_xbox_xiso_description">Recortar ISOs de Xbox de Redump a XISO para Hakux y xemu.</string><string name="tool_card_description">%1$s \u2022 %2$s</string>
-    <string name="no_rom_folder_selected">No hay carpeta de ROM seleccionada</string><string name="no_vita_output_directory_selected">No hay carpeta de salida de Vita seleccionada</string><string name="no_esde_folder_selected">No hay carpeta de ES-DE seleccionada</string>
+    <string name="goal_shrink_3ds">Reducir juegos de Nintendo 3DS</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">Comprimir imágenes 3DS y CCI descifradas a ZCCI.</string><string name="goal_shrink_xbox">Reducir juegos de Xbox</string><string name="tool_xbox_xiso">Xbox XISO</string><string name="tool_xbox_xiso_description">Recortar ISOs de Xbox de Redump a XISO para Hakux y xemu.</string>    <string name="no_rom_folder_selected">No hay carpeta de ROM seleccionada</string><string name="no_vita_output_directory_selected">No hay carpeta de salida de Vita seleccionada</string><string name="no_esde_folder_selected">No hay carpeta de ES-DE seleccionada</string>
 
     <!-- Tool screens, dialogs and status messages. -->
-    <string name="action_cancel">CANCELAR</string>
+    <string name="action_cancel">Cancelar</string>
     <string name="sort_name_ascending">Nombre A–Z</string>
     <string name="sort_name_descending">Nombre Z–A</string>
     <string name="sort_size_largest">Más grandes</string>
     <string name="sort_size_smallest">Más pequeños</string>
-    <string name="queue_title">COLA DE CONVERSIÓN</string>
-    <string name="action_select_all">SELECCIONAR TODO</string>
-    <string name="action_deselect_all">DESELECCIONAR TODO</string>
-    <string name="queue_sort_by">Ordenar por</string>
-    <string name="storage_title">Almacenamiento del dispositivo analizado</string>
+    <string name="action_select_all">Seleccionar todo</string>
+    <string name="action_deselect_all">Deseleccionar todo</string>
     <string name="storage_body">%1$s libres de %2$s. Esta cola necesita unos %3$s de espacio de trabajo.</string>
     <string name="storage_low_warning">Advertencia: puede que no haya suficiente espacio libre para convertir la cola seleccionada. Deselecciona algunos elementos o libera espacio primero.</string>
-    <string name="queue_column_rom">ROM</string>
-    <string name="queue_column_size">TAMAÑO</string>
-    <string name="queue_column_output">SALIDA</string>
     <string name="queue_existing_output">Salida existente: selecciónala individualmente para reemplazarla</string>
     <string name="replace_output_title">¿Reemplazar la salida existente?</string>
     <string name="replace_output_body_selected">%1$s ya existe y se sobrescribirá si se selecciona.</string>
-    <string name="action_replace_output">REEMPLAZAR SALIDA</string>
+    <string name="action_replace_output">Reemplazar salida</string>
     <string name="report_space_saved">Espacio neto ahorrado: %1$s.</string>
     <string name="report_size_increase">Aumento neto de tamaño: %1$s.</string>
     <string name="report_no_size_change">Sin cambio neto de tamaño.</string>
@@ -45,15 +37,11 @@
     <string name="progress_converting">Convirtiendo %1$s: %2$d %%</string>
     <string name="progress_selected_image">imagen seleccionada</string>
     <string name="progress_queue">Cola: tarea %1$d de %2$d</string>
-    <string name="action_stop_after_current">DETENER TRAS LA CONVERSIÓN ACTUAL</string>
-    <string name="action_stop_now">DETENER AHORA</string>
-    <string name="support_title">APOYA A MIMIR</string>
+    <string name="action_stop_after_current">Detener tras la conversión actual</string>
+    <string name="action_stop_now">Detener ahora</string>
     <string name="support_body" formatted="false">Mimir es y siempre será 100 % gratuito y sin anuncios. Si quieres mostrar tu apoyo, echa un vistazo a mi canal de YouTube o haz una donación.</string>
     <string name="home_footer">Creado por RetroPup</string>
     <string name="app_logo">Logotipo de Mimir</string>
-    <string name="action_convert_selected">CONVERTIR %1$d SELECCIONADOS</string>
-    <string name="action_apply_selected">APLICAR %1$d SELECCIONADOS</string>
-    <string name="action_scan_folder">ANALIZAR CARPETA SELECCIONADA</string>
     <string name="apply_title_convert">¿Convertir las imágenes seleccionadas?</string>
     <string name="apply_title_changes">¿Aplicar cambios?</string>
     <plurals name="apply_body_changes">
@@ -79,21 +67,21 @@
     <string name="apply_body_cannot_undo">Mimir no puede deshacer esta acción.</string>
     <string name="apply_delete_originals">Eliminar archivos originales</string>
     <string name="apply_delete_originals_detail">También elimina las pistas de la misma carpeta referenciadas por un archivo .cue o .gdi cuando la conversión se completa.</string>
-    <string name="action_start_conversions">INICIAR CONVERSIONES</string>
-    <string name="action_apply_changes">APLICAR CAMBIOS</string>
+    <string name="action_start_conversions">Iniciar conversiones</string>
+    <string name="action_apply_changes">Aplicar cambios</string>
     <string name="esde_install_title">¿Instalar sistemas personalizados?</string>
     <plurals name="esde_install_body">
         <item quantity="one">Se instalará %1$d sistema configurado en el directorio custom_systems de la carpeta de ES-DE seleccionada. Es posible que se actualicen los archivos de sistemas personalizados existentes. Reinicia ES-DE cuando termine la instalación.</item>
         <item quantity="many">Se instalarán %1$d sistemas configurados en el directorio custom_systems de la carpeta de ES-DE seleccionada. Es posible que se actualicen los archivos de sistemas personalizados existentes. Reinicia ES-DE cuando termine la instalación.</item>
         <item quantity="other">Se instalarán %1$d sistemas configurados en el directorio custom_systems de la carpeta de ES-DE seleccionada. Es posible que se actualicen los archivos de sistemas personalizados existentes. Reinicia ES-DE cuando termine la instalación.</item>
     </plurals>
-    <string name="action_install_systems">INSTALAR SISTEMAS</string>
+    <string name="action_install_systems">Instalar sistemas</string>
     <string name="vita_add_title">¿Crear acceso directo de Vita?</string>
     <string name="vita_add_body">Se creará un acceso directo .%1$s para %2$s (%3$s) en la carpeta de salida seleccionada.</string>
-    <string name="action_create_shortcut">CREAR ACCESO DIRECTO</string>
+    <string name="action_create_shortcut">Crear acceso directo</string>
     <string name="vita_remove_title">¿Quitar acceso directo de Vita?</string>
     <string name="vita_remove_body">Se eliminará el acceso directo de %1$s (%2$s) de la carpeta de salida seleccionada.</string>
-    <string name="action_remove_shortcut">QUITAR ACCESO DIRECTO</string>
+    <string name="action_remove_shortcut">Quitar acceso directo</string>
     <plurals name="chip_discs">
         <item quantity="one">%1$d DISCO</item>
         <item quantity="many">%1$d DISCOS</item>
@@ -103,7 +91,6 @@
     <string name="preview_sources">Orígenes</string>
     <string name="preview_targets">Destinos</string>
     <string name="replace_output_body_convert">%1$s ya existe y se sobrescribirá si conviertes esta imagen.</string>
-    <string name="preview_title">VISTA PREVIA</string>
     <plurals name="preview_jobs_selected">
         <item quantity="one">%1$d tarea seleccionada • %2$s</item>
         <item quantity="many">%1$d tareas seleccionadas • %2$s</item>
@@ -129,24 +116,14 @@
         <item quantity="many">%1$d sistemas listos; %2$d seleccionados.</item>
         <item quantity="other">%1$d sistemas listos; %2$d seleccionados.</item>
     </plurals>
-    <string name="action_apply">APLICAR</string>
-    <string name="control_title">CONTROL DEL SISTEMA</string>
     <string name="control_selected_rom_folder">Carpeta de ROM seleccionada</string>
-    <string name="action_select_rom_folder">SELECCIONAR CARPETA DE ROM</string>
-    <string name="esde_title">SISTEMAS PERSONALIZADOS DE ES-DE</string>
     <string name="esde_selected_folder">Carpeta de ES-DE seleccionada</string>
-    <string name="action_select_esde_folder">SELECCIONAR CARPETA DE ES-DE</string>
     <string name="esde_rom_root">Carpeta raíz de ROM</string>
-    <string name="action_select_rom_root">SELECCIONAR RAÍZ DE ROM</string>
-    <string name="action_download_xmls">DESCARGAR ÚLTIMOS XML</string>
     <string name="esde_download_hint">Descarga los últimos XML para configurar los sistemas personalizados de Android. Se instalarán en custom_systems.</string>
     <string name="esde_rom_folders">Carpetas de ROM</string>
     <string name="esde_default_folder">Predeterminada</string>
-    <string name="action_choose_folder">ELEGIR CARPETA</string>
-    <string name="action_install_custom_systems">INSTALAR SISTEMAS PERSONALIZADOS</string>
-    <string name="vita_title">ACCESOS DIRECTOS DE VITA</string>
+    <string name="action_choose_folder">Elegir carpeta</string>
     <string name="vita_output_directory">Carpeta de salida de accesos directos</string>
-    <string name="action_select_output_folder">SELECCIONAR CARPETA DE SALIDA</string>
     <string name="vita_file_type">Tipo de archivo de acceso directo</string>
     <string name="vita_cocoon_hint">Si usas Cocoon, selecciona .dpt</string>
     <string name="vita_database">Base de datos de accesos directos</string>
@@ -158,19 +135,18 @@
     <string name="vita_search_label">Buscar título o ID de app</string>
     <string name="vita_search_results">Resultados de búsqueda</string>
     <string name="vita_delete_shortcut">Eliminar acceso directo de %1$s</string>
-    <string name="action_quick_add">AÑADIR RÁPIDO</string>
-    <string name="organizer_frontend_target">FRONTEND DE DESTINO</string>
+    <string name="action_quick_add">Añadir rápido</string>
+    <string name="organizer_frontend_target">Frontend de destino</string>
     <string name="preset_other">Otro</string>
     <string name="organizer_scan_hidden">Analizar carpetas ocultas</string>
     <string name="organizer_scan_hidden_detail">Extrae las ROM de carpetas que empiezan por punto a la carpeta del sistema antes de organizar.</string>
     <string name="nsz_keys_title">Claves NSZ</string>
     <string name="nsz_keys_configured">prod.keys está importado y se conservará en el almacenamiento privado de Mimir.</string>
     <string name="nsz_keys_missing">Importa tu archivo prod.keys obtenido legalmente antes de analizar o convertir paquetes NSZ.</string>
-    <string name="action_replace_keys">REEMPLAZAR PROD.KEYS</string>
-    <string name="action_import_keys">IMPORTAR PROD.KEYS</string>
+    <string name="action_replace_keys">Reemplazar prod.keys</string>
+    <string name="action_import_keys">Importar prod.keys</string>
     <string name="chd_system">Sistema</string>
     <string name="chd_conversion_type">Tipo de conversión</string>
-    <string name="chd_compatibility_title">Guía de compatibilidad</string>
     <string name="chd_compatibility_body">Usa CD con NetherSX2 y DVD con ARMSX2.</string>
     <string name="msg_rom_path_unresolved">No se pudo resolver la ruta de la carpeta de ROM seleccionada.</string>
     <string name="msg_select_esde_first">Selecciona primero la carpeta de ES-DE.</string>
@@ -261,4 +237,42 @@
     <string name="apply_activity_shortcuts">Creando accesos directos</string>
     <string name="apply_activity_esde">Actualizando sistemas de ES-DE</string>
     <string name="apply_progress">%1$s: %2$d de %3$d</string>
+
+    <!-- Memory-card shell: home, legend bar and empty states. -->
+    <string name="about_mimir">Acerca de Mimir</string>
+    <string name="info_reads">Lee</string>
+    <string name="info_writes">Escribe</string>
+    <string name="legend_open">Abrir</string>
+    <string name="legend_theme">Tema</string>
+    <string name="legend_select">Seleccionar</string>
+    <string name="legend_back">Atrás</string>
+    <string name="legend_download">Descargar</string>
+    <string name="legend_install">Instalar</string>
+    <string name="legend_scan">Analizar carpeta</string>
+    <plurals name="legend_convert">
+        <item quantity="one">Convertir %1$d</item>
+        <item quantity="many">Convertir %1$d</item>
+        <item quantity="other">Convertir %1$d</item>
+    </plurals>
+    <plurals name="legend_apply">
+        <item quantity="one">Aplicar %1$d</item>
+        <item quantity="many">Aplicar %1$d</item>
+        <item quantity="other">Aplicar %1$d</item>
+    </plurals>
+    <string name="storage_free_header">%1$s libres</string>
+    <string name="vita_search_hint">Escribe el título de un juego o un ID de título, como PCSB01256.</string>
+    <string name="data_no_folder_title">Elige una carpeta de ROM</string>
+    <string name="data_no_folder_body">Elige la carpeta que Mimir debe leer y luego analízala.</string>
+    <string name="data_not_scanned_title">Listo para analizar</string>
+    <string name="data_not_scanned_body">Pulsa X o toca Analizar carpeta para revisar %1$s.</string>
+    <string name="data_nothing_found_title">Nada que cambiar</string>
+    <string name="data_nothing_found_body">Mimir no encontró en esa carpeta archivos con los que esta herramienta pueda trabajar.</string>
+
+    <!-- Legend labels with nothing selected. -->
+    <string name="legend_convert_idle">Convertir</string>
+    <string name="legend_apply_idle">Aplicar</string>
+
+    <!-- Memory-card slot names. -->
+    <string name="slot_utilities">Ranura 1 · Utilidades</string>
+    <string name="slot_space_savers">Ranura 2 · Ahorro de espacio</string>
 </resources>

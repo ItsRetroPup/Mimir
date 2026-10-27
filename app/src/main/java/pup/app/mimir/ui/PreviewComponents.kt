@@ -2,28 +2,18 @@ package pup.app.mimir.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Archive
-import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.FolderZip
-import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,127 +28,84 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import pup.app.mimir.R
-import pup.app.mimir.domain.ConverterTool
-import pup.app.mimir.domain.FileOperation
 import pup.app.mimir.domain.OperationPlan
+import pup.app.mimir.domain.PlannedChange
 import pup.app.mimir.domain.ToolMode
 
+/**
+ * One planned change for the organiser and zipper: which files it reads and what it writes, so
+ * nothing on the card is a surprise when the change is applied.
+ */
 @Composable
-internal fun ChangeCard(
+internal fun ChangeRow(
     plan: OperationPlan,
-    change: pup.app.mimir.domain.PlannedChange,
+    change: PlannedChange,
     selected: Boolean,
     enabled: Boolean,
-    modifier: Modifier = Modifier,
+    largest: Long,
     onSelectedChange: (Boolean) -> Unit,
 ) {
+    val palette = LocalMimirPalette.current
+    val ink = MaterialTheme.colorScheme.primary
     var showOverwriteWarning by rememberSaveable(change.detailPath) { mutableStateOf(false) }
-    val chipText = when (plan.mode) {
+    val badge = when (plan.mode) {
         ToolMode.MultiDiscOrganizer -> pluralStringResource(R.plurals.chip_discs, change.sourceFiles.size, change.sourceFiles.size)
-        ToolMode.RomZipper -> "ZIP"
-        ToolMode.Converter -> change.operations
-            .firstNotNullOfOrNull { (it as? FileOperation.ConvertWithTool)?.tool?.badge }
-            ?: ConverterTool.Chd.badge
-        ToolMode.VitaAppIds -> "VITA"
-        ToolMode.EsDeSystems -> "ES-DE"
+        else -> change.detailPath.substringAfterLast('.', "").uppercase()
     }
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.88f)
-        ),
-        shape = RoundedCornerShape(12.dp),
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.small)
+            .background(if (selected) ink.copy(alpha = 0.1f) else palette.panel)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top,
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    Checkbox(
-                        checked = selected,
-                        onCheckedChange = { shouldSelect ->
-                            if (shouldSelect && change.targetAlreadyExists && !selected) {
-                                showOverwriteWarning = true
-                            } else {
-                                onSelectedChange(shouldSelect)
-                            }
-                        },
-                        enabled = enabled,
-                    )
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        val icon = when (plan.mode) {
-                            ToolMode.RomZipper -> Icons.Outlined.FolderZip
-                            ToolMode.Converter -> Icons.Outlined.Archive
-                            ToolMode.VitaAppIds -> Icons.Outlined.Home
-                            ToolMode.EsDeSystems -> Icons.Outlined.Folder
-                            else -> Icons.Outlined.Folder
-                        }
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
-                    }
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = RoundedCornerShape(999.dp),
-                    ) {
-                        Text(
-                            chipText,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                    }
-                }
-            }
-
-            Text(change.title, style = MaterialTheme.typography.titleLarge)
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Checkbox(
+                checked = selected,
+                onCheckedChange = { shouldSelect ->
+                    if (shouldSelect && change.targetAlreadyExists && !selected) showOverwriteWarning = true
+                    else onSelectedChange(shouldSelect)
+                },
+                enabled = enabled,
+            )
             Text(
-                "${change.detailLabel} • ${change.detailPath}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
+                change.title,
+                style = MaterialTheme.typography.titleMedium,
+                color = palette.text,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
             )
-            if (change.targetAlreadyExists) {
+            if (badge.isNotEmpty()) {
                 Text(
-                    stringResource(R.string.preview_existing_output, change.detailPath.substringAfterLast('.')),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error,
+                    badge,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = ink,
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.extraSmall)
+                        .background(ink.copy(alpha = 0.14f))
+                        .padding(horizontal = 8.dp, vertical = 3.dp),
                 )
             }
-
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(stringResource(R.string.preview_sources), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-                change.sourceFiles.forEach { path ->
-                    Text(path, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                }
-            }
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(stringResource(R.string.preview_targets), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary)
-                change.targetFiles.forEach { path ->
-                    Text(path, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                }
-            }
+        }
+        SizeBar(change.sourceSizeBytes, largest, Modifier.padding(start = 48.dp))
+        if (change.targetAlreadyExists) {
+            Text(
+                stringResource(R.string.preview_existing_output, change.detailPath.substringAfterLast('.')),
+                style = MaterialTheme.typography.bodySmall,
+                color = palette.caution,
+            )
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
+            FileList(stringResource(R.string.preview_sources), change.sourceFiles, Modifier.weight(1f))
+            Icon(
+                Icons.AutoMirrored.Outlined.ArrowForward,
+                contentDescription = null,
+                tint = ink,
+                modifier = Modifier.padding(top = 18.dp).size(18.dp),
+            )
+            FileList(stringResource(R.string.preview_targets), change.targetFiles, Modifier.weight(1f))
         }
     }
     if (showOverwriteWarning) {
@@ -167,10 +114,14 @@ internal fun ChangeCard(
             title = { Text(stringResource(R.string.replace_output_title)) },
             text = { Text(stringResource(R.string.replace_output_body_convert, change.targetFiles.singleOrNull() ?: change.detailPath)) },
             confirmButton = {
-                Button(onClick = {
-                    showOverwriteWarning = false
-                    onSelectedChange(true)
-                }) { Text(stringResource(R.string.action_replace_output)) }
+                InkButton(
+                    onClick = {
+                        showOverwriteWarning = false
+                        onSelectedChange(true)
+                    },
+                    containerColor = palette.caution,
+                    contentColor = palette.onCaution,
+                ) { Text(stringResource(R.string.action_replace_output)) }
             },
             dismissButton = {
                 OutlinedButton(onClick = { showOverwriteWarning = false }) { Text(stringResource(R.string.action_cancel)) }
@@ -180,43 +131,12 @@ internal fun ChangeCard(
 }
 
 @Composable
-internal fun PreviewSummary(
-    previewCount: Int,
-    selectedCount: Int,
-    selectedPaths: Set<String>,
-    plan: OperationPlan,
-    onApply: () -> Unit,
-    isBusy: Boolean,
-) {
-    val selectedSize = plan.changes
-        .filter { it.detailPath in selectedPaths }
-        .sumOf { it.sourceSizeBytes }
-    StyledCard {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Label(stringResource(R.string.preview_title))
-            if (plan.mode == ToolMode.Converter) {
-                Text(
-                    pluralStringResource(R.plurals.preview_jobs_selected, selectedCount, selectedCount, formatQueueSize(selectedSize)),
-                    style = MaterialTheme.typography.headlineMedium,
-                )
-            } else {
-                Text(
-                    when (plan.mode) {
-                        ToolMode.MultiDiscOrganizer -> R.plurals.preview_multidisc_summary
-                        ToolMode.RomZipper -> R.plurals.preview_zip_summary
-                        ToolMode.Converter, ToolMode.VitaAppIds -> R.plurals.preview_items_summary
-                        ToolMode.EsDeSystems -> R.plurals.preview_systems_summary
-                    }.let { pluralStringResource(it, previewCount, previewCount, selectedCount) },
-                    style = MaterialTheme.typography.headlineMedium,
-                )
-                Button(
-                    onClick = onApply,
-                    enabled = !isBusy && selectedCount > 0,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.action_apply))
-                }
-            }
+private fun FileList(title: String, paths: List<String>, modifier: Modifier) {
+    val palette = LocalMimirPalette.current
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(title, style = MaterialTheme.typography.labelMedium, color = palette.textMuted)
+        paths.forEach { path ->
+            Text(path, style = MaterialTheme.typography.bodySmall, color = palette.text, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }
 }

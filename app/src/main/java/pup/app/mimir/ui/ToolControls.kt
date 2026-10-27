@@ -1,24 +1,24 @@
 package pup.app.mimir.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.key.Key
@@ -49,337 +50,260 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import pup.app.mimir.R
+import pup.app.mimir.data.EsDeSystem
 import pup.app.mimir.domain.ChdDiscType
 import pup.app.mimir.domain.ChdSystem
-import pup.app.mimir.domain.ConverterTool
 import pup.app.mimir.domain.FrontendPreset
+import pup.app.mimir.domain.VitaApp
 import pup.app.mimir.domain.VitaShortcutFormat
 
+/**
+ * The setup pane as one console panel: each setting is a row with its label on the left and its
+ * control on the right, separated by rules, so a tool's whole setup fits the handheld screen.
+ */
 @Composable
-internal fun ControlCard(
+internal fun SetupPanel(content: @Composable ColumnScope.() -> Unit) {
+    ConsolePanel(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp), content = content)
+}
+
+/** Which folder the tool reads or writes, and the button that changes it. */
+@Composable
+internal fun FolderRow(
+    label: String,
     folderName: String,
-    onSelectFolder: () -> Unit,
+    onSelect: () -> Unit,
+    enabled: Boolean = true,
+    primary: Boolean = true,
+    buttonModifier: Modifier = Modifier,
 ) {
-    StyledCard {
-        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Label(stringResource(R.string.control_title))
-            Text(stringResource(R.string.control_selected_rom_folder), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-            Text(folderName, style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Button(
-                onClick = onSelectFolder,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Icon(Icons.Outlined.Folder, contentDescription = null)
-                Spacer(Modifier.size(8.dp))
-                Text(stringResource(R.string.action_select_rom_folder))
-            }
+    val palette = LocalMimirPalette.current
+    // The folder gets the row's full width so a picked path is never cut short; the button sits under it.
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(label, style = MaterialTheme.typography.labelMedium, color = palette.textMuted)
+        Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Icon(Icons.Outlined.Folder, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
+            Text(folderName, style = MaterialTheme.typography.titleSmall, color = palette.text, maxLines = 3, overflow = TextOverflow.Ellipsis)
+        }
+        val buttonLabel = stringResource(R.string.action_choose_folder)
+        if (primary) {
+            InkButton(onClick = onSelect, enabled = enabled, modifier = buttonModifier) { Text(buttonLabel, maxLines = 1) }
+        } else {
+            OutlinedButton(onClick = onSelect, enabled = enabled, modifier = buttonModifier.focusRing()) { Text(buttonLabel, maxLines = 1) }
         }
     }
 }
 
+/** A setting's name on the left and its control on the right. */
 @Composable
-internal fun EsDeSystemsCard(
-    rootFolderName: String,
-    hasRootFolder: Boolean,
-    romRootFolderName: String,
-    systems: List<pup.app.mimir.data.EsDeSystem>,
-    isBusy: Boolean,
-    onSelectRomRoot: () -> Unit,
-    onSelectRoot: () -> Unit,
-    onRefresh: () -> Unit,
-    onApply: () -> Unit,
-    onPickFolder: (String) -> Unit,
-) {
-    StyledCard {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Label(stringResource(R.string.esde_title))
-            Text(stringResource(R.string.esde_selected_folder), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-            Text(rootFolderName, style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Button(onClick = onSelectRoot, enabled = !isBusy, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Outlined.Folder, contentDescription = null)
-                Spacer(Modifier.size(8.dp))
-                Text(stringResource(R.string.action_select_esde_folder))
-            }
-            Text(stringResource(R.string.esde_rom_root), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-            Text(romRootFolderName, style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            OutlinedButton(onClick = onSelectRomRoot, enabled = !isBusy, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Outlined.Folder, contentDescription = null)
-                Spacer(Modifier.size(8.dp))
-                Text(stringResource(R.string.action_select_rom_root))
-            }
-            OutlinedButton(
-                onClick = onRefresh,
-                enabled = !isBusy && hasRootFolder,
-                modifier = Modifier.fillMaxWidth(),
-            ) { Text(stringResource(R.string.action_download_xmls)) }
-            if (systems.isEmpty()) {
-                Text(
-                    stringResource(R.string.esde_download_hint),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.78f),
-                )
-            } else {
-                Text(stringResource(R.string.esde_rom_folders), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-                systems.forEach { system ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Text(system.fullName, style = MaterialTheme.typography.bodyLarge)
-                            Text(
-                                if (system.isDefault) stringResource(R.string.esde_default_folder) else system.romFolder,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
-                            )
-                        }
-                        OutlinedButton(
-                            onClick = { onPickFolder(system.name) },
-                            enabled = !isBusy,
-                        ) { Text(stringResource(R.string.action_choose_folder)) }
-                    }
-                }
-                Button(onClick = onApply, enabled = !isBusy, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.action_install_custom_systems))
-                }
-            }
+private fun OptionRow(label: String, detail: String? = null, control: @Composable () -> Unit) {
+    val palette = LocalMimirPalette.current
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(label, style = MaterialTheme.typography.titleSmall, color = palette.text)
+            if (detail != null) Text(detail, style = MaterialTheme.typography.bodySmall, color = palette.textMuted)
         }
+        control()
     }
 }
 
 @Composable
-@OptIn(ExperimentalLayoutApi::class)
-internal fun VitaControlCard(
-    outputFolderName: String,
-    onSelectVitaOutput: () -> Unit,
-    shortcutFormat: VitaShortcutFormat,
-    vitaQuery: String,
-    databaseSize: Int,
-    searchResults: List<pup.app.mimir.domain.VitaApp>,
-    addedShortcuts: Map<String, String>,
-    isBusy: Boolean,
-    onVitaQueryChanged: (String) -> Unit,
-    onVitaShortcutFormatSelected: (VitaShortcutFormat) -> Unit,
-    onVitaShortcutAdd: (pup.app.mimir.domain.VitaApp) -> Unit,
-    onVitaShortcutRemove: (pup.app.mimir.domain.VitaApp) -> Unit,
-) {
-    StyledCard {
-        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Label(stringResource(R.string.vita_title))
-            Text(
-                stringResource(R.string.vita_output_directory),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.secondary,
-            )
-            Text(outputFolderName, style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Button(
-                onClick = onSelectVitaOutput,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Icon(Icons.Outlined.Folder, contentDescription = null)
-                Spacer(Modifier.size(8.dp))
-                Text(stringResource(R.string.action_select_output_folder))
-            }
-            Text(
-                stringResource(R.string.vita_file_type),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.secondary,
-            )
-            ChoiceRow(
-                options = VitaShortcutFormat.entries,
-                selected = shortcutFormat,
-                enabled = !isBusy,
-                label = { it.displayName },
-                onSelect = onVitaShortcutFormatSelected,
-            )
-            Text(
-                stringResource(R.string.vita_cocoon_hint),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
-            )
-            Text(
-                stringResource(R.string.vita_database),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Text(pluralStringResource(R.plurals.vita_database_size, databaseSize, databaseSize), style = MaterialTheme.typography.bodyLarge)
-            SearchField(
-                query = vitaQuery,
-                onQueryChanged = onVitaQueryChanged,
-                label = stringResource(R.string.vita_search_label),
-            )
-            if (vitaQuery.isNotBlank()) {
-                Text(
-                    stringResource(R.string.vita_search_results),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    searchResults.forEach { app ->
-                        val added = addedShortcuts.containsKey(app.titleId)
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                            ),
-                            shape = RoundedCornerShape(12.dp),
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(12.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Column(
-                                    modifier = Modifier.weight(1f),
-                                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                                ) {
-                                    Text(app.title, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                                    Text(
-                                        app.titleId,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
-                                    )
-                                }
-                                if (added) {
-                                    IconButton(
-                                        onClick = { onVitaShortcutRemove(app) },
-                                        enabled = !isBusy,
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Outlined.Delete,
-                                            contentDescription = stringResource(R.string.vita_delete_shortcut, app.title),
-                                        )
-                                    }
-                                } else {
-                                    OutlinedButton(
-                                        onClick = { onVitaShortcutAdd(app) },
-                                        enabled = !isBusy,
-                                    ) {
-                                        Text(stringResource(R.string.action_quick_add))
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-internal fun OrganizerPresetCard(
+internal fun OrganizerOptions(
     selectedPreset: FrontendPreset,
     onPresetSelected: (FrontendPreset) -> Unit,
     scanHiddenFolders: Boolean,
     onScanHiddenFoldersChanged: (Boolean) -> Unit,
     enabled: Boolean,
 ) {
-    StyledCard {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Label(stringResource(R.string.organizer_frontend_target))
-            ChoiceRow(
-                options = FrontendPreset.entries,
-                selected = selectedPreset,
-                enabled = enabled,
-                label = { if (it == FrontendPreset.Other) stringResource(R.string.preset_other) else it.displayName },
-                onSelect = onPresetSelected,
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(stringResource(R.string.organizer_scan_hidden), style = MaterialTheme.typography.bodyLarge)
-                    Text(
-                        stringResource(R.string.organizer_scan_hidden_detail),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                    )
-                }
-                Switch(
-                    checked = scanHiddenFolders,
-                    onCheckedChange = if (enabled) onScanHiddenFoldersChanged else null,
-                )
-            }
-        }
+    PanelRule()
+    OptionRow(stringResource(R.string.organizer_frontend_target)) {
+        ChoiceRow(
+            options = FrontendPreset.entries,
+            selected = selectedPreset,
+            enabled = enabled,
+            label = { if (it == FrontendPreset.Other) stringResource(R.string.preset_other) else it.displayName },
+            onSelect = onPresetSelected,
+        )
+    }
+    PanelRule()
+    OptionRow(
+        label = stringResource(R.string.organizer_scan_hidden),
+        detail = stringResource(R.string.organizer_scan_hidden_detail),
+    ) {
+        Switch(checked = scanHiddenFolders, onCheckedChange = if (enabled) onScanHiddenFoldersChanged else null)
     }
 }
 
 @Composable
-internal fun NszKeysCard(
-    configured: Boolean,
-    enabled: Boolean,
-    onSelect: () -> Unit,
-) {
-    StyledCard {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(stringResource(R.string.nsz_keys_title), style = MaterialTheme.typography.titleMedium)
-            Text(
-                if (configured) {
-                    stringResource(R.string.nsz_keys_configured)
-                } else {
-                    stringResource(R.string.nsz_keys_missing)
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.78f),
-            )
-            Button(onClick = onSelect, enabled = enabled, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(if (configured) R.string.action_replace_keys else R.string.action_import_keys))
-            }
-        }
-    }
-}
-
-@Composable
-internal fun ConverterToolsOptionsCard(
-    selectedTool: ConverterTool,
+internal fun ChdOptions(
     system: ChdSystem,
     discType: ChdDiscType,
     enabled: Boolean,
     onSystemSelected: (ChdSystem) -> Unit,
     onDiscTypeSelected: (ChdDiscType) -> Unit,
 ) {
-    StyledCard {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (selectedTool == ConverterTool.Chd) {
-                Text(
-                    stringResource(R.string.chd_system),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                ChoiceRow(
-                    options = ChdSystem.entries,
-                    selected = system,
-                    enabled = enabled,
-                    label = { it.displayName },
-                    onSelect = onSystemSelected,
-                )
-                if (system == ChdSystem.PlayStation2) {
-                    Text(
-                        stringResource(R.string.chd_conversion_type),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                    ChoiceRow(
-                        options = ChdDiscType.entries,
-                        selected = discType,
-                        enabled = enabled,
-                        label = { it.displayName },
-                        onSelect = onDiscTypeSelected,
-                    )
-                    InfoPanel(
-                        title = stringResource(R.string.chd_compatibility_title),
-                        body = stringResource(R.string.chd_compatibility_body),
-                        accent = MaterialTheme.colorScheme.secondary,
-                    )
-                }
+    val palette = LocalMimirPalette.current
+    PanelRule()
+    // Six systems do not fit beside a label, so this one setting stacks.
+    Text(stringResource(R.string.chd_system), style = MaterialTheme.typography.titleSmall, color = palette.text)
+    ChoiceRow(
+        options = ChdSystem.entries,
+        selected = system,
+        enabled = enabled,
+        label = { it.displayName },
+        onSelect = onSystemSelected,
+    )
+    if (system == ChdSystem.PlayStation2) {
+        PanelRule()
+        OptionRow(stringResource(R.string.chd_conversion_type), detail = stringResource(R.string.chd_compatibility_body)) {
+            ChoiceRow(
+                options = ChdDiscType.entries,
+                selected = discType,
+                enabled = enabled,
+                label = { it.displayName },
+                onSelect = onDiscTypeSelected,
+            )
+        }
+    }
+}
+
+@Composable
+internal fun NszKeysRow(configured: Boolean, enabled: Boolean, onSelect: () -> Unit) {
+    PanelRule()
+    OptionRow(
+        label = stringResource(R.string.nsz_keys_title),
+        detail = stringResource(if (configured) R.string.nsz_keys_configured else R.string.nsz_keys_missing),
+    ) {
+        val label = stringResource(if (configured) R.string.action_replace_keys else R.string.action_import_keys)
+        if (configured) {
+            OutlinedButton(onClick = onSelect, enabled = enabled, modifier = Modifier.focusRing()) { Text(label, maxLines = 1) }
+        } else {
+            InkButton(onClick = onSelect, enabled = enabled) {
+                Icon(Icons.Outlined.Key, contentDescription = null, modifier = Modifier.size(18.dp))
+                Text(label, maxLines = 1, modifier = Modifier.padding(start = 6.dp))
             }
         }
     }
+}
+
+@Composable
+internal fun VitaFormatOptions(
+    shortcutFormat: VitaShortcutFormat,
+    enabled: Boolean,
+    onSelected: (VitaShortcutFormat) -> Unit,
+) {
+    PanelRule()
+    OptionRow(stringResource(R.string.vita_file_type), detail = stringResource(R.string.vita_cocoon_hint)) {
+        ChoiceRow(
+            options = VitaShortcutFormat.entries,
+            selected = shortcutFormat,
+            enabled = enabled,
+            label = { it.displayName },
+            onSelect = onSelected,
+        )
+    }
+}
+
+/** The Vita data pane: the built-in title database, searched and added to the output folder. */
+@Composable
+internal fun VitaDatabasePane(
+    vitaQuery: String,
+    databaseSize: Int,
+    searchResults: List<VitaApp>,
+    addedShortcuts: Map<String, String>,
+    isBusy: Boolean,
+    onVitaQueryChanged: (String) -> Unit,
+    onAdd: (VitaApp) -> Unit,
+    onRemove: (VitaApp) -> Unit,
+) {
+    val palette = LocalMimirPalette.current
+    Row(verticalAlignment = Alignment.Bottom) {
+        Text(stringResource(R.string.vita_database), style = MaterialTheme.typography.headlineSmall, color = palette.text, modifier = Modifier.weight(1f))
+        Text(
+            pluralStringResource(R.plurals.vita_database_size, databaseSize, databaseSize),
+            style = MaterialTheme.typography.labelLarge.copy(fontFeatureSettings = "tnum"),
+            color = palette.textMuted,
+        )
+    }
+    SearchField(query = vitaQuery, onQueryChanged = onVitaQueryChanged, label = stringResource(R.string.vita_search_label))
+    if (vitaQuery.isNotBlank()) {
+        searchResults.forEach { app ->
+            val added = addedShortcuts.containsKey(app.titleId)
+            DataRow(selected = added) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(app.title, style = MaterialTheme.typography.titleMedium, color = palette.text, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Text(app.titleId, style = MaterialTheme.typography.bodySmall.copy(fontFeatureSettings = "tnum"), color = palette.textMuted)
+                }
+                if (added) {
+                    IconButton(onClick = { onRemove(app) }, enabled = !isBusy, modifier = Modifier.focusRing(CircleShape)) {
+                        Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.vita_delete_shortcut, app.title), tint = palette.caution)
+                    }
+                } else {
+                    OutlinedButton(onClick = { onAdd(app) }, enabled = !isBusy, modifier = Modifier.focusRing()) {
+                        Text(stringResource(R.string.action_quick_add))
+                    }
+                }
+            }
+        }
+    } else {
+        EmptyPane(title = stringResource(R.string.vita_search_results), body = stringResource(R.string.vita_search_hint))
+    }
+}
+
+/** The ES-DE data pane: every detected system with the ROM folder it will point at. */
+@Composable
+internal fun EsDeSystemsPane(
+    systems: List<EsDeSystem>,
+    isBusy: Boolean,
+    onPickFolder: (String) -> Unit,
+) {
+    val palette = LocalMimirPalette.current
+    if (systems.isEmpty()) {
+        EmptyPane(title = stringResource(R.string.esde_rom_folders), body = stringResource(R.string.esde_download_hint))
+        return
+    }
+    Row(verticalAlignment = Alignment.Bottom) {
+        Text(stringResource(R.string.esde_rom_folders), style = MaterialTheme.typography.headlineSmall, color = palette.text, modifier = Modifier.weight(1f))
+        Text("${systems.size}", style = MaterialTheme.typography.labelLarge.copy(fontFeatureSettings = "tnum"), color = palette.textMuted)
+    }
+    systems.forEach { system ->
+        DataRow {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(system.fullName, style = MaterialTheme.typography.titleMedium, color = palette.text)
+                Text(
+                    if (system.isDefault) stringResource(R.string.esde_default_folder) else system.romFolder,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = palette.textMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            OutlinedButton(onClick = { onPickFolder(system.name) }, enabled = !isBusy, modifier = Modifier.focusRing()) {
+                Text(stringResource(R.string.action_choose_folder))
+            }
+        }
+    }
+}
+
+/** A row in a data pane, drawn like an entry in the memory card's file list. */
+@Composable
+internal fun DataRow(
+    modifier: Modifier = Modifier,
+    selected: Boolean = false,
+    content: @Composable RowScope.() -> Unit,
+) {
+    val palette = LocalMimirPalette.current
+    val ink = MaterialTheme.colorScheme.primary
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp)
+            .clip(MaterialTheme.shapes.small)
+            .background(if (selected) ink.copy(alpha = 0.1f) else palette.panel)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        content = content,
+    )
 }
 
 /**

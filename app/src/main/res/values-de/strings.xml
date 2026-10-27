@@ -1,37 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Mimir</string><string name="home">Startseite</string><string name="go_home">Zur Startseite</string><string name="toggle_dark_mode">Dunkelmodus umschalten</string><string name="status">Status</string><string name="open_tool">%1$s öffnen</string>
-    <string name="home_intro">Willkommen bei Mimir!</string><string name="home_prompt">Wähle unten ein Tool, um loszulegen</string><string name="home_prepare_library">Nützliche Tools</string><string name="home_make_room">Speicherplatz auf deinem Gerät sparen</string>
-    <string name="goal_fix_multidisc">Mehrdisc-Spiele reparieren</string><string name="tool_multidisc">Mehrdisc-Organisator</string><string name="tool_multidisc_description">Frontend-fertige Ordner und Wiedergabelisten erstellen.</string>
+    <string name="app_name">Mimir</string><string name="go_home">Zur Startseite</string><string name="toggle_dark_mode">Dunkelmodus umschalten</string><string name="open_tool">%1$s öffnen</string>
+<string name="home_prompt">Wähle unten ein Tool, um loszulegen</string>    <string name="goal_fix_multidisc">Mehrdisc-Spiele reparieren</string><string name="tool_multidisc">Mehrdisc-Organisator</string><string name="tool_multidisc_description">Frontend-fertige Ordner und Wiedergabelisten erstellen.</string>
     <string name="goal_create_vita_shortcuts">Vita-Verknüpfungen erstellen</string><string name="tool_vita_shortcuts">Vita-Verknüpfungen</string><string name="tool_vita_shortcuts_description">.psvita- oder .dpt-Verknüpfungen aus der integrierten Datenbank erstellen.</string>
     <string name="goal_setup_esde">ES-DE einrichten</string><string name="tool_esde_systems">ES-DE-Systeme</string><string name="tool_esde_systems_description">Benutzerdefinierte Systeme installieren und ihre ROM-Ordner zuordnen.</string>
     <string name="goal_convert_switch_packages">Switch-Pakete konvertieren</string><string name="tool_nsz_to_nsp">NSZ zu NSP</string><string name="tool_nsz_to_nsp_description">NSZ-Dateien in NSP-Pakete dekomprimieren.</string>
     <string name="goal_compress_cartridge_roms">Modul-ROMs komprimieren</string><string name="tool_romzipper">RomZipper</string><string name="tool_romzipper_description">Unterstützte Modul-ROMs als .zip-Dateien archivieren.</string>
     <string name="goal_compress_disc_images">Disc-Images komprimieren</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">PSX-, PS2-, PSP-, Saturn-, Dreamcast- und Sega-CD-Images in CHD konvertieren.</string>
     <string name="goal_shrink_gamecube_wii">GameCube- und Wii-Spiele verkleinern</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">ISO-Images in RVZ konvertieren.</string>
-    <string name="goal_shrink_3ds">Nintendo-3DS-Spiele verkleinern</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">Entschlüsselte 3DS- und CCI-Images in ZCCI komprimieren.</string><string name="goal_shrink_xbox">Xbox-Spiele verkleinern</string><string name="tool_xbox_xiso">Xbox XISO</string><string name="tool_xbox_xiso_description">Redump-Xbox-ISOs für Hakux und xemu zu XISO kürzen.</string><string name="tool_card_description">%1$s \u2022 %2$s</string>
-    <string name="no_rom_folder_selected">Kein ROM-Ordner ausgewählt</string><string name="no_vita_output_directory_selected">Kein Vita-Ausgabeordner ausgewählt</string><string name="no_esde_folder_selected">Kein ES-DE-Ordner ausgewählt</string>
+    <string name="goal_shrink_3ds">Nintendo-3DS-Spiele verkleinern</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">Entschlüsselte 3DS- und CCI-Images in ZCCI komprimieren.</string><string name="goal_shrink_xbox">Xbox-Spiele verkleinern</string><string name="tool_xbox_xiso">Xbox XISO</string><string name="tool_xbox_xiso_description">Redump-Xbox-ISOs für Hakux und xemu zu XISO kürzen.</string>    <string name="no_rom_folder_selected">Kein ROM-Ordner ausgewählt</string><string name="no_vita_output_directory_selected">Kein Vita-Ausgabeordner ausgewählt</string><string name="no_esde_folder_selected">Kein ES-DE-Ordner ausgewählt</string>
 
     <!-- Tool screens, dialogs and status messages. -->
-    <string name="action_cancel">ABBRECHEN</string>
+    <string name="action_cancel">Abbrechen</string>
     <string name="sort_name_ascending">Name A–Z</string>
     <string name="sort_name_descending">Name Z–A</string>
     <string name="sort_size_largest">Größte zuerst</string>
     <string name="sort_size_smallest">Kleinste zuerst</string>
-    <string name="queue_title">KONVERTIERUNGSWARTESCHLANGE</string>
-    <string name="action_select_all">ALLE AUSWÄHLEN</string>
-    <string name="action_deselect_all">AUSWAHL AUFHEBEN</string>
-    <string name="queue_sort_by">Sortieren nach</string>
-    <string name="storage_title">Speicher auf dem gescannten Gerät</string>
+    <string name="action_select_all">Alle auswählen</string>
+    <string name="action_deselect_all">Auswahl aufheben</string>
     <string name="storage_body">%1$s von %2$s frei. Diese Warteschlange benötigt etwa %3$s Arbeitsspeicherplatz.</string>
     <string name="storage_low_warning">Warnung: Möglicherweise ist nicht genug freier Speicher vorhanden, um die ausgewählte Warteschlange zu konvertieren. Hebe die Auswahl einiger Einträge auf oder schaffe zuerst Platz.</string>
-    <string name="queue_column_rom">ROM</string>
-    <string name="queue_column_size">GRÖSSE</string>
-    <string name="queue_column_output">AUSGABE</string>
     <string name="queue_existing_output">Ausgabe vorhanden – zum Ersetzen einzeln auswählen</string>
     <string name="replace_output_title">Vorhandene Ausgabe ersetzen?</string>
     <string name="replace_output_body_selected">%1$s ist bereits vorhanden und wird bei Auswahl überschrieben.</string>
-    <string name="action_replace_output">AUSGABE ERSETZEN</string>
+    <string name="action_replace_output">Ausgabe ersetzen</string>
     <string name="report_space_saved">Netto eingesparter Speicher: %1$s.</string>
     <string name="report_size_increase">Netto-Größenzunahme: %1$s.</string>
     <string name="report_no_size_change">Keine Netto-Größenänderung.</string>
@@ -44,15 +36,11 @@
     <string name="progress_converting">%1$s wird konvertiert: %2$d %%</string>
     <string name="progress_selected_image">Ausgewähltes Image</string>
     <string name="progress_queue">Warteschlange: Auftrag %1$d von %2$d</string>
-    <string name="action_stop_after_current">NACH AKTUELLER KONVERTIERUNG STOPPEN</string>
-    <string name="action_stop_now">JETZT STOPPEN</string>
-    <string name="support_title">MIMIR UNTERSTÜTZEN</string>
+    <string name="action_stop_after_current">Nach aktueller Konvertierung stoppen</string>
+    <string name="action_stop_now">Jetzt stoppen</string>
     <string name="support_body" formatted="false">Mimir ist und bleibt zu 100 % kostenlos und werbefrei. Wenn du mich unterstützen möchtest, schau gern bei meinem YouTube-Kanal vorbei oder spende.</string>
     <string name="home_footer">Entwickelt von RetroPup</string>
     <string name="app_logo">Mimir-Logo</string>
-    <string name="action_convert_selected">%1$d AUSGEWÄHLTE KONVERTIEREN</string>
-    <string name="action_apply_selected">%1$d AUSGEWÄHLTE ANWENDEN</string>
-    <string name="action_scan_folder">AUSGEWÄHLTEN ORDNER SCANNEN</string>
     <string name="apply_title_convert">Ausgewählte Images konvertieren?</string>
     <string name="apply_title_changes">Änderungen anwenden?</string>
     <plurals name="apply_body_changes">
@@ -74,20 +62,20 @@
     <string name="apply_body_cannot_undo">Mimir kann dies nicht rückgängig machen.</string>
     <string name="apply_delete_originals">Originaldateien löschen</string>
     <string name="apply_delete_originals_detail">Entfernt nach erfolgreicher Konvertierung auch Tracks im selben Ordner, auf die eine .cue- oder .gdi-Datei verweist.</string>
-    <string name="action_start_conversions">KONVERTIERUNGEN STARTEN</string>
-    <string name="action_apply_changes">ÄNDERUNGEN ANWENDEN</string>
+    <string name="action_start_conversions">Konvertierungen starten</string>
+    <string name="action_apply_changes">Änderungen anwenden</string>
     <string name="esde_install_title">Benutzerdefinierte Systeme installieren?</string>
     <plurals name="esde_install_body">
         <item quantity="one">Dadurch wird %1$d konfiguriertes System im Verzeichnis custom_systems des ausgewählten ES-DE-Ordners installiert. Vorhandene benutzerdefinierte Systemdateien können aktualisiert werden. Starte ES-DE nach der Installation neu.</item>
         <item quantity="other">Dadurch werden %1$d konfigurierte Systeme im Verzeichnis custom_systems des ausgewählten ES-DE-Ordners installiert. Vorhandene benutzerdefinierte Systemdateien können aktualisiert werden. Starte ES-DE nach der Installation neu.</item>
     </plurals>
-    <string name="action_install_systems">SYSTEME INSTALLIEREN</string>
+    <string name="action_install_systems">Systeme installieren</string>
     <string name="vita_add_title">Vita-Verknüpfung erstellen?</string>
     <string name="vita_add_body">Dadurch wird eine .%1$s-Verknüpfung für %2$s (%3$s) im ausgewählten Ausgabeordner erstellt.</string>
-    <string name="action_create_shortcut">VERKNÜPFUNG ERSTELLEN</string>
+    <string name="action_create_shortcut">Verknüpfung erstellen</string>
     <string name="vita_remove_title">Vita-Verknüpfung entfernen?</string>
     <string name="vita_remove_body">Dadurch wird die Verknüpfung für %1$s (%2$s) aus dem ausgewählten Ausgabeordner gelöscht.</string>
-    <string name="action_remove_shortcut">VERKNÜPFUNG ENTFERNEN</string>
+    <string name="action_remove_shortcut">Verknüpfung entfernen</string>
     <plurals name="chip_discs">
         <item quantity="one">%1$d DISC</item>
         <item quantity="other">%1$d DISCS</item>
@@ -96,7 +84,6 @@
     <string name="preview_sources">Quellen</string>
     <string name="preview_targets">Ziele</string>
     <string name="replace_output_body_convert">%1$s ist bereits vorhanden und wird überschrieben, wenn du dieses Image konvertierst.</string>
-    <string name="preview_title">VORSCHAU</string>
     <plurals name="preview_jobs_selected">
         <item quantity="one">%1$d Auftrag ausgewählt • %2$s</item>
         <item quantity="other">%1$d Aufträge ausgewählt • %2$s</item>
@@ -117,24 +104,14 @@
         <item quantity="one">%1$d System bereit; %2$d ausgewählt.</item>
         <item quantity="other">%1$d Systeme bereit; %2$d ausgewählt.</item>
     </plurals>
-    <string name="action_apply">ANWENDEN</string>
-    <string name="control_title">SYSTEMSTEUERUNG</string>
     <string name="control_selected_rom_folder">Ausgewählter ROM-Ordner</string>
-    <string name="action_select_rom_folder">ROM-ORDNER AUSWÄHLEN</string>
-    <string name="esde_title">ES-DE BENUTZERDEFINIERTE SYSTEME</string>
     <string name="esde_selected_folder">Ausgewählter ES-DE-Ordner</string>
-    <string name="action_select_esde_folder">ES-DE-ORDNER AUSWÄHLEN</string>
     <string name="esde_rom_root">ROM-Stammordner</string>
-    <string name="action_select_rom_root">ROM-STAMMORDNER AUSWÄHLEN</string>
-    <string name="action_download_xmls">NEUESTE XMLS HERUNTERLADEN</string>
     <string name="esde_download_hint">Lade die neuesten XMLs herunter, um die benutzerdefinierten Android-Systeme zu konfigurieren. Sie werden unter custom_systems installiert.</string>
     <string name="esde_rom_folders">ROM-Ordner</string>
     <string name="esde_default_folder">Standard</string>
-    <string name="action_choose_folder">ORDNER WÄHLEN</string>
-    <string name="action_install_custom_systems">BENUTZERDEFINIERTE SYSTEME INSTALLIEREN</string>
-    <string name="vita_title">VITA-VERKNÜPFUNGEN</string>
+    <string name="action_choose_folder">Ordner wählen</string>
     <string name="vita_output_directory">Ausgabeordner für Verknüpfungen</string>
-    <string name="action_select_output_folder">AUSGABEORDNER AUSWÄHLEN</string>
     <string name="vita_file_type">Dateityp der Verknüpfung</string>
     <string name="vita_cocoon_hint">Wähle für Cocoon .dpt</string>
     <string name="vita_database">Verknüpfungsdatenbank</string>
@@ -145,19 +122,18 @@
     <string name="vita_search_label">Titel oder App-ID suchen</string>
     <string name="vita_search_results">Suchergebnisse</string>
     <string name="vita_delete_shortcut">Verknüpfung für %1$s löschen</string>
-    <string name="action_quick_add">SCHNELL HINZUFÜGEN</string>
-    <string name="organizer_frontend_target">FRONTEND-ZIEL</string>
+    <string name="action_quick_add">Schnell hinzufügen</string>
+    <string name="organizer_frontend_target">Frontend-Ziel</string>
     <string name="preset_other">Andere</string>
     <string name="organizer_scan_hidden">Versteckte Ordner scannen</string>
     <string name="organizer_scan_hidden_detail">ROMs vor dem Organisieren aus Ordnern mit vorangestelltem Punkt in den Systemordner verschieben.</string>
     <string name="nsz_keys_title">NSZ-Schlüssel</string>
     <string name="nsz_keys_configured">prod.keys ist importiert und wird im privaten Speicher von Mimir aufbewahrt.</string>
     <string name="nsz_keys_missing">Importiere deine legal erworbene prod.keys-Datei, bevor du NSZ-Pakete scannst oder konvertierst.</string>
-    <string name="action_replace_keys">PROD.KEYS ERSETZEN</string>
-    <string name="action_import_keys">PROD.KEYS IMPORTIEREN</string>
+    <string name="action_replace_keys">prod.keys ersetzen</string>
+    <string name="action_import_keys">prod.keys importieren</string>
     <string name="chd_system">System</string>
     <string name="chd_conversion_type">Konvertierungsart</string>
-    <string name="chd_compatibility_title">Kompatibilitätshinweis</string>
     <string name="chd_compatibility_body">Verwende CD für NetherSX2 und DVD für ARMSX2.</string>
     <string name="msg_rom_path_unresolved">Der Pfad des ausgewählten ROM-Ordners konnte nicht ermittelt werden.</string>
     <string name="msg_select_esde_first">Wähle zuerst den ES-DE-Ordner aus.</string>
@@ -240,4 +216,40 @@
     <string name="apply_activity_shortcuts">Verknüpfungen werden erstellt</string>
     <string name="apply_activity_esde">ES-DE-Systeme werden aktualisiert</string>
     <string name="apply_progress">%1$s: %2$d von %3$d</string>
+
+    <!-- Memory-card shell: home, legend bar and empty states. -->
+    <string name="about_mimir">Über Mimir</string>
+    <string name="info_reads">Liest</string>
+    <string name="info_writes">Schreibt</string>
+    <string name="legend_open">Öffnen</string>
+    <string name="legend_theme">Design</string>
+    <string name="legend_select">Auswählen</string>
+    <string name="legend_back">Zurück</string>
+    <string name="legend_download">Herunterladen</string>
+    <string name="legend_install">Installieren</string>
+    <string name="legend_scan">Ordner scannen</string>
+    <plurals name="legend_convert">
+        <item quantity="one">%1$d konvertieren</item>
+        <item quantity="other">%1$d konvertieren</item>
+    </plurals>
+    <plurals name="legend_apply">
+        <item quantity="one">%1$d anwenden</item>
+        <item quantity="other">%1$d anwenden</item>
+    </plurals>
+    <string name="storage_free_header">%1$s frei</string>
+    <string name="vita_search_hint">Gib einen Spieltitel oder eine Titel-ID ein, etwa PCSB01256.</string>
+    <string name="data_no_folder_title">ROM-Ordner wählen</string>
+    <string name="data_no_folder_body">Wähle den Ordner, den Mimir lesen soll, und scanne ihn dann.</string>
+    <string name="data_not_scanned_title">Bereit zum Scannen</string>
+    <string name="data_not_scanned_body">Drücke X oder tippe auf „Ordner scannen“, um %1$s zu durchsuchen.</string>
+    <string name="data_nothing_found_title">Nichts zu ändern</string>
+    <string name="data_nothing_found_body">Mimir hat in diesem Ordner keine Dateien gefunden, die dieses Werkzeug bearbeiten kann.</string>
+
+    <!-- Legend labels with nothing selected. -->
+    <string name="legend_convert_idle">Konvertieren</string>
+    <string name="legend_apply_idle">Anwenden</string>
+
+    <!-- Memory-card slot names. -->
+    <string name="slot_utilities">Steckplatz 1 · Werkzeuge</string>
+    <string name="slot_space_savers">Steckplatz 2 · Platzsparer</string>
 </resources>

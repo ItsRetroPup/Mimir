@@ -2,15 +2,10 @@
 <resources>
     <!-- Default English resources. Locale-specific files such as values-fr/strings.xml override these. -->
     <string name="app_name">Mimir</string>
-    <string name="home">Home</string>
     <string name="go_home">Go home</string>
     <string name="toggle_dark_mode">Toggle dark mode</string>
-    <string name="status">Status</string>
     <string name="open_tool">Open %1$s</string>
-    <string name="home_intro">Welcome to Mimir!</string>
     <string name="home_prompt">Choose a tool from the list below to get started</string>
-    <string name="home_prepare_library">Some handy tools</string>
-    <string name="home_make_room">Save space on your device</string>
 
     <!-- Home tool cards: the goal is shown first; the backend name is supporting context. -->
     <string name="goal_fix_multidisc">Fix multi-disc games</string>
@@ -40,7 +35,6 @@
     <string name="goal_shrink_xbox">Shrink Xbox games</string>
     <string name="tool_xbox_xiso">Xbox XISO</string>
     <string name="tool_xbox_xiso_description">Trim Redump Xbox ISOs to XISO for Hakux and xemu.</string>
-    <string name="tool_card_description">%1$s \u2022 %2$s</string>
 
     <!-- Shared persisted labels. Do not translate filesystem names or extensions. -->
     <string name="no_rom_folder_selected">No ROM folder selected</string>
@@ -48,25 +42,19 @@
     <string name="no_esde_folder_selected">No ES-DE folder selected</string>
 
     <!-- Tool screens, dialogs and status messages. -->
-    <string name="action_cancel">CANCEL</string>
+    <string name="action_cancel">Cancel</string>
     <string name="sort_name_ascending">Name A–Z</string>
     <string name="sort_name_descending">Name Z–A</string>
     <string name="sort_size_largest">Size largest</string>
     <string name="sort_size_smallest">Size smallest</string>
-    <string name="queue_title">CONVERSION QUEUE</string>
-    <string name="action_select_all">SELECT ALL</string>
-    <string name="action_deselect_all">DESELECT ALL</string>
-    <string name="queue_sort_by">Sort by</string>
-    <string name="storage_title">Storage on scanned device</string>
+    <string name="action_select_all">Select all</string>
+    <string name="action_deselect_all">Deselect all</string>
     <string name="storage_body">%1$s free of %2$s. This queue needs about %3$s of working space.</string>
     <string name="storage_low_warning">Warning: there may not be enough free space to convert the selected queue. Deselect some items or free space first.</string>
-    <string name="queue_column_rom">ROM</string>
-    <string name="queue_column_size">SIZE</string>
-    <string name="queue_column_output">OUTPUT</string>
     <string name="queue_existing_output">Existing output — select individually to replace</string>
     <string name="replace_output_title">Replace existing output?</string>
     <string name="replace_output_body_selected">%1$s already exists and will be overwritten if selected.</string>
-    <string name="action_replace_output">REPLACE OUTPUT</string>
+    <string name="action_replace_output">Replace output</string>
     <string name="report_space_saved">Net space saved: %1$s.</string>
     <string name="report_size_increase">Net size increase: %1$s.</string>
     <string name="report_no_size_change">No net size change.</string>
@@ -79,15 +67,11 @@
     <string name="progress_converting">Converting %1$s: %2$d%%</string>
     <string name="progress_selected_image">selected image</string>
     <string name="progress_queue">Queue: job %1$d of %2$d</string>
-    <string name="action_stop_after_current">STOP AFTER CURRENT CONVERSION</string>
-    <string name="action_stop_now">STOP NOW</string>
-    <string name="support_title">SUPPORT MIMIR</string>
+    <string name="action_stop_after_current">Stop after current conversion</string>
+    <string name="action_stop_now">Stop now</string>
     <string name="support_body" formatted="false">Mimir is, and always will be, 100% free and without ads. If you would like to show your support, please consider checking out my YouTube channel or donating.</string>
     <string name="home_footer">Built by RetroPup</string>
     <string name="app_logo">Mimir logo</string>
-    <string name="action_convert_selected">CONVERT %1$d SELECTED</string>
-    <string name="action_apply_selected">APPLY %1$d SELECTED</string>
-    <string name="action_scan_folder">SCAN SELECTED FOLDER</string>
     <string name="apply_title_convert">Convert selected images?</string>
     <string name="apply_title_changes">Apply changes?</string>
     <plurals name="apply_body_changes">
@@ -109,20 +93,20 @@
     <string name="apply_body_cannot_undo">Mimir cannot undo this action.</string>
     <string name="apply_delete_originals">Delete original files</string>
     <string name="apply_delete_originals_detail">Also removes same-folder tracks referenced by a .cue or .gdi file after conversion succeeds.</string>
-    <string name="action_start_conversions">START CONVERSIONS</string>
-    <string name="action_apply_changes">APPLY CHANGES</string>
+    <string name="action_start_conversions">Start conversions</string>
+    <string name="action_apply_changes">Apply changes</string>
     <string name="esde_install_title">Install custom systems?</string>
     <plurals name="esde_install_body">
         <item quantity="one">This will install %1$d configured system in the selected ES-DE folder\'s custom_systems directory. Existing custom system files may be updated. Restart ES-DE after the install finishes.</item>
         <item quantity="other">This will install %1$d configured systems in the selected ES-DE folder\'s custom_systems directory. Existing custom system files may be updated. Restart ES-DE after the install finishes.</item>
     </plurals>
-    <string name="action_install_systems">INSTALL SYSTEMS</string>
+    <string name="action_install_systems">Install systems</string>
     <string name="vita_add_title">Create Vita shortcut?</string>
     <string name="vita_add_body">This will create a .%1$s shortcut for %2$s (%3$s) in the selected output folder.</string>
-    <string name="action_create_shortcut">CREATE SHORTCUT</string>
+    <string name="action_create_shortcut">Create shortcut</string>
     <string name="vita_remove_title">Remove Vita shortcut?</string>
     <string name="vita_remove_body">This will delete the shortcut for %1$s (%2$s) from the selected output folder.</string>
-    <string name="action_remove_shortcut">REMOVE SHORTCUT</string>
+    <string name="action_remove_shortcut">Remove shortcut</string>
     <plurals name="chip_discs">
         <item quantity="one">%1$d DISC</item>
         <item quantity="other">%1$d DISCS</item>
@@ -131,7 +115,6 @@
     <string name="preview_sources">Sources</string>
     <string name="preview_targets">Targets</string>
     <string name="replace_output_body_convert">%1$s already exists and will be overwritten if you convert this image.</string>
-    <string name="preview_title">PREVIEW</string>
     <plurals name="preview_jobs_selected">
         <item quantity="one">%1$d job selected • %2$s</item>
         <item quantity="other">%1$d jobs selected • %2$s</item>
@@ -152,24 +135,14 @@
         <item quantity="one">%1$d system ready; %2$d selected.</item>
         <item quantity="other">%1$d systems ready; %2$d selected.</item>
     </plurals>
-    <string name="action_apply">APPLY</string>
-    <string name="control_title">SYSTEM CONTROL</string>
     <string name="control_selected_rom_folder">Selected ROM folder</string>
-    <string name="action_select_rom_folder">SELECT ROM FOLDER</string>
-    <string name="esde_title">ES-DE CUSTOM SYSTEMS</string>
     <string name="esde_selected_folder">Selected ES-DE folder</string>
-    <string name="action_select_esde_folder">SELECT ES-DE FOLDER</string>
     <string name="esde_rom_root">ROM root folder</string>
-    <string name="action_select_rom_root">SELECT ROM ROOT</string>
-    <string name="action_download_xmls">DOWNLOAD LATEST XMLS</string>
     <string name="esde_download_hint">Download the latest XMLs to configure the custom Android systems. They will be installed under custom_systems.</string>
     <string name="esde_rom_folders">ROM folders</string>
     <string name="esde_default_folder">Default</string>
-    <string name="action_choose_folder">CHOOSE FOLDER</string>
-    <string name="action_install_custom_systems">INSTALL CUSTOM SYSTEMS</string>
-    <string name="vita_title">VITA SHORTCUTS</string>
+    <string name="action_choose_folder">Choose folder</string>
     <string name="vita_output_directory">Shortcut output directory</string>
-    <string name="action_select_output_folder">SELECT OUTPUT FOLDER</string>
     <string name="vita_file_type">Shortcut file type</string>
     <string name="vita_cocoon_hint">For Cocoon users, select .dpt</string>
     <string name="vita_database">Shortcut database</string>
@@ -180,19 +153,18 @@
     <string name="vita_search_label">Search title or app ID</string>
     <string name="vita_search_results">Search results</string>
     <string name="vita_delete_shortcut">Delete shortcut for %1$s</string>
-    <string name="action_quick_add">QUICK ADD</string>
-    <string name="organizer_frontend_target">FRONTEND TARGET</string>
+    <string name="action_quick_add">Quick add</string>
+    <string name="organizer_frontend_target">Frontend target</string>
     <string name="preset_other">Other</string>
     <string name="organizer_scan_hidden">Scan hidden folders</string>
     <string name="organizer_scan_hidden_detail">Extract ROMs from .-prefixed folders into the system folder before organizing.</string>
     <string name="nsz_keys_title">NSZ keys</string>
     <string name="nsz_keys_configured">prod.keys is imported and will be kept in Mimir\'s private storage.</string>
     <string name="nsz_keys_missing">Import your legally obtained prod.keys file before scanning or converting NSZ packages.</string>
-    <string name="action_replace_keys">REPLACE PROD.KEYS</string>
-    <string name="action_import_keys">IMPORT PROD.KEYS</string>
+    <string name="action_replace_keys">Replace prod.keys</string>
+    <string name="action_import_keys">Import prod.keys</string>
     <string name="chd_system">System</string>
     <string name="chd_conversion_type">Conversion type</string>
-    <string name="chd_compatibility_title">Compatibility guidance</string>
     <string name="chd_compatibility_body">Use CD when using NetherSX2; use DVD when using ARMSX2.</string>
     <string name="msg_rom_path_unresolved">Unable to resolve the selected ROM folder path.</string>
     <string name="msg_select_esde_first">Select the ES-DE folder first.</string>
@@ -275,4 +247,40 @@
     <string name="apply_activity_shortcuts">Creating shortcuts</string>
     <string name="apply_activity_esde">Updating ES-DE systems</string>
     <string name="apply_progress">%1$s: %2$d of %3$d</string>
+
+    <!-- Memory-card shell: home, legend bar and empty states. -->
+    <string name="about_mimir">About Mimir</string>
+    <string name="info_reads">Reads</string>
+    <string name="info_writes">Writes</string>
+    <string name="legend_open">Open</string>
+    <string name="legend_theme">Theme</string>
+    <string name="legend_select">Select</string>
+    <string name="legend_back">Back</string>
+    <string name="legend_download">Download</string>
+    <string name="legend_install">Install</string>
+    <string name="legend_scan">Scan folder</string>
+    <plurals name="legend_convert">
+        <item quantity="one">Convert %1$d</item>
+        <item quantity="other">Convert %1$d</item>
+    </plurals>
+    <plurals name="legend_apply">
+        <item quantity="one">Apply %1$d</item>
+        <item quantity="other">Apply %1$d</item>
+    </plurals>
+    <string name="storage_free_header">%1$s free</string>
+    <string name="vita_search_hint">Type a game title or a title ID, such as PCSB01256.</string>
+    <string name="data_no_folder_title">Choose a ROM folder</string>
+    <string name="data_no_folder_body">Pick the folder Mimir should read, then scan it.</string>
+    <string name="data_not_scanned_title">Ready to scan</string>
+    <string name="data_not_scanned_body">Press X or tap Scan folder to look through %1$s.</string>
+    <string name="data_nothing_found_title">Nothing to change</string>
+    <string name="data_nothing_found_body">Mimir found no files this tool can work on in that folder.</string>
+
+    <!-- Legend labels with nothing selected. -->
+    <string name="legend_convert_idle">Convert</string>
+    <string name="legend_apply_idle">Apply</string>
+
+    <!-- Memory-card slot names. -->
+    <string name="slot_utilities">Slot 1 · Utilities</string>
+    <string name="slot_space_savers">Slot 2 · Space savers</string>
 </resources>

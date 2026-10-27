@@ -114,10 +114,13 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             val catalog = runCatching { repository.loadVitaShortcutCatalog() }.getOrElse { emptyList() }
             vitaCatalog = catalog
+            val storage = _uiState.value.selectedFolderUri?.let(repository::storageInfo)
+                ?: repository.primaryStorageInfo()
             _uiState.update {
                 it.copy(
                     vitaDatabaseSize = catalog.size,
                     vitaSearchResults = emptyList(),
+                    storageInfo = storage ?: it.storageInfo,
                 )
             }
             val existingOutputUri = _uiState.value.vitaOutputUri
@@ -477,7 +480,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                 selectedFolderName = label,
                 previewPlan = null,
                 selectedChangePaths = emptySet(),
-                storageInfo = null,
+                storageInfo = repository.storageInfo(uri),
                 message = null,
             )
         }

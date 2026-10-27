@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mimir</string>
-    <string name="home">Accueil</string>
     <string name="go_home">Retour à l’accueil</string>
     <string name="toggle_dark_mode">Activer ou désactiver le mode sombre</string>
-    <string name="status">État</string>
     <string name="open_tool">Ouvrir %1$s</string>
-    <string name="home_intro">Bienvenue dans Mimir !</string>
     <string name="home_prompt">Choisissez un outil dans la liste ci-dessous pour commencer</string>
-    <string name="home_prepare_library">Outils pratiques</string>
-    <string name="home_make_room">Libérez de l’espace sur votre appareil</string>
 
     <string name="goal_fix_multidisc">Corriger les jeux multidisques</string>
     <string name="tool_multidisc">Organiseur multidisque</string>
@@ -38,32 +33,25 @@
     <string name="goal_shrink_xbox">Réduire les jeux Xbox</string>
     <string name="tool_xbox_xiso">Xbox XISO</string>
     <string name="tool_xbox_xiso_description">Réduire les ISO Xbox Redump au format XISO pour Hakux et xemu.</string>
-    <string name="tool_card_description">%1$s \u2022 %2$s</string>
 
     <string name="no_rom_folder_selected">Aucun dossier de ROMs sélectionné</string>
     <string name="no_vita_output_directory_selected">Aucun dossier de sortie Vita sélectionné</string>
     <string name="no_esde_folder_selected">Aucun dossier ES-DE sélectionné</string>
 
     <!-- Tool screens, dialogs and status messages. -->
-    <string name="action_cancel">ANNULER</string>
+    <string name="action_cancel">Annuler</string>
     <string name="sort_name_ascending">Nom A–Z</string>
     <string name="sort_name_descending">Nom Z–A</string>
     <string name="sort_size_largest">Plus volumineux</string>
     <string name="sort_size_smallest">Moins volumineux</string>
-    <string name="queue_title">FILE DE CONVERSION</string>
-    <string name="action_select_all">TOUT SÉLECTIONNER</string>
-    <string name="action_deselect_all">TOUT DÉSÉLECTIONNER</string>
-    <string name="queue_sort_by">Trier par</string>
-    <string name="storage_title">Stockage de l\'appareil analysé</string>
+    <string name="action_select_all">Tout sélectionner</string>
+    <string name="action_deselect_all">Tout désélectionner</string>
     <string name="storage_body">%1$s libres sur %2$s. Cette file nécessite environ %3$s d\'espace de travail.</string>
     <string name="storage_low_warning">Attention : l\'espace libre risque d\'être insuffisant pour convertir la file sélectionnée. Désélectionnez certains éléments ou libérez de l\'espace d\'abord.</string>
-    <string name="queue_column_rom">ROM</string>
-    <string name="queue_column_size">TAILLE</string>
-    <string name="queue_column_output">SORTIE</string>
     <string name="queue_existing_output">Sortie existante – sélectionnez individuellement pour la remplacer</string>
     <string name="replace_output_title">Remplacer la sortie existante ?</string>
     <string name="replace_output_body_selected">%1$s existe déjà et sera écrasé si sélectionné.</string>
-    <string name="action_replace_output">REMPLACER LA SORTIE</string>
+    <string name="action_replace_output">Remplacer la sortie</string>
     <string name="report_space_saved">Espace net économisé : %1$s.</string>
     <string name="report_size_increase">Augmentation nette de taille : %1$s.</string>
     <string name="report_no_size_change">Aucune variation nette de taille.</string>
@@ -77,15 +65,11 @@
     <string name="progress_converting">Conversion de %1$s : %2$d %%</string>
     <string name="progress_selected_image">l\'image sélectionnée</string>
     <string name="progress_queue">File : tâche %1$d sur %2$d</string>
-    <string name="action_stop_after_current">ARRÊTER APRÈS LA CONVERSION EN COURS</string>
-    <string name="action_stop_now">ARRÊTER MAINTENANT</string>
-    <string name="support_title">SOUTENIR MIMIR</string>
+    <string name="action_stop_after_current">Arrêter après la conversion en cours</string>
+    <string name="action_stop_now">Arrêter maintenant</string>
     <string name="support_body" formatted="false">Mimir est, et restera toujours, 100 % gratuit et sans publicité. Si vous souhaitez me soutenir, n\'hésitez pas à découvrir ma chaîne YouTube ou à faire un don.</string>
     <string name="home_footer">Créé par RetroPup</string>
     <string name="app_logo">Logo de Mimir</string>
-    <string name="action_convert_selected">CONVERTIR %1$d SÉLECTIONNÉS</string>
-    <string name="action_apply_selected">APPLIQUER %1$d SÉLECTIONNÉS</string>
-    <string name="action_scan_folder">ANALYSER LE DOSSIER SÉLECTIONNÉ</string>
     <string name="apply_title_convert">Convertir les images sélectionnées ?</string>
     <string name="apply_title_changes">Appliquer les modifications ?</string>
     <plurals name="apply_body_changes">
@@ -111,21 +95,21 @@
     <string name="apply_body_cannot_undo">Mimir ne peut pas annuler cette action.</string>
     <string name="apply_delete_originals">Supprimer les fichiers d\'origine</string>
     <string name="apply_delete_originals_detail">Supprime également les pistes du même dossier référencées par un fichier .cue ou .gdi une fois la conversion réussie.</string>
-    <string name="action_start_conversions">LANCER LES CONVERSIONS</string>
-    <string name="action_apply_changes">APPLIQUER LES MODIFICATIONS</string>
+    <string name="action_start_conversions">Lancer les conversions</string>
+    <string name="action_apply_changes">Appliquer les modifications</string>
     <string name="esde_install_title">Installer les systèmes personnalisés ?</string>
     <plurals name="esde_install_body">
         <item quantity="one">%1$d système configuré sera installé dans le répertoire custom_systems du dossier ES-DE sélectionné. Les fichiers de systèmes personnalisés existants peuvent être mis à jour. Redémarrez ES-DE une fois l\'installation terminée.</item>
         <item quantity="many">%1$d systèmes configurés seront installés dans le répertoire custom_systems du dossier ES-DE sélectionné. Les fichiers de systèmes personnalisés existants peuvent être mis à jour. Redémarrez ES-DE une fois l\'installation terminée.</item>
         <item quantity="other">%1$d systèmes configurés seront installés dans le répertoire custom_systems du dossier ES-DE sélectionné. Les fichiers de systèmes personnalisés existants peuvent être mis à jour. Redémarrez ES-DE une fois l\'installation terminée.</item>
     </plurals>
-    <string name="action_install_systems">INSTALLER LES SYSTÈMES</string>
+    <string name="action_install_systems">Installer les systèmes</string>
     <string name="vita_add_title">Créer un raccourci Vita ?</string>
     <string name="vita_add_body">Un raccourci .%1$s pour %2$s (%3$s) sera créé dans le dossier de sortie sélectionné.</string>
-    <string name="action_create_shortcut">CRÉER LE RACCOURCI</string>
+    <string name="action_create_shortcut">Créer le raccourci</string>
     <string name="vita_remove_title">Supprimer le raccourci Vita ?</string>
     <string name="vita_remove_body">Le raccourci de %1$s (%2$s) sera supprimé du dossier de sortie sélectionné.</string>
-    <string name="action_remove_shortcut">SUPPRIMER LE RACCOURCI</string>
+    <string name="action_remove_shortcut">Supprimer le raccourci</string>
     <plurals name="chip_discs">
         <item quantity="one">%1$d DISQUE</item>
         <item quantity="many">%1$d DISQUES</item>
@@ -135,7 +119,6 @@
     <string name="preview_sources">Sources</string>
     <string name="preview_targets">Cibles</string>
     <string name="replace_output_body_convert">%1$s existe déjà et sera écrasé si vous convertissez cette image.</string>
-    <string name="preview_title">APERÇU</string>
     <plurals name="preview_jobs_selected">
         <item quantity="one">%1$d tâche sélectionnée • %2$s</item>
         <item quantity="many">%1$d tâches sélectionnées • %2$s</item>
@@ -161,24 +144,14 @@
         <item quantity="many">%1$d systèmes prêts ; %2$d sélectionné(s).</item>
         <item quantity="other">%1$d systèmes prêts ; %2$d sélectionné(s).</item>
     </plurals>
-    <string name="action_apply">APPLIQUER</string>
-    <string name="control_title">CONTRÔLE DU SYSTÈME</string>
     <string name="control_selected_rom_folder">Dossier de ROM sélectionné</string>
-    <string name="action_select_rom_folder">SÉLECTIONNER LE DOSSIER DE ROM</string>
-    <string name="esde_title">SYSTÈMES PERSONNALISÉS ES-DE</string>
     <string name="esde_selected_folder">Dossier ES-DE sélectionné</string>
-    <string name="action_select_esde_folder">SÉLECTIONNER LE DOSSIER ES-DE</string>
     <string name="esde_rom_root">Dossier racine des ROM</string>
-    <string name="action_select_rom_root">SÉLECTIONNER LA RACINE DES ROM</string>
-    <string name="action_download_xmls">TÉLÉCHARGER LES DERNIERS XML</string>
     <string name="esde_download_hint">Téléchargez les derniers XML pour configurer les systèmes Android personnalisés. Ils seront installés dans custom_systems.</string>
     <string name="esde_rom_folders">Dossiers de ROM</string>
     <string name="esde_default_folder">Par défaut</string>
-    <string name="action_choose_folder">CHOISIR UN DOSSIER</string>
-    <string name="action_install_custom_systems">INSTALLER LES SYSTÈMES PERSONNALISÉS</string>
-    <string name="vita_title">RACCOURCIS VITA</string>
+    <string name="action_choose_folder">Choisir un dossier</string>
     <string name="vita_output_directory">Dossier de sortie des raccourcis</string>
-    <string name="action_select_output_folder">SÉLECTIONNER LE DOSSIER DE SORTIE</string>
     <string name="vita_file_type">Type de fichier de raccourci</string>
     <string name="vita_cocoon_hint">Pour Cocoon, sélectionnez .dpt</string>
     <string name="vita_database">Base de données des raccourcis</string>
@@ -190,19 +163,18 @@
     <string name="vita_search_label">Rechercher un titre ou un ID d\'app</string>
     <string name="vita_search_results">Résultats de recherche</string>
     <string name="vita_delete_shortcut">Supprimer le raccourci de %1$s</string>
-    <string name="action_quick_add">AJOUT RAPIDE</string>
-    <string name="organizer_frontend_target">FRONTEND CIBLE</string>
+    <string name="action_quick_add">Ajout rapide</string>
+    <string name="organizer_frontend_target">Frontend cible</string>
     <string name="preset_other">Autre</string>
     <string name="organizer_scan_hidden">Analyser les dossiers masqués</string>
     <string name="organizer_scan_hidden_detail">Extrait les ROM des dossiers commençant par un point vers le dossier du système avant l\'organisation.</string>
     <string name="nsz_keys_title">Clés NSZ</string>
     <string name="nsz_keys_configured">prod.keys est importé et sera conservé dans le stockage privé de Mimir.</string>
     <string name="nsz_keys_missing">Importez votre fichier prod.keys obtenu légalement avant d\'analyser ou de convertir des paquets NSZ.</string>
-    <string name="action_replace_keys">REMPLACER PROD.KEYS</string>
-    <string name="action_import_keys">IMPORTER PROD.KEYS</string>
+    <string name="action_replace_keys">Remplacer prod.keys</string>
+    <string name="action_import_keys">Importer prod.keys</string>
     <string name="chd_system">Système</string>
     <string name="chd_conversion_type">Type de conversion</string>
-    <string name="chd_compatibility_title">Conseils de compatibilité</string>
     <string name="chd_compatibility_body">Utilisez CD avec NetherSX2 et DVD avec ARMSX2.</string>
     <string name="msg_rom_path_unresolved">Impossible de résoudre le chemin du dossier de ROM sélectionné.</string>
     <string name="msg_select_esde_first">Sélectionnez d\'abord le dossier ES-DE.</string>
@@ -293,4 +265,42 @@
     <string name="apply_activity_shortcuts">Création des raccourcis</string>
     <string name="apply_activity_esde">Mise à jour des systèmes ES-DE</string>
     <string name="apply_progress">%1$s : %2$d sur %3$d</string>
+
+    <!-- Memory-card shell: home, legend bar and empty states. -->
+    <string name="about_mimir">À propos de Mimir</string>
+    <string name="info_reads">Lit</string>
+    <string name="info_writes">Écrit</string>
+    <string name="legend_open">Ouvrir</string>
+    <string name="legend_theme">Thème</string>
+    <string name="legend_select">Sélectionner</string>
+    <string name="legend_back">Retour</string>
+    <string name="legend_download">Télécharger</string>
+    <string name="legend_install">Installer</string>
+    <string name="legend_scan">Analyser le dossier</string>
+    <plurals name="legend_convert">
+        <item quantity="one">Convertir %1$d</item>
+        <item quantity="many">Convertir %1$d</item>
+        <item quantity="other">Convertir %1$d</item>
+    </plurals>
+    <plurals name="legend_apply">
+        <item quantity="one">Appliquer %1$d</item>
+        <item quantity="many">Appliquer %1$d</item>
+        <item quantity="other">Appliquer %1$d</item>
+    </plurals>
+    <string name="storage_free_header">%1$s libres</string>
+    <string name="vita_search_hint">Saisissez le titre d\'un jeu ou un ID de titre, comme PCSB01256.</string>
+    <string name="data_no_folder_title">Choisissez un dossier de ROM</string>
+    <string name="data_no_folder_body">Choisissez le dossier que Mimir doit lire, puis analysez-le.</string>
+    <string name="data_not_scanned_title">Prêt pour l\'analyse</string>
+    <string name="data_not_scanned_body">Appuyez sur X ou touchez Analyser le dossier pour parcourir %1$s.</string>
+    <string name="data_nothing_found_title">Rien à modifier</string>
+    <string name="data_nothing_found_body">Mimir n\'a trouvé dans ce dossier aucun fichier que cet outil peut traiter.</string>
+
+    <!-- Legend labels with nothing selected. -->
+    <string name="legend_convert_idle">Convertir</string>
+    <string name="legend_apply_idle">Appliquer</string>
+
+    <!-- Memory-card slot names. -->
+    <string name="slot_utilities">Emplacement 1 · Utilitaires</string>
+    <string name="slot_space_savers">Emplacement 2 · Gain de place</string>
 </resources>
