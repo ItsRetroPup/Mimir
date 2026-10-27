@@ -4,7 +4,6 @@ import android.app.Application
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.util.Log
-import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,15 +23,11 @@ import pup.app.mimir.data.PlanExecutor
 import pup.app.mimir.data.RomTreeRepository
 import pup.app.mimir.data.StopRequest
 import pup.app.mimir.domain.ChdDiscType
-import pup.app.mimir.domain.ChdPlanner
 import pup.app.mimir.domain.ChdSystem
 import pup.app.mimir.domain.ConverterTool
 import pup.app.mimir.domain.FileOperation
 import pup.app.mimir.domain.FrontendPreset
-import pup.app.mimir.domain.NativeConverterPlanner
 import pup.app.mimir.domain.OperationPlan
-import pup.app.mimir.domain.RomScanner
-import pup.app.mimir.domain.RomZipperPlanner
 import pup.app.mimir.domain.ToolMode
 import pup.app.mimir.domain.VitaAppIdPlanner
 import pup.app.mimir.domain.VitaShortcutFormat
@@ -86,6 +81,8 @@ data class ConversionReport(
 
 class MimirViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = RomTreeRepository(application)
+    private val strings = AppStrings(application)
+    private val planBuilder = ToolPlanBuilder(repository, strings)
     private val executor = PlanExecutor(application)
     private val esDeRepository = EsDeSystemsRepository(application)
     private val prefs = application.getSharedPreferences("mimir_prefs", 0)
@@ -204,7 +201,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         it.copy(
                             isBusy = false,
                             esDeSystems = mergeEsDeOverrides(systems, it.esDeSystems),
-                            message = StatusMessage(plural(R.plurals.msg_esde_downloaded, systems.size, systems.size)),
+                            message = StatusMessage(strings.plural(R.plurals.msg_esde_downloaded, systems.size, systems.size)),
                         )
                     }
                     esDeLatestRequested = true
@@ -249,7 +246,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             }
                 .onSuccess { count ->
                     esDeLatestRequested = false
-                    _uiState.update { it.copy(isBusy = false, message = StatusMessage(plural(R.plurals.msg_esde_installed, count, count))) }
+                    _uiState.update { it.copy(isBusy = false, message = StatusMessage(strings.plural(R.plurals.msg_esde_installed, count, count))) }
                 }
                 .onFailure { error ->
                     Log.e(TAG, "Unable to install ES-DE systems", error)
@@ -414,7 +411,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                 _uiState.update {
                     it.copy(
                         isBusy = false,
-                        message = StatusMessage(plan.conflicts.firstOrNull() ?: text(R.string.msg_vita_add_unable, app.title), isError = true),
+                        message = StatusMessage(plan.conflicts.firstOrNull() ?: strings.text(R.string.msg_vita_add_unable, app.title), isError = true),
                     )
                 }
                 return@launch
@@ -510,17 +507,17 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             _uiState.update { it.copy(isBusy = true, message = null) }
             runCatching {
                 val parent = nszKeysFile.parentFile
-                    ?: error(text(R.string.msg_keys_directory_failed))
-                require(parent.exists() || parent.mkdirs()) { text(R.string.msg_keys_directory_failed) }
+                    ?: error(strings.text(R.string.msg_keys_directory_failed))
+                require(parent.exists() || parent.mkdirs()) { strings.text(R.string.msg_keys_directory_failed) }
                 val temporary = File(parent, "prod.keys.importing")
                 getApplication<Application>().contentResolver.openInputStream(uri).use { input ->
-                    requireNotNull(input) { text(R.string.msg_keys_unreadable) }
+                    requireNotNull(input) { strings.text(R.string.msg_keys_unreadable) }
                     temporary.outputStream().use { output -> input.copyTo(output) }
                 }
-                require(temporary.length() > 0L) { text(R.string.msg_keys_empty) }
+                require(temporary.length() > 0L) { strings.text(R.string.msg_keys_empty) }
                 if (!temporary.renameTo(nszKeysFile)) {
                     temporary.copyTo(nszKeysFile, overwrite = true)
-                    require(temporary.delete()) { text(R.string.msg_keys_finish_failed) }
+                    require(temporary.delete()) { strings.text(R.string.msg_keys_finish_failed) }
                 }
             }
                 .onSuccess {
@@ -568,91 +565,18 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             _uiState.update {
                 it.copy(
                     isBusy = true,
-                    scanProgressLabel = initialScanLabel(mode),
+                    scanProgressLabel = planBuilder.initialLabel(currentState),
                     message = null,
                     stopRequest = StopRequest.None,
                 )
             }
             runCatching {
-                val plan = when (mode) {
-                    ToolMode.MultiDiscOrganizer -> {
-                        val entries = repository.scanTree(
-                            rootUri = requireNotNull(romUri),
-                            scanHiddenFolders = _uiState.value.scanHiddenFolders,
-                            onFileScanned = { scannedFiles -> updateScanProgress(mode, scannedFiles) },
-                            shouldStop = cancellation::shouldInterruptCurrentOperation,
-                        )
-                        _uiState.update {
-                            it.copy(scanProgressLabel = plural(R.plurals.scan_checking_multidisc, entries.size, entries.size))
-                        }
-                        val scanResult = RomScanner.scan(entries)
-                        pup.app.mimir.domain.ChangePlanner.buildPlan(
-                            scanResult = scanResult,
-                            preset = _uiState.value.selectedPreset,
-                        )
-                    }
-
-                    ToolMode.RomZipper -> {
-                        val entries = repository.scanTree(
-                            rootUri = requireNotNull(romUri),
-                            onFileScanned = { scannedFiles -> updateScanProgress(mode, scannedFiles) },
-                            shouldStop = cancellation::shouldInterruptCurrentOperation,
-                        )
-                        _uiState.update {
-                            it.copy(scanProgressLabel = plural(R.plurals.scan_checking_zip, entries.size, entries.size))
-                        }
-                        RomZipperPlanner.buildPlan(entries)
-                    }
-
-                    ToolMode.Converter -> {
-                        when (currentState.selectedConverterTool) {
-                            ConverterTool.Chd -> {
-                                val entries = repository.scanChdTree(
-                                    rootUri = requireNotNull(romUri),
-                                    folderAliases = currentState.selectedChdSystem.folderAliases,
-                                    supportedExtensions = currentState.selectedChdSystem.supportedExtensions,
-                                    onFileScanned = { scannedFiles -> updateScanProgress(mode, scannedFiles) },
-                                    shouldStop = cancellation::shouldInterruptCurrentOperation,
-                                )
-                                _uiState.update {
-                                    it.copy(scanProgressLabel = plural(R.plurals.scan_checking_chd, entries.size, entries.size, currentState.selectedChdSystem.displayName))
-                                }
-                                ChdPlanner.buildPlan(
-                                    entries = entries,
-                                    system = currentState.selectedChdSystem,
-                                    discType = currentState.selectedChdDiscType,
-                                    deleteOriginalFiles = currentState.deleteOriginalChdFiles,
-                                )
-                            }
-                            else -> {
-                                val tool = currentState.selectedConverterTool
-                                val scannedEntries = repository.scanChdTree(
-                                    rootUri = requireNotNull(romUri),
-                                    folderAliases = tool.folderAliases,
-                                    supportedExtensions = tool.sourceExtensions,
-                                    outputExtension = tool.outputExtension,
-                                    onFileScanned = { scannedFiles -> updateScanProgress(mode, scannedFiles) },
-                                    shouldStop = cancellation::shouldInterruptCurrentOperation,
-                                )
-                                _uiState.update {
-                                    it.copy(scanProgressLabel = plural(R.plurals.scan_checking_tool, scannedEntries.size, scannedEntries.size, tool.displayName))
-                                }
-                                val entries = if (tool == ConverterTool.XboxXiso) {
-                                    repository.filterXboxImagesNeedingXiso(
-                                        rootUri = requireNotNull(romUri),
-                                        entries = scannedEntries,
-                                        shouldStop = cancellation::shouldInterruptCurrentOperation,
-                                    )
-                                } else {
-                                    scannedEntries
-                                }
-                                NativeConverterPlanner.buildPlan(entries, tool)
-                            }
-                        }
-                    }
-
-                    ToolMode.VitaAppIds, ToolMode.EsDeSystems -> error("This tool does not use ROM scanning.")
-                }
+                val plan = planBuilder.build(
+                    state = currentState,
+                    romUri = requireNotNull(romUri),
+                    cancellation = cancellation,
+                    onProgressLabel = { label -> _uiState.update { it.copy(scanProgressLabel = label) } },
+                )
                 val previewCount = plan.changes.size
                 _uiState.update {
                     it.copy(
@@ -666,17 +590,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         selectedChangePaths = plan.changes
                             .filterNot { mode == ToolMode.Converter && it.targetAlreadyExists }
                             .mapTo(linkedSetOf()) { it.detailPath },
-                        message = if (plan.changes.isEmpty()) {
-                            when (mode) {
-                                ToolMode.MultiDiscOrganizer -> info(R.string.msg_none_multidisc)
-                                ToolMode.RomZipper -> info(R.string.msg_none_zip)
-                                ToolMode.Converter -> info(R.string.msg_none_converter, currentState.selectedConverterTool.displayName)
-                                ToolMode.VitaAppIds -> info(R.string.msg_none_vita)
-                                ToolMode.EsDeSystems -> info(R.string.msg_none_esde)
-                            }
-                        } else {
-                            null
-                        },
+                        message = if (plan.changes.isEmpty()) StatusMessage(planBuilder.emptyResultText(currentState)) else null,
                         stopRequest = StopRequest.None,
                     )
                 }
@@ -790,7 +704,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                             stopRequest = StopRequest.None,
                             message = if (result.stopped) {
                                 StatusMessage(
-                                    plural(R.plurals.msg_stopped_after, plan.operations.size, result.completedOperations, plan.operations.size),
+                                    strings.plural(R.plurals.msg_stopped_after, plan.operations.size, result.completedOperations, plan.operations.size),
                                 )
                             } else {
                                 info(R.string.msg_changes_applied)
@@ -842,21 +756,14 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         private const val KEY_DELETE_ORIGINAL_CHD_FILES = "delete_original_chd_files"
         private const val NSZ_KEYS_RELATIVE_PATH = "nsz/prod.keys"
         private const val MAX_VITA_RESULTS = 40
-        private const val SCAN_PROGRESS_UPDATE_INTERVAL = 25
     }
 
-    private fun text(@StringRes id: Int, vararg args: Any): String =
-        getApplication<Application>().getString(id, *args)
+    private fun info(@StringRes id: Int, vararg args: Any) = StatusMessage(strings.text(id, *args))
 
-    private fun plural(@PluralsRes id: Int, count: Int, vararg args: Any): String =
-        getApplication<Application>().resources.getQuantityString(id, count, *args)
-
-    private fun info(@StringRes id: Int, vararg args: Any) = StatusMessage(text(id, *args))
-
-    private fun failure(@StringRes id: Int, vararg args: Any) = StatusMessage(text(id, *args), isError = true)
+    private fun failure(@StringRes id: Int, vararg args: Any) = StatusMessage(strings.text(id, *args), isError = true)
 
     private fun failure(error: Throwable, @StringRes fallback: Int) =
-        StatusMessage(error.message ?: text(fallback), isError = true)
+        StatusMessage(error.message ?: strings.text(fallback), isError = true)
 
     private fun treeLabel(uri: Uri): String =
         DocumentsContract.getTreeDocumentId(uri).substringAfterLast(':')
@@ -901,38 +808,15 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun initialScanLabel(mode: ToolMode): String =
-        when (mode) {
-            ToolMode.MultiDiscOrganizer -> text(R.string.scan_start_multidisc)
-            ToolMode.RomZipper -> text(R.string.scan_start_zip)
-            ToolMode.Converter -> text(R.string.scan_start_tool, _uiState.value.selectedConverterTool.displayName)
-            ToolMode.VitaAppIds -> text(R.string.scan_start_files)
-            ToolMode.EsDeSystems -> ""
-        }
-
-    private fun updateScanProgress(mode: ToolMode, scannedFiles: Int) {
-        if (scannedFiles % SCAN_PROGRESS_UPDATE_INTERVAL != 0) return
-        val activity = when (mode) {
-            ToolMode.MultiDiscOrganizer -> text(R.string.scan_activity_multidisc)
-            ToolMode.RomZipper -> text(R.string.scan_activity_zip)
-            ToolMode.Converter -> text(R.string.scan_activity_tool, _uiState.value.selectedConverterTool.displayName)
-            ToolMode.VitaAppIds -> text(R.string.scan_activity_files)
-            ToolMode.EsDeSystems -> ""
-        }
-        _uiState.update {
-            it.copy(scanProgressLabel = plural(R.plurals.scan_files_checked, scannedFiles, activity, scannedFiles))
-        }
-    }
-
     private fun applyProgressLabel(mode: ToolMode, completed: Int, total: Int): String {
         val activity = when (mode) {
-            ToolMode.MultiDiscOrganizer -> text(R.string.apply_activity_organizing)
-            ToolMode.RomZipper -> text(R.string.apply_activity_zipping)
-            ToolMode.Converter -> text(R.string.apply_activity_converting, _uiState.value.selectedConverterTool.displayName)
-            ToolMode.VitaAppIds -> text(R.string.apply_activity_shortcuts)
-            ToolMode.EsDeSystems -> text(R.string.apply_activity_esde)
+            ToolMode.MultiDiscOrganizer -> strings.text(R.string.apply_activity_organizing)
+            ToolMode.RomZipper -> strings.text(R.string.apply_activity_zipping)
+            ToolMode.Converter -> strings.text(R.string.apply_activity_converting, _uiState.value.selectedConverterTool.displayName)
+            ToolMode.VitaAppIds -> strings.text(R.string.apply_activity_shortcuts)
+            ToolMode.EsDeSystems -> strings.text(R.string.apply_activity_esde)
         }
-        return text(R.string.apply_progress, activity, completed, total)
+        return strings.text(R.string.apply_progress, activity, completed, total)
     }
 
     private suspend fun refreshExistingVitaShortcuts(
