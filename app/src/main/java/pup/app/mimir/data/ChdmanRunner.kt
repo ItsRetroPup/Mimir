@@ -53,7 +53,7 @@ class ChdmanRunner(private val context: Context) {
                 onProgress?.invoke(0f)
                 var log = ""
                 val logReader = thread(start = true, isDaemon = true) {
-                    log = readProcessOutput(process.inputStream, onProgress)
+                    log = readConverterOutput(process.inputStream, onProgress, MAX_LOG_LENGTH)
                 }
                 while (process.isAlive) {
                     if (cancellation?.shouldInterruptCurrentOperation() == true) {
@@ -83,37 +83,6 @@ class ChdmanRunner(private val context: Context) {
                 workspace.deleteRecursively()
             }
         }.getOrElse { throw it }
-
-    private fun readProcessOutput(
-        input: java.io.InputStream,
-        onProgress: ((Float) -> Unit)?,
-    ): String {
-        val log = StringBuilder()
-        val update = StringBuilder()
-        input.bufferedReader().use { reader ->
-            while (true) {
-                val value = reader.read()
-                if (value == -1) break
-                val character = value.toChar()
-                if (character == '\r' || character == '\n') {
-                    reportProgress(update.toString(), onProgress)
-                    update.clear()
-                } else {
-                    update.append(character)
-                }
-                log.append(character)
-                if (log.length > MAX_LOG_LENGTH) log.delete(0, log.length - MAX_LOG_LENGTH)
-            }
-        }
-        reportProgress(update.toString(), onProgress)
-        return log.toString()
-    }
-
-    private fun reportProgress(line: String, onProgress: ((Float) -> Unit)?) {
-        PERCENT_PATTERN.findAll(line).lastOrNull()?.groupValues?.get(1)?.toFloatOrNull()?.let { percent ->
-            onProgress?.invoke((percent / 100f).coerceIn(0f, 1f))
-        }
-    }
 
     private fun stageSource(source: DocumentFile, workspace: File): Set<String> {
         val sourceName = source.name ?: error("Source image has no name.")
@@ -182,6 +151,5 @@ class ChdmanRunner(private val context: Context) {
         val DESCRIPTOR_EXTENSIONS = setOf("cue", "gdi")
         val CUE_FILE_PATTERN = Regex("""(?im)^\s*FILE\s+"([^"]+)"""")
         val GDI_TRACK_PATTERN = Regex("""^\s*\d+\s+\d+\s+\d+\s+\d+\s+(?:"([^"]+)"|(\S+))""")
-        val PERCENT_PATTERN = Regex("""(\d{1,3}(?:\.\d+)?)\s*%""")
     }
 }

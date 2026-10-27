@@ -48,14 +48,7 @@ class NativeConverterRunner(private val context: Context) {
             onProgress?.invoke(0f)
             var outputLog = ""
             val logReader = thread(start = true, isDaemon = true) {
-                outputLog = process.inputStream.bufferedReader().useLines { lines ->
-                    lines.joinToString(separator = "\n") { line ->
-                        PERCENT_PATTERN.findAll(line).lastOrNull()?.groupValues?.get(1)?.toFloatOrNull()?.let {
-                            onProgress?.invoke((it / 100f).coerceIn(0f, 1f))
-                        }
-                        line
-                    }
-                }
+                outputLog = readConverterOutput(process.inputStream, onProgress)
             }
             while (process.isAlive) {
                 if (cancellation?.shouldInterruptCurrentOperation() == true) {
@@ -171,7 +164,6 @@ class NativeConverterRunner(private val context: Context) {
 
     private companion object {
         const val TAG = "Mimir.NSZ"
-        val PERCENT_PATTERN = Regex("""(\d{1,3}(?:\.\d+)?)\s*%""")
         const val PROCESS_POLL_INTERVAL_MS = 100L
     }
 }
