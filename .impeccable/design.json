@@ -644,7 +644,7 @@
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "The Mimir name in the About panel only. Material displaySmall."
+        "purpose": "The Mimir name in the home welcome panel only. Material displaySmall."
       },
       "headline-large": {
         "displayName": "Headline Large",
@@ -926,7 +926,7 @@
       "name": "Console Panel",
       "kind": "card",
       "refersTo": "console-panel",
-      "description": "Solid panel with a 1dp cold edge light (ink at 55% when it belongs to a tool); hosts setup, info, About, progress and report.",
+      "description": "Solid panel with a 1dp cold edge light (ink at 55% when it belongs to a tool); hosts setup, info, welcome, progress and report.",
       "html": "<div class=\"ds-panel\"><div class=\"ds-panel-title\">Xbox XISO</div><p class=\"ds-panel-body\">Trim Redump Xbox ISOs to XISO for Hakux and xemu.</p><hr class=\"ds-rule\"><div class=\"ds-fmt\"><span>Reads</span><b>Redump .iso</b></div><div class=\"ds-fmt\"><span>Writes</span><b class=\"ds-ink\">XISO .iso</b></div></div>",
       "css": ".ds-panel{font-family:'Rubik',system-ui,sans-serif;background:#111934;border:1px solid rgba(74,222,128,.55);border-radius:16px;padding:18px;color:#E8EEFF;display:flex;flex-direction:column;gap:10px;max-width:420px;}.ds-panel-title{font-size:28px;font-weight:700;line-height:32px;letter-spacing:-.01em;}.ds-panel-body{margin:0;font-size:14px;line-height:20px;color:#9AA7CB;}.ds-rule{border:none;height:1px;background:#1B2650;margin:2px 0;width:100%;}.ds-fmt{display:flex;gap:12px;align-items:center;}.ds-fmt span{width:64px;font-size:14px;font-weight:600;color:#9AA7CB;}.ds-fmt b{font-size:16px;font-weight:600;}.ds-ink{color:#4ADE80;}"
     },

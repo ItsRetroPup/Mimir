@@ -258,7 +258,7 @@ There are two lighting states of the same world, night (default, deep navy) and 
 A cold, two-state console palette: navy and steel at rest, nine saturated inks for identity, amber held back for the one moment that matters.
 
 ### Primary
-- **Cold Edge Light** (night-edge-light / day-edge-light): the system's own accent when no tool is open. It is Material's primary on home, the edge of every panel (28% alpha at rest, 55% for outlines), the About block's ink, and the selected-chip fill outside a tool.
+- **Cold Edge Light** (night-edge-light / day-edge-light): the system's own accent when no tool is open. It is Material's primary on home, the edge of every panel (28% alpha at rest, 55% for outlines), the About link's focus ring, and the selected-chip fill outside a tool.
 - **Tool Inks** (ink-*-night / ink-*-day): one per tool. Multi-disc Organizer orange, Vita Shortcuts cobalt, ES-DE Systems mint, NSZ to NSP magenta, RomZipper gold, CHDMan cyan, Dolphin RVZ violet, Azahar ZCCI lime, Xbox XISO green. Opening a tool wraps its page in an ink theme that replaces Material's primary and secondary with the ink, so filled buttons, chips, checkboxes, switches, focus rings, the header crumb, the "Writes" value and the panel accent all take it. Night inks are bright on navy (5.9:1 or better on the panel); daylight inks are darkened so a white label on an ink fill stays at 4.6:1 or better.
 
 ### Tertiary
@@ -288,7 +288,7 @@ A cold, two-state console palette: navy and steel at rest, nine saturated inks f
 **Character:** One soft-cornered geometric sans for everything, so hierarchy has to come from weight (400 body, 600 titles and labels, 700 headlines, 800 display) and from reversal (ink text, knocked-out glyph letters), not from a second family.
 
 ### Hierarchy
-- **Display** (800, 32sp/36sp, -0.015em): the "Mimir" name in the About panel only.
+- **Display** (800, 32sp/36sp, -0.015em): the "Mimir" name in the home welcome panel only.
 - **Headline Large** (700, 28sp/32sp, -0.01em): the focused tool's name in the home info panel, the scale-contrast moment beside the small blocks.
 - **Headline** (700, 21sp/26sp): data-pane headings (plan header, Vita database, ROM folders) and empty-pane titles.
 - **Title Large** (600, 19sp/24sp): header strip name and tool crumb, slot titles ("Slot 1 • Utilities"), report title.
@@ -313,7 +313,7 @@ The screen is a fixed console frame: header strip (minimum 52dp, 12dp horizontal
 - **Home, wide (600dp and up):** two columns with a 20dp gutter and 20dp/16dp outer padding. Left 60%: two memory-card slots, each a title plus a row of five square cells with 10dp gaps; slots sit 14dp apart and size their cells from the available height so both fit without scrolling. Unused cells are drawn as dashed empty frames (1.5dp, 10/8 dash, grid colour). Right 40%: the info panel for the focused block, filling the height, with the A prompt pinned to its foot.
 - **Tool page, wide (700dp and up):** setup pane 42% and data pane 58%, 20dp gutter, each independently scrollable with 12dp vertical padding; setup stacks at 12dp, data at 10dp, data rows at 6dp.
 - **Narrow:** both stack into one scrolling column with 16dp padding.
-- **Rhythm:** a near-linear 2/4/6/8/10/12/16/18/20/24dp scale; panels pad 16dp (info 18dp, About 20dp). The 48dp field grid is decorative and does not snap content.
+- **Rhythm:** a near-linear 2/4/6/8/10/12/16/18/20/24dp scale; panels pad 16dp (info 18dp, welcome 20dp). The 48dp field grid is decorative and does not snap content.
 - **Locale and scale headroom:** labels allow two lines (block names reserve two), legend labels ellipsize to one, and panes scroll rather than clip, so German/French strings and system font scale hold.
 
 **The Two Pane Rule.** A tool page is always setup on the left, data on the right. Never collapse it into a single column of cards on a wide screen.
@@ -347,7 +347,7 @@ Game-card objects share one silhouette: a rounded rectangle with the top-right c
 - **State:** a controller moving into the row lands on the current choice, not the nearest chip.
 
 ### Cards / Containers
-- **Console panel:** panel colour, 16dp corners, 1dp edge light (cold edge at 28%, or ink at 55% when it belongs to a tool), 16dp padding, 12dp stack. Hosts the setup pane, info panel, About panel, and progress and report panels.
+- **Console panel:** panel colour, 16dp corners, 1dp edge light (cold edge at 28%, or ink at 55% when it belongs to a tool), 16dp padding, 12dp stack. Hosts the setup pane, info and welcome panels, and progress and report panels.
 - **Panel rule:** a 1dp line in the grid colour separating groups inside a panel.
 - **Shadow Strategy:** none (see Elevation & Depth).
 
@@ -355,7 +355,7 @@ Game-card objects share one silhouette: a rounded rectangle with the top-right c
 - **Search field:** Material outlined text field in the page ink. Read-only until activated with A, Enter or a tap, so a controller can pass over it without summoning the keyboard; it returns to read-only when focus leaves, and Up/Down always move focus out of it.
 
 ### Navigation
-- **Header strip:** Home button (tool pages only), Mimir mark (34dp), "Mimir", then a chevron and the tool name in its ink. At the right, an SD icon, a 12-segment block meter of used storage in steel, the free space in tabular figures, and the theme toggle. Icon buttons carry a circular focus ring.
+- **Header strip:** Home button (tool pages only), Mimir mark (34dp), "Mimir", then a chevron and the tool name in its ink. The breadcrumb takes the remaining width and truncates. At the right, one readout per volume (internal storage, then the SD card when one is mounted): its icon, an 8-segment block meter of used space in steel, and the free space in tabular figures; then the theme toggle. Home's legend bar carries an About Mimir link at its left, which opens the About dialog (support links and credit). Icon buttons carry a circular focus ring.
 - **Legend bar:** panel at 94% along the foot. Each action is a glyph plus a sentence-case label at least 48dp tall. Disabled actions drop to 38% alpha; the screen's primary action is emphasised with an ink tint at 18%, a 60% ink outline and ink-coloured glyph and label.
 - **Controller model:** A selects or opens; B goes back (home); X scans (or downloads on ES-DE); Y applies or converts with the selected count, installs on ES-DE, and toggles the theme on home. The first directional press on a screen lands in content, not the header. Returning home refocuses the block you opened. Touch input never shows focus.
 
@@ -363,7 +363,7 @@ Game-card objects share one silhouette: a rounded rectangle with the top-right c
 A square cell on the slot grid holding the tool's drawn object, with its name beneath in two reserved lines. At rest: panel fill, 1dp edge at 22%, steel name. Focused: ink fill at 16%, a 3dp ink border, the name brightens to full text, the cell lifts, and the object turns: it rocks between -18° and 18° about its vertical axis on an 1800ms ease-in-out reversing loop. The last block opened keeps a 60% ink border as "selected". The info panel beside it mirrors the focused block: the object at 52dp, the name in Headline Large, a description, Reads and Writes rows (Writes in ink), and the A prompt in ink.
 
 ### Block Meter (signature)
-Progress is drawn as a row of segments, never a smooth Material bar: 24 segments at 12dp for progress, 16 segments at 5dp and 160dp wide as a per-row size bar (relative to the largest item), 12 segments at 8dp in the header for storage. Unlit segments use the grid colour; lit segments use the ink, partially lit at the leading edge. When the amount of work is unknown, a group of lit segments sweeps back and forth (1400ms linear).
+Progress is drawn as a row of segments, never a smooth Material bar: 24 segments at 12dp for progress, 16 segments at 5dp and 160dp wide as a per-row size bar (relative to the largest item), 8 segments at 8dp and 56dp wide per volume in the header. Unlit segments use the grid colour; lit segments use the ink, partially lit at the leading edge. When the amount of work is unknown, a group of lit segments sweeps back and forth (1400ms linear).
 
 ### Data Row
 A file-list entry: panel fill (ink at 10% when selected), 12dp corners, minimum 56dp tall, 12dp/8dp padding. A checkbox, the title, a size bar, the target name in steel, and an amber line if an output will be replaced; sizes sit at the right in tabular figures. Change rows add an ink format badge (ink text on 14% ink, 8dp corners) and a sources → targets file list with an ink arrow.
