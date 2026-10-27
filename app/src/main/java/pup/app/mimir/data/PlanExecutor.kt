@@ -41,7 +41,7 @@ class PlanExecutor(private val context: Context) {
                 }
 
                 is FileOperation.MoveFile -> {
-                    val sourceFile = findFile(root, operation.sourcePath)
+                    val sourceFile = root.findRelative(operation.sourcePath)
                         ?: error("Missing source file: ${operation.sourcePath}")
                     val target = createFile(root, operation.targetPath)
                     context.contentResolver.openInputStream(sourceFile.uri).use { input ->
@@ -65,7 +65,7 @@ class PlanExecutor(private val context: Context) {
                 }
 
                 is FileOperation.ZipFile -> {
-                    val sourceFile = findFile(root, operation.sourcePath)
+                    val sourceFile = root.findRelative(operation.sourcePath)
                         ?: error("Missing source file: ${operation.sourcePath}")
                     val target = createFile(root, operation.targetPath)
                     context.contentResolver.openInputStream(sourceFile.uri).use { input ->
@@ -106,7 +106,7 @@ class PlanExecutor(private val context: Context) {
                         spaceSavedBytes += sourceBytesBefore - target.length()
                         if (operation.deleteOriginalFiles) {
                             conversion.originalSourcePaths.forEach { sourcePath ->
-                                val source = findFile(root, sourcePath)
+                                val source = root.findRelative(sourcePath)
                                     ?: error("Missing original source file: $sourcePath")
                                 require(source.delete()) { "Failed to delete original source file: $sourcePath" }
                             }
@@ -152,7 +152,7 @@ class PlanExecutor(private val context: Context) {
     fun deleteOutputFile(rootUri: Uri, relativePath: String): Result<Unit> = runCatching {
         val root = DocumentFile.fromTreeUri(context, rootUri)
             ?: error("Unable to access selected output folder.")
-        val file = findFile(root, relativePath) ?: error("Missing shortcut: $relativePath")
+        val file = root.findRelative(relativePath) ?: error("Missing shortcut: $relativePath")
         require(file.delete()) { "Failed to delete shortcut: $relativePath" }
     }
 
@@ -175,21 +175,8 @@ class PlanExecutor(private val context: Context) {
         return current.takeIf { it.isDirectory }
     }
 
-    private fun findFile(root: DocumentFile, relativePath: String): DocumentFile? {
-        val parts = relativePath.split('/').filter { it.isNotBlank() }
-        var current = root
-        parts.forEachIndexed { index, part ->
-            val child = current.findFile(part) ?: return null
-            if (index == parts.lastIndex) {
-                return child
-            }
-            current = child
-        }
-        return null
-    }
-
     private fun sourceSize(root: DocumentFile, relativePath: String): Long =
-        findFile(root, relativePath)?.length()?.coerceAtLeast(0L) ?: 0L
+        root.findRelative(relativePath)?.length()?.coerceAtLeast(0L) ?: 0L
 
     private fun createFile(root: DocumentFile, relativePath: String): DocumentFile {
         val parentPath = RelativePaths.parentOf(relativePath)

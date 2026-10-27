@@ -28,7 +28,7 @@ class NativeConverterRunner(private val context: Context) {
         require(executable.isFile && executable.canExecute()) {
             "${operation.tool.displayName} is not bundled for this device's CPU architecture."
         }
-        val source = findFile(root, operation.sourcePath)
+        val source = root.findRelative(operation.sourcePath)
             ?: error("Missing source image: ${operation.sourcePath}")
         val workspace = File(context.cacheDir, "converter/${UUID.randomUUID()}")
         require(workspace.mkdirs()) { "Unable to prepare converter workspace." }
@@ -77,7 +77,7 @@ class NativeConverterRunner(private val context: Context) {
         cancellation: OperationCancellation?,
         onProgress: ((Float) -> Unit)?,
     ): ConversionResult {
-        val source = findFile(root, operation.sourcePath)
+        val source = root.findRelative(operation.sourcePath)
             ?: error("Missing source package: ${operation.sourcePath}")
         val workspace = File(context.cacheDir, "converter/${UUID.randomUUID()}")
         require(workspace.mkdirs()) { "Unable to prepare converter workspace." }
@@ -149,17 +149,6 @@ class NativeConverterRunner(private val context: Context) {
         ConverterTool.NszNsp -> error("NSZ conversions are run by embedded Python.")
         ConverterTool.XboxXiso -> error("XISO conversions are run by XisoRunner.")
         ConverterTool.Chd -> error("CHD conversions are run by CHDMan.")
-    }
-
-    private fun findFile(root: DocumentFile, relativePath: String): DocumentFile? {
-        var current = root
-        val parts = relativePath.split('/').filter(String::isNotBlank)
-        parts.forEachIndexed { index, part ->
-            val child = current.findFile(part) ?: return null
-            if (index == parts.lastIndex) return child
-            current = child
-        }
-        return null
     }
 
     private companion object {

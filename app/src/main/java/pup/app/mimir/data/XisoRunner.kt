@@ -28,7 +28,7 @@ class XisoRunner(private val context: Context) {
         cancellation: OperationCancellation? = null,
         onProgress: ((Float) -> Unit)? = null,
     ): Long {
-        val source = findFile(root, operation.sourcePath)
+        val source = root.findRelative(operation.sourcePath)
             ?: error("Missing source image: ${operation.sourcePath}")
         val sourceName = source.name ?: error("Source image has no name.")
         val parent = source.parentFile ?: error("Unable to access the folder containing ${operation.sourcePath}")
@@ -85,17 +85,6 @@ class XisoRunner(private val context: Context) {
                 if (read < 0) throw IOException("Unexpected end of disc image.")
             }
         }
-    }
-
-    private fun findFile(root: DocumentFile, relativePath: String): DocumentFile? {
-        var current = root
-        val parts = relativePath.split('/').filter(String::isNotBlank)
-        parts.forEachIndexed { index, part ->
-            val child = current.findFile(part) ?: return null
-            if (index == parts.lastIndex) return child
-            current = child
-        }
-        return null
     }
 
     private companion object {

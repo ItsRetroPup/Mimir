@@ -33,7 +33,7 @@ class ChdmanRunner(private val context: Context) {
                 "CHDMan is not bundled for this device's CPU architecture."
             }
 
-            val source = findFile(root, operation.sourcePath)
+            val source = root.findRelative(operation.sourcePath)
                 ?: error("Missing source image: ${operation.sourcePath}")
             val workspace = File(context.cacheDir, "chdman/${UUID.randomUUID()}")
             require(workspace.mkdirs()) { "Unable to prepare CHDMan workspace." }
@@ -130,19 +130,6 @@ class ChdmanRunner(private val context: Context) {
                 .toSet()
             else -> emptySet()
         }
-
-    private fun findFile(root: DocumentFile, relativePath: String): DocumentFile? {
-        var current = root
-        val parts = relativePath.split('/').filter { it.isNotBlank() }
-        parts.forEachIndexed { index, part ->
-            val child = current.findFile(part) ?: return null
-            if (index == parts.lastIndex) {
-                return child
-            }
-            current = child
-        }
-        return null
-    }
 
     private companion object {
         const val EXECUTABLE_NAME = "libchdman.so"

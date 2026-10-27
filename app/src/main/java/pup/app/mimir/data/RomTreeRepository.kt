@@ -121,7 +121,7 @@ class RomTreeRepository(private val context: Context) {
         return entries.filter { entry ->
             if (shouldStop?.invoke() == true) throw OperationStoppedException("Scan stopped by user.")
             if (!entry.fileName.endsWith(".iso", ignoreCase = true)) return@filter true
-            val file = findFile(root, entry.relativePath) ?: return@filter false
+            val file = root.findRelative(entry.relativePath) ?: return@filter false
             val offset = xisoRunner.partitionOffset(file)
             offset != null && offset != 0L
         }
@@ -143,7 +143,7 @@ class RomTreeRepository(private val context: Context) {
         return entries
             .filter { it.fileName.endsWith(".${format.extension}", ignoreCase = true) }
             .mapNotNull { entry ->
-                val file = findFile(root, entry.relativePath) ?: return@mapNotNull null
+                val file = root.findRelative(entry.relativePath) ?: return@mapNotNull null
                 val appId = runCatching {
                     context.contentResolver.openInputStream(file.uri).use { input ->
                         requireNotNull(input) { "Unable to read ${entry.relativePath}" }
@@ -328,19 +328,6 @@ class RomTreeRepository(private val context: Context) {
             .map { it.groupValues[1] }
             .distinct()
             .sumOf { fileName -> parent.findFile(fileName)?.length() ?: 0L }
-    }
-
-    private fun findFile(root: DocumentFile, relativePath: String): DocumentFile? {
-        val parts = relativePath.split('/').filter { it.isNotBlank() }
-        var current = root
-        parts.forEachIndexed { index, part ->
-            val child = current.findFile(part) ?: return null
-            if (index == parts.lastIndex) {
-                return child
-            }
-            current = child
-        }
-        return null
     }
 
     private companion object {
