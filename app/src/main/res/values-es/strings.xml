@@ -275,4 +275,9 @@
     <!-- Memory-card slot names. -->
     <string name="slot_utilities">Ranura 1 · Utilidades</string>
     <string name="slot_space_savers">Ranura 2 · Ahorro de espacio</string>
+
+    <!-- Storage volumes and About. -->
+    <string name="storage_internal">Almacenamiento interno</string>
+    <string name="storage_sd_card">Tarjeta SD</string>
+    <string name="action_close">Cerrar</string>
 </resources>

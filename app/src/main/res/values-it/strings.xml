@@ -275,4 +275,9 @@
     <!-- Memory-card slot names. -->
     <string name="slot_utilities">Slot 1 · Utilità</string>
     <string name="slot_space_savers">Slot 2 · Risparmio di spazio</string>
+
+    <!-- Storage volumes and About. -->
+    <string name="storage_internal">Memoria interna</string>
+    <string name="storage_sd_card">Scheda SD</string>
+    <string name="action_close">Chiudi</string>
 </resources>

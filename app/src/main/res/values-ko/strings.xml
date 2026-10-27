@@ -229,4 +229,9 @@
     <!-- Memory-card slot names. -->
     <string name="slot_utilities">슬롯 1 · 유틸리티</string>
     <string name="slot_space_savers">슬롯 2 · 공간 절약</string>
+
+    <!-- Storage volumes and About. -->
+    <string name="storage_internal">내부 저장공간</string>
+    <string name="storage_sd_card">SD 카드</string>
+    <string name="action_close">닫기</string>
 </resources>

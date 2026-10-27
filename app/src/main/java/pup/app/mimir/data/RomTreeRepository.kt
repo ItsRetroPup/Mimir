@@ -15,6 +15,32 @@ import pup.app.mimir.domain.VitaShortcutFormat
 class RomTreeRepository(private val context: Context) {
     data class StorageInfo(val totalBytes: Long, val freeBytes: Long)
 
+    enum class VolumeKind { Internal, SdCard }
+
+    data class VolumeSpace(val kind: VolumeKind, val info: StorageInfo)
+
+    /**
+     * Free space on the device's shared storage and, when one is inserted, its SD card. Each
+     * mounted volume gets an app-specific directory, so the SD card is the first removable one.
+     */
+    fun deviceVolumes(): List<VolumeSpace> = buildList {
+        primaryStorageInfo()?.let { add(VolumeSpace(VolumeKind.Internal, it)) }
+        val sdRoot = runCatching {
+            context.getExternalFilesDirs(null)
+                .drop(1)
+                .filterNotNull()
+                .firstOrNull { Environment.isExternalStorageRemovable(it) && Environment.getExternalStorageState(it) == Environment.MEDIA_MOUNTED }
+                ?.path
+                ?.substringBefore("/Android/")
+        }.getOrNull()
+        sdRoot?.let { path ->
+            runCatching {
+                val stat = StatFs(path)
+                StorageInfo(totalBytes = stat.totalBytes, freeBytes = stat.availableBytes)
+            }.getOrNull()?.let { add(VolumeSpace(VolumeKind.SdCard, it)) }
+        }
+    }
+
     fun storageInfo(rootUri: Uri): StorageInfo? {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return null
         return runCatching {

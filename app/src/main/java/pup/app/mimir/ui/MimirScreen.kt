@@ -1,5 +1,10 @@
 package pup.app.mimir.ui
 
+import pup.app.mimir.data.RomTreeRepository
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.Role
+import androidx.compose.foundation.clickable
 import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.BackHandler
@@ -29,7 +34,9 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LightMode
-import androidx.compose.material.icons.outlined.SdStorage
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.PhoneAndroid
+import androidx.compose.material.icons.outlined.SdCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -111,6 +118,7 @@ internal fun MimirScreen(
     var showEsDeConfirmation by rememberSaveable { mutableStateOf(false) }
     var pendingVitaAdd by remember { mutableStateOf<VitaApp?>(null) }
     var pendingVitaRemove by remember { mutableStateOf<VitaApp?>(null) }
+    var showAbout by rememberSaveable { mutableStateOf(false) }
     var queueSortOption by rememberSaveable { mutableStateOf(QueueSortOption.NameAscending.name) }
     val openUrl: (String) -> Unit = { url ->
         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
@@ -178,7 +186,11 @@ internal fun MimirScreen(
                         onToggleTheme = { onDarkModeToggled(!uiState.useDarkMode) },
                     )
                 },
-                bottomBar = { LegendBar(legend) },
+                bottomBar = {
+                    LegendBar(legend) {
+                        if (tool == null) AboutLink(onClick = { showAbout = true })
+                    }
+                },
             ) { innerPadding ->
                 if (tool == null) {
                     HomeScreen(
@@ -186,9 +198,6 @@ internal fun MimirScreen(
                         returnSection = lastToolSection,
                         returnFocus = returnFocus,
                         onOpen = selectTool,
-                        onOpenYoutube = { openUrl(YOUTUBE_CHANNEL_URL) },
-                        onOpenKofi = { openUrl(KOFI_URL) },
-                        onOpenBuyMeACoffee = { openUrl(BUY_ME_A_COFFEE_URL) },
                         modifier = Modifier.padding(innerPadding),
                     )
                 } else {
@@ -264,6 +273,10 @@ internal fun MimirScreen(
                     onVitaShortcutAdd(app)
                 },
             )
+        }
+
+        if (showAbout) {
+            AboutDialog(onOpenUrl = openUrl, onDismiss = { showAbout = false })
         }
 
         pendingVitaRemove?.let { app ->
@@ -365,41 +378,31 @@ private fun HeaderStrip(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        if (tool != null) {
-            IconButton(onClick = onHome, modifier = Modifier.focusRing(CircleShape)) {
-                Icon(Icons.Outlined.Home, contentDescription = stringResource(R.string.go_home), tint = palette.text)
+        // The breadcrumb takes the remaining width and truncates, so the storage readouts never get pushed off.
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            if (tool != null) {
+                IconButton(onClick = onHome, modifier = Modifier.focusRing(CircleShape)) {
+                    Icon(Icons.Outlined.Home, contentDescription = stringResource(R.string.go_home), tint = palette.text)
+                }
+            }
+            MimirMark(Modifier.size(34.dp), contentDescription = stringResource(R.string.app_logo))
+            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.titleLarge, color = palette.text, maxLines = 1)
+            if (tool != null) {
+                Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = palette.textMuted)
+                Text(
+                    stringResource(tool.toolName),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
-        MimirMark(Modifier.size(34.dp), contentDescription = stringResource(R.string.app_logo))
-        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.titleLarge, color = palette.text)
-        if (tool != null) {
-            Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = palette.textMuted)
-            Text(
-                stringResource(tool.toolName),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-        Spacer(Modifier.weight(1f))
-        uiState.storageInfo?.let { storage ->
-            Icon(Icons.Outlined.SdStorage, contentDescription = null, tint = palette.textMuted, modifier = Modifier.size(18.dp))
-            // Used space as the memory card's block meter.
-            BlockProgressBar(
-                progress = 1f - storage.freeBytes.toFloat() / storage.totalBytes.coerceAtLeast(1L),
-                modifier = Modifier.width(96.dp),
-                blocks = 12,
-                height = 8.dp,
-                ink = palette.textMuted,
-            )
-            Text(
-                stringResource(R.string.storage_free_header, formatBytes(storage.freeBytes)),
-                style = MaterialTheme.typography.labelLarge.copy(fontFeatureSettings = "tnum"),
-                color = palette.textMuted,
-                maxLines = 1,
-            )
-        }
+        uiState.volumes.forEach { volume -> VolumeReadout(volume) }
         IconButton(onClick = onToggleTheme, modifier = Modifier.focusRing(CircleShape)) {
             Icon(
                 if (uiState.useDarkMode) Icons.Outlined.LightMode else Icons.Outlined.DarkMode,
@@ -407,6 +410,38 @@ private fun HeaderStrip(
                 tint = palette.text,
             )
         }
+    }
+}
+
+/** One volume's free space: its icon, used space as the memory card's block meter, and what is left. */
+@Composable
+private fun VolumeReadout(volume: RomTreeRepository.VolumeSpace) {
+    val palette = LocalMimirPalette.current
+    val storage = volume.info
+    val (icon, name) = when (volume.kind) {
+        RomTreeRepository.VolumeKind.Internal -> Icons.Outlined.PhoneAndroid to stringResource(R.string.storage_internal)
+        RomTreeRepository.VolumeKind.SdCard -> Icons.Outlined.SdCard to stringResource(R.string.storage_sd_card)
+    }
+    val free = stringResource(R.string.storage_free_header, formatBytes(storage.freeBytes))
+    Row(
+        modifier = Modifier.semantics(mergeDescendants = true) { contentDescription = "$name, $free" },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Icon(icon, contentDescription = null, tint = palette.textMuted, modifier = Modifier.size(18.dp))
+        BlockProgressBar(
+            progress = 1f - storage.freeBytes.toFloat() / storage.totalBytes.coerceAtLeast(1L),
+            modifier = Modifier.width(56.dp),
+            blocks = 8,
+            height = 8.dp,
+            ink = palette.textMuted,
+        )
+        Text(
+            free,
+            style = MaterialTheme.typography.labelLarge.copy(fontFeatureSettings = "tnum"),
+            color = palette.textMuted,
+            maxLines = 1,
+        )
     }
 }
 
@@ -672,3 +707,21 @@ private fun ScanResults(
     }
 }
 
+/** The footer link to About Mimir, at the left of the legend bar on home. */
+@Composable
+private fun AboutLink(onClick: () -> Unit) {
+    val palette = LocalMimirPalette.current
+    Row(
+        modifier = Modifier
+            .heightIn(min = 48.dp)
+            .clip(RoundedCornerShape(50))
+            .focusRing()
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Icon(Icons.Outlined.Info, contentDescription = null, tint = palette.textMuted, modifier = Modifier.size(20.dp))
+        Text(stringResource(R.string.about_mimir), style = MaterialTheme.typography.labelLarge, color = palette.text)
+    }
+}

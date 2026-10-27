@@ -1,5 +1,15 @@
 package pup.app.mimir.ui
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.outlined.Subscriptions
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.Coffee
+import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -157,4 +167,40 @@ internal fun VitaShortcutRemoveDialog(
             OutlinedButton(onClick = onDismiss, modifier = Modifier.focusRing()) { Text(stringResource(R.string.action_cancel)) }
         },
     )
+}
+
+/** About Mimir, opened from the footer link on home: who makes it and how to support it. */
+@Composable
+internal fun AboutDialog(onOpenUrl: (String) -> Unit, onDismiss: () -> Unit) {
+    val palette = LocalMimirPalette.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { MimirMark(Modifier.size(48.dp)) },
+        title = { Text(stringResource(R.string.about_mimir)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(stringResource(R.string.support_body), style = MaterialTheme.typography.bodyMedium, color = palette.textMuted)
+                SupportLink("YouTube", Icons.Outlined.Subscriptions) { onOpenUrl(YOUTUBE_CHANNEL_URL) }
+                SupportLink("Ko-fi", Icons.Outlined.Favorite) { onOpenUrl(KOFI_URL) }
+                SupportLink("Buy Me a Coffee", Icons.Outlined.Coffee) { onOpenUrl(BUY_ME_A_COFFEE_URL) }
+                Text(stringResource(R.string.home_footer), style = MaterialTheme.typography.labelMedium, color = palette.textMuted)
+            }
+        },
+        confirmButton = {
+            OutlinedButton(onClick = onDismiss, modifier = Modifier.focusRing()) { Text(stringResource(R.string.action_close)) }
+        },
+    )
+}
+
+@Composable
+private fun SupportLink(label: String, icon: ImageVector, onClick: () -> Unit) {
+    TextButton(
+        onClick = onClick,
+        modifier = Modifier.focusRing(),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+    ) {
+        Icon(imageVector = icon, contentDescription = null)
+        Spacer(Modifier.size(10.dp))
+        Text(label, maxLines = 1, style = MaterialTheme.typography.labelLarge)
+    }
 }

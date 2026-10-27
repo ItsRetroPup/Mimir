@@ -283,4 +283,9 @@
     <!-- Memory-card slot names. -->
     <string name="slot_utilities">Slot 1 · Utilities</string>
     <string name="slot_space_savers">Slot 2 · Space savers</string>
+
+    <!-- Storage volumes and About. -->
+    <string name="storage_internal">Internal storage</string>
+    <string name="storage_sd_card">SD card</string>
+    <string name="action_close">Close</string>
 </resources>

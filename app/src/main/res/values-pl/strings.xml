@@ -298,4 +298,9 @@
     <!-- Memory-card slot names. -->
     <string name="slot_utilities">Gniazdo 1 · Narzędzia</string>
     <string name="slot_space_savers">Gniazdo 2 · Oszczędzanie miejsca</string>
+
+    <!-- Storage volumes and About. -->
+    <string name="storage_internal">Pamięć wewnętrzna</string>
+    <string name="storage_sd_card">Karta SD</string>
+    <string name="action_close">Zamknij</string>
 </resources>

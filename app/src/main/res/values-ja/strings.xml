@@ -229,4 +229,9 @@
     <!-- Memory-card slot names. -->
     <string name="slot_utilities">スロット1 · ユーティリティ</string>
     <string name="slot_space_savers">スロット2 · 容量節約</string>
+
+    <!-- Storage volumes and About. -->
+    <string name="storage_internal">内部ストレージ</string>
+    <string name="storage_sd_card">SD カード</string>
+    <string name="action_close">閉じる</string>
 </resources>

@@ -24,14 +24,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Coffee
-import androidx.compose.material.icons.outlined.Favorite
-import androidx.compose.material.icons.outlined.Subscriptions
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,7 +42,6 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -149,7 +142,7 @@ private val BLOCK_LABEL = 36.dp
 
 /**
  * Home as a memory card manager: two slots of save blocks on the left, and on the right the info
- * panel for whichever block the cursor rests on. The fifth utility cell is Mimir's own block.
+ * panel for whichever block the cursor rests on. About Mimir lives in the footer, not on the card.
  */
 @Composable
 internal fun HomeScreen(
@@ -157,9 +150,6 @@ internal fun HomeScreen(
     returnSection: AppSection?,
     returnFocus: FocusRequester,
     onOpen: (ToolEntry) -> Unit,
-    onOpenYoutube: () -> Unit,
-    onOpenKofi: () -> Unit,
-    onOpenBuyMeACoffee: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var focusedSection by rememberSaveable { mutableStateOf<AppSection?>(null) }
@@ -182,13 +172,6 @@ internal fun HomeScreen(
                     focusedSection = focusedSection,
                     onFocus = { focusedSection = it },
                     onOpen = onOpen,
-                    trailing = { cellSize ->
-                        AboutBlock(
-                            size = cellSize,
-                            selected = focusedSection == null,
-                            onFocus = { focusedSection = null },
-                        )
-                    },
                 )
                 MemorySlot(
                     title = stringResource(R.string.slot_space_savers),
@@ -206,7 +189,7 @@ internal fun HomeScreen(
             if (focusedTool != null) {
                 ToolInfoPanel(focusedTool, infoModifier, fillHeight = wide)
             } else {
-                AboutPanel(infoModifier, onOpenYoutube, onOpenKofi, onOpenBuyMeACoffee)
+                WelcomePanel(infoModifier)
             }
         }
         if (wide) {
@@ -256,10 +239,9 @@ private fun MemorySlot(
     focusedSection: AppSection?,
     onFocus: (AppSection) -> Unit,
     onOpen: (ToolEntry) -> Unit,
-    trailing: (@Composable (cellSize: Dp) -> Unit)? = null,
 ) {
     val palette = LocalMimirPalette.current
-    val used = tools.size + if (trailing != null) 1 else 0
+    val used = tools.size
     Column(verticalArrangement = Arrangement.spacedBy(SLOT_INNER_GAP)) {
         Text(
             title,
@@ -283,7 +265,6 @@ private fun MemorySlot(
                         onClick = { onOpen(tool) },
                     )
                 }
-                trailing?.invoke(cell)
                 repeat(SLOT_CELLS - used) { EmptyCell(cell) }
             }
         }
@@ -318,27 +299,6 @@ private fun SaveBlock(
         contentDescription = stringResource(R.string.open_tool, name),
     ) {
         SaveBlockArt(tool.art, ink, hole = palette.panel, modifier = Modifier.fillMaxSize(), turning = focused)
-    }
-}
-
-@Composable
-private fun AboutBlock(size: Dp, selected: Boolean, onFocus: () -> Unit) {
-    val palette = LocalMimirPalette.current
-    var focused by remember { mutableStateOf(false) }
-    BlockCell(
-        size = size,
-        label = stringResource(R.string.about_mimir),
-        ink = palette.edge,
-        focused = focused,
-        selected = selected,
-        modifier = Modifier.focusLift { hasFocus ->
-            focused = hasFocus
-            if (hasFocus) onFocus()
-        },
-        onClick = onFocus,
-        contentDescription = stringResource(R.string.about_mimir),
-    ) {
-        MimirMark(Modifier.fillMaxSize(0.62f))
     }
 }
 
@@ -455,44 +415,14 @@ private fun FormatRow(label: String, value: String, valueColor: Color) {
     }
 }
 
+/** What the info panel shows before any block has focus, as on a touch launch. */
 @Composable
-private fun AboutPanel(
-    modifier: Modifier,
-    onOpenYoutube: () -> Unit,
-    onOpenKofi: () -> Unit,
-    onOpenBuyMeACoffee: () -> Unit,
-) {
+private fun WelcomePanel(modifier: Modifier) {
     val palette = LocalMimirPalette.current
     ConsolePanel(modifier, contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        MimirMark(Modifier.size(56.dp))
         Text(stringResource(R.string.app_name), style = MaterialTheme.typography.displaySmall, color = palette.text)
         Text(stringResource(R.string.home_prompt), style = MaterialTheme.typography.bodyLarge, color = palette.textMuted)
-        PanelRule()
-        Text(stringResource(R.string.support_body), style = MaterialTheme.typography.bodyMedium, color = palette.textMuted)
-        val firstLink = remember { FocusRequester() }
-        Column(modifier = Modifier.enterFocusAt(firstLink)) {
-            SupportLinkButton("YouTube", Icons.Outlined.Subscriptions, onOpenYoutube, Modifier.focusRequester(firstLink))
-            SupportLinkButton("Ko-fi", Icons.Outlined.Favorite, onOpenKofi)
-            SupportLinkButton("Buy Me a Coffee", Icons.Outlined.Coffee, onOpenBuyMeACoffee)
-        }
-        Text(stringResource(R.string.home_footer), style = MaterialTheme.typography.labelMedium, color = palette.textMuted)
-    }
-}
-
-@Composable
-private fun SupportLinkButton(
-    label: String,
-    icon: ImageVector,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    TextButton(
-        onClick = onClick,
-        modifier = modifier,
-        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
-    ) {
-        Icon(imageVector = icon, contentDescription = null)
-        Spacer(Modifier.size(10.dp))
-        Text(label, maxLines = 1, style = MaterialTheme.typography.labelLarge)
     }
 }
 

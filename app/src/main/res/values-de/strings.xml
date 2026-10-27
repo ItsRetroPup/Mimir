@@ -252,4 +252,9 @@
     <!-- Memory-card slot names. -->
     <string name="slot_utilities">Steckplatz 1 · Werkzeuge</string>
     <string name="slot_space_savers">Steckplatz 2 · Platzsparer</string>
+
+    <!-- Storage volumes and About. -->
+    <string name="storage_internal">Interner Speicher</string>
+    <string name="storage_sd_card">SD-Karte</string>
+    <string name="action_close">Schließen</string>
 </resources>

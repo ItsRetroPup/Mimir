@@ -229,4 +229,9 @@
     <!-- Memory-card slot names. -->
     <string name="slot_utilities">插槽 1 · 實用工具</string>
     <string name="slot_space_savers">插槽 2 · 節省空間</string>
+
+    <!-- Storage volumes and About. -->
+    <string name="storage_internal">內部儲存空間</string>
+    <string name="storage_sd_card">SD 卡</string>
+    <string name="action_close">關閉</string>
 </resources>

@@ -62,6 +62,8 @@ data class MimirUiState(
     val currentJobProgress: Float? = null,
     val currentJobLabel: String? = null,
     val storageInfo: RomTreeRepository.StorageInfo? = null,
+    /** Free space per device volume, for the header: internal storage and any SD card. */
+    val volumes: List<RomTreeRepository.VolumeSpace> = emptyList(),
     val stopRequest: StopRequest = StopRequest.None,
     val previewCount: Int = 0,
     val previewPlan: OperationPlan? = null,
@@ -121,6 +123,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                     vitaDatabaseSize = catalog.size,
                     vitaSearchResults = emptyList(),
                     storageInfo = storage ?: it.storageInfo,
+                    volumes = repository.deviceVolumes(),
                 )
             }
             val existingOutputUri = _uiState.value.vitaOutputUri
@@ -481,6 +484,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                 previewPlan = null,
                 selectedChangePaths = emptySet(),
                 storageInfo = repository.storageInfo(uri),
+                volumes = repository.deviceVolumes(),
                 message = null,
             )
         }
@@ -690,6 +694,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                     _uiState.update {
                         it.copy(
                             isBusy = false,
+                            volumes = repository.deviceVolumes(),
                             operationProgressLabel = null,
                             operationProgress = null,
                             currentJobProgress = null,
@@ -719,6 +724,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                     _uiState.update {
                         it.copy(
                             isBusy = false,
+                            volumes = repository.deviceVolumes(),
                             operationProgressLabel = null,
                             operationProgress = null,
                             currentJobProgress = null,

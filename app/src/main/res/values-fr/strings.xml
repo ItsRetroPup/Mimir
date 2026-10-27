@@ -303,4 +303,9 @@
     <!-- Memory-card slot names. -->
     <string name="slot_utilities">Emplacement 1 · Utilitaires</string>
     <string name="slot_space_savers">Emplacement 2 · Gain de place</string>
+
+    <!-- Storage volumes and About. -->
+    <string name="storage_internal">Stockage interne</string>
+    <string name="storage_sd_card">Carte SD</string>
+    <string name="action_close">Fermer</string>
 </resources>
