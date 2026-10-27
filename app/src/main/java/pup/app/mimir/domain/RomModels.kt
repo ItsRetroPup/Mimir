@@ -24,7 +24,7 @@ enum class VitaShortcutFormat(
 enum class ToolMode(val displayName: String) {
     MultiDiscOrganizer("Multi-disc Organizer"),
     RomZipper("RomZipper"),
-    ChdConverter("Converter Tools"),
+    Converter("Converter Tools"),
     VitaAppIds("Vita App IDs"),
     EsDeSystems("ES-DE Systems"),
 }

@@ -129,15 +129,15 @@ private val utilities = listOf(
     ToolEntry(R.string.goal_fix_multidisc, R.string.tool_multidisc, R.string.tool_multidisc_description, ToolMode.MultiDiscOrganizer, AppSection.Organizer, icon = Icons.Outlined.Archive),
     ToolEntry(R.string.goal_create_vita_shortcuts, R.string.tool_vita_shortcuts, R.string.tool_vita_shortcuts_description, ToolMode.VitaAppIds, AppSection.Vita, icon = Icons.Outlined.Home),
     ToolEntry(R.string.goal_setup_esde, R.string.tool_esde_systems, R.string.tool_esde_systems_description, ToolMode.EsDeSystems, AppSection.EsDeSystems, icon = Icons.Outlined.Folder),
-    ToolEntry(R.string.goal_convert_switch_packages, R.string.tool_nsz_to_nsp, R.string.tool_nsz_to_nsp_description, ToolMode.ChdConverter, AppSection.Nsz, ConverterTool.NszNsp, Icons.Outlined.Archive),
+    ToolEntry(R.string.goal_convert_switch_packages, R.string.tool_nsz_to_nsp, R.string.tool_nsz_to_nsp_description, ToolMode.Converter, AppSection.Nsz, ConverterTool.NszNsp, Icons.Outlined.Archive),
 )
 
 private val spaceSavers = listOf(
     ToolEntry(R.string.goal_compress_cartridge_roms, R.string.tool_romzipper, R.string.tool_romzipper_description, ToolMode.RomZipper, AppSection.Zipper, icon = Icons.Outlined.FolderZip),
-    ToolEntry(R.string.goal_compress_disc_images, R.string.tool_chdman, R.string.tool_chdman_description, ToolMode.ChdConverter, AppSection.ChdMan, ConverterTool.Chd, Icons.Outlined.Archive),
-    ToolEntry(R.string.goal_shrink_gamecube_wii, R.string.tool_dolphin_rvz, R.string.tool_dolphin_rvz_description, ToolMode.ChdConverter, AppSection.Rvz, ConverterTool.DolphinRvz, Icons.Outlined.Archive),
-    ToolEntry(R.string.goal_shrink_3ds, R.string.tool_azahar_zcci, R.string.tool_azahar_zcci_description, ToolMode.ChdConverter, AppSection.Zcci, ConverterTool.AzaharZcci, Icons.Outlined.Archive),
-    ToolEntry(R.string.goal_shrink_xbox, R.string.tool_xbox_xiso, R.string.tool_xbox_xiso_description, ToolMode.ChdConverter, AppSection.Xiso, ConverterTool.XboxXiso, Icons.Outlined.Archive),
+    ToolEntry(R.string.goal_compress_disc_images, R.string.tool_chdman, R.string.tool_chdman_description, ToolMode.Converter, AppSection.ChdMan, ConverterTool.Chd, Icons.Outlined.Archive),
+    ToolEntry(R.string.goal_shrink_gamecube_wii, R.string.tool_dolphin_rvz, R.string.tool_dolphin_rvz_description, ToolMode.Converter, AppSection.Rvz, ConverterTool.DolphinRvz, Icons.Outlined.Archive),
+    ToolEntry(R.string.goal_shrink_3ds, R.string.tool_azahar_zcci, R.string.tool_azahar_zcci_description, ToolMode.Converter, AppSection.Zcci, ConverterTool.AzaharZcci, Icons.Outlined.Archive),
+    ToolEntry(R.string.goal_shrink_xbox, R.string.tool_xbox_xiso, R.string.tool_xbox_xiso_description, ToolMode.Converter, AppSection.Xiso, ConverterTool.XboxXiso, Icons.Outlined.Archive),
 )
 
 class MainActivity : ComponentActivity() {
@@ -385,7 +385,7 @@ private fun MimirScreen(
     var pendingVitaAdd by remember { mutableStateOf<pup.app.mimir.domain.VitaApp?>(null) }
     var pendingVitaRemove by remember { mutableStateOf<pup.app.mimir.domain.VitaApp?>(null) }
     var pendingDeleteOriginalChdFiles by rememberSaveable { mutableStateOf(false) }
-    var chdSortOption by rememberSaveable { mutableStateOf(ChdSortOption.NameAscending.name) }
+    var queueSortOption by rememberSaveable { mutableStateOf(QueueSortOption.NameAscending.name) }
     val openUrl: (String) -> Unit = { url ->
         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     }
@@ -558,7 +558,7 @@ private fun MimirScreen(
                             }
                         }
 
-                        if (currentSection == AppSection.ChdMan && uiState.selectedMode == ToolMode.ChdConverter) {
+                        if (currentSection == AppSection.ChdMan && uiState.selectedMode == ToolMode.Converter) {
                             item {
                                 ConverterToolsOptionsCard(
                                     selectedTool = uiState.selectedConverterTool,
@@ -571,7 +571,7 @@ private fun MimirScreen(
                             }
                         }
 
-                        if (currentSection == AppSection.Nsz && uiState.selectedMode == ToolMode.ChdConverter) {
+                        if (currentSection == AppSection.Nsz && uiState.selectedMode == ToolMode.Converter) {
                             item {
                                 NszKeysCard(
                                     configured = uiState.nszKeysConfigured,
@@ -593,15 +593,15 @@ private fun MimirScreen(
                         }
 
                         if (uiState.selectedMode != ToolMode.VitaAppIds) uiState.previewPlan?.let { plan ->
-                            if (uiState.selectedMode == ToolMode.ChdConverter) {
+                            if (uiState.selectedMode == ToolMode.Converter) {
                                 item {
-                                    ChdQueueTable(
+                                    ConversionQueueTable(
                                         plan = plan,
                                         selectedPaths = uiState.selectedChangePaths,
-                                        sortOption = ChdSortOption.valueOf(chdSortOption),
+                                        sortOption = QueueSortOption.valueOf(queueSortOption),
                                         enabled = !uiState.isBusy,
                                         storageInfo = uiState.storageInfo,
-                                        onSortOptionChanged = { chdSortOption = it.name },
+                                        onSortOptionChanged = { queueSortOption = it.name },
                                         onSelectAll = onSelectAllChanges,
                                         onDeselectAll = onDeselectAllChanges,
                                         onChangeSelection = onChangeSelection,
@@ -619,7 +619,7 @@ private fun MimirScreen(
                                 )
                             }
 
-                            if (uiState.selectedMode != ToolMode.ChdConverter) {
+                            if (uiState.selectedMode != ToolMode.Converter) {
                                 items(plan.changes) { change ->
                                     ChangeCard(
                                         plan = plan,
@@ -634,8 +634,8 @@ private fun MimirScreen(
                             }
                         }
 
-                        if (uiState.selectedMode == ToolMode.ChdConverter) uiState.chdConversionReport?.let { report ->
-                            item { ChdConversionReportCard(report) }
+                        if (uiState.selectedMode == ToolMode.Converter) uiState.conversionReport?.let { report ->
+                            item { ConversionReportCard(report) }
                         }
 
                     }
@@ -677,7 +677,7 @@ private fun MimirScreen(
                     shape = RoundedCornerShape(16.dp),
                 ) {
                     Button(
-                        onClick = if (uiState.selectedMode == ToolMode.ChdConverter && hasSelection) {
+                        onClick = if (uiState.selectedMode == ToolMode.Converter && hasSelection) {
                             {
                                 pendingDeleteOriginalChdFiles = uiState.deleteOriginalChdFiles
                                 showApplyConfirmation = true
@@ -692,7 +692,7 @@ private fun MimirScreen(
                     ) {
                         Text(
                             when {
-                                uiState.selectedMode == ToolMode.ChdConverter && hasSelection -> "CONVERT ${uiState.selectedChangePaths.size} SELECTED"
+                                uiState.selectedMode == ToolMode.Converter && hasSelection -> "CONVERT ${uiState.selectedChangePaths.size} SELECTED"
                                 hasSelection -> "APPLY ${uiState.selectedChangePaths.size} SELECTED"
                                 else -> "SCAN SELECTED FOLDER"
                             }
@@ -707,11 +707,11 @@ private fun MimirScreen(
                     end = 16.dp,
                     bottom = innerPadding.calculateBottomPadding() + 16.dp,
                 )
-            if (uiState.selectedMode == ToolMode.ChdConverter && uiState.isBusy && uiState.chdConversionReport != null) {
+            if (uiState.selectedMode == ToolMode.Converter && uiState.isBusy && uiState.conversionReport != null) {
                 ChdProgressToast(
-                    report = uiState.chdConversionReport,
-                    currentJobLabel = uiState.chdCurrentJobLabel,
-                    currentJobProgress = uiState.chdCurrentJobProgress ?: 0f,
+                    report = uiState.conversionReport,
+                    currentJobLabel = uiState.currentJobLabel,
+                    currentJobProgress = uiState.currentJobProgress ?: 0f,
                     canStopAfterCurrent = uiState.operationProgressLabel != null &&
                         uiState.stopRequest == pup.app.mimir.data.StopRequest.None,
                     stopNowEnabled = uiState.stopRequest != pup.app.mimir.data.StopRequest.Now,
@@ -729,14 +729,14 @@ private fun MimirScreen(
 
     if (showApplyConfirmation) {
         val changeCount = uiState.selectedChangePaths.size
-        val existingChdCount = uiState.previewPlan?.changes
+        val existingOutputCount = uiState.previewPlan?.changes
             ?.count { it.targetAlreadyExists && it.detailPath in uiState.selectedChangePaths }
             ?: 0
         AlertDialog(
             onDismissRequest = { showApplyConfirmation = false },
-            title = { Text(if (uiState.selectedMode == ToolMode.ChdConverter) "Convert selected images?" else "Apply changes?") },
+            title = { Text(if (uiState.selectedMode == ToolMode.Converter) "Convert selected images?" else "Apply changes?") },
             text = {
-                if (uiState.selectedMode == ToolMode.ChdConverter) {
+                if (uiState.selectedMode == ToolMode.Converter) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         if (uiState.selectedConverterTool == ConverterTool.XboxXiso) {
                             Text(
@@ -748,7 +748,7 @@ private fun MimirScreen(
                             Text(
                                 "This will convert $changeCount selected file${if (changeCount == 1) "" else "s"} " +
                                     "to .${uiState.selectedConverterTool.outputExtension}. " +
-                                    (if (existingChdCount > 0) "$existingChdCount selected output${if (existingChdCount == 1) "" else "s"} already exists and will be overwritten. " else "") +
+                                    (if (existingOutputCount > 0) "$existingOutputCount selected output${if (existingOutputCount == 1) "" else "s"} already exists and will be overwritten. " else "") +
                                     "Mimir cannot undo this action."
                             )
                         }
@@ -783,7 +783,7 @@ private fun MimirScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        if (uiState.selectedMode == ToolMode.ChdConverter && uiState.selectedConverterTool == ConverterTool.Chd) {
+                        if (uiState.selectedMode == ToolMode.Converter && uiState.selectedConverterTool == ConverterTool.Chd) {
                             onDeleteOriginalChdFilesChanged(pendingDeleteOriginalChdFiles)
                         }
                         showApplyConfirmation = false
@@ -791,7 +791,7 @@ private fun MimirScreen(
                     },
                     enabled = !uiState.isBusy && changeCount > 0,
                 ) {
-                    Text(if (uiState.selectedMode == ToolMode.ChdConverter) "START CONVERSIONS" else "APPLY CHANGES")
+                    Text(if (uiState.selectedMode == ToolMode.Converter) "START CONVERSIONS" else "APPLY CHANGES")
                 }
             },
             dismissButton = {
@@ -865,7 +865,7 @@ private fun MimirScreen(
 
 }
 
-private enum class ChdSortOption(val label: String) {
+private enum class QueueSortOption(val label: String) {
     NameAscending("Name A–Z"),
     NameDescending("Name Z–A"),
     SizeLargest("Size largest"),
@@ -893,23 +893,23 @@ private fun formatQueueSize(bytes: Long): String {
 }
 
 @Composable
-private fun ChdQueueTable(
+private fun ConversionQueueTable(
     plan: OperationPlan,
     selectedPaths: Set<String>,
-    sortOption: ChdSortOption,
+    sortOption: QueueSortOption,
     enabled: Boolean,
     storageInfo: pup.app.mimir.data.RomTreeRepository.StorageInfo?,
-    onSortOptionChanged: (ChdSortOption) -> Unit,
+    onSortOptionChanged: (QueueSortOption) -> Unit,
     onSelectAll: () -> Unit,
     onDeselectAll: () -> Unit,
     onChangeSelection: (String, Boolean) -> Unit,
 ) {
     var pendingOverwrite by remember { mutableStateOf<pup.app.mimir.domain.PlannedChange?>(null) }
     val sortedChanges = when (sortOption) {
-        ChdSortOption.NameAscending -> plan.changes.sortedBy { it.title.lowercase() }
-        ChdSortOption.NameDescending -> plan.changes.sortedByDescending { it.title.lowercase() }
-        ChdSortOption.SizeLargest -> plan.changes.sortedByDescending { it.sourceSizeBytes }
-        ChdSortOption.SizeSmallest -> plan.changes.sortedBy { it.sourceSizeBytes }
+        QueueSortOption.NameAscending -> plan.changes.sortedBy { it.title.lowercase() }
+        QueueSortOption.NameDescending -> plan.changes.sortedByDescending { it.title.lowercase() }
+        QueueSortOption.SizeLargest -> plan.changes.sortedByDescending { it.sourceSizeBytes }
+        QueueSortOption.SizeSmallest -> plan.changes.sortedBy { it.sourceSizeBytes }
     }
     val selectedBytes = plan.changes
         .filter { it.detailPath in selectedPaths }
@@ -931,7 +931,7 @@ private fun ChdQueueTable(
             }
             Text("Sort by", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             ChoiceRow(
-                options = ChdSortOption.entries,
+                options = QueueSortOption.entries,
                 selected = sortOption,
                 enabled = enabled,
                 label = { it.label },
@@ -1549,7 +1549,7 @@ private fun ConverterToolsOptionsCard(
 }
 
 @Composable
-private fun ChdConversionReportCard(report: pup.app.mimir.ui.ChdConversionReport) {
+private fun ConversionReportCard(report: pup.app.mimir.ui.ConversionReport) {
     val sizeSummary = when {
         report.spaceSavedBytes > 0L -> "Net space saved: ${formatBytes(report.spaceSavedBytes)}."
         report.spaceSavedBytes < 0L -> "Net size increase: ${formatBytes(-report.spaceSavedBytes)}."
@@ -1607,7 +1607,7 @@ private fun ProgressToast(
 
 @Composable
 private fun ChdProgressToast(
-    report: pup.app.mimir.ui.ChdConversionReport,
+    report: pup.app.mimir.ui.ConversionReport,
     currentJobLabel: String?,
     currentJobProgress: Float,
     canStopAfterCurrent: Boolean,
@@ -1700,7 +1700,7 @@ private fun ChangeCard(
     val chipText = when (plan.mode) {
         ToolMode.MultiDiscOrganizer -> "${change.sourceFiles.size} DISCS"
         ToolMode.RomZipper -> "ZIP"
-        ToolMode.ChdConverter -> change.operations
+        ToolMode.Converter -> change.operations
             .firstNotNullOfOrNull { (it as? FileOperation.ConvertWithTool)?.tool?.badge }
             ?: ConverterTool.Chd.badge
         ToolMode.VitaAppIds -> "VITA"
@@ -1746,7 +1746,7 @@ private fun ChangeCard(
                     ) {
                         val icon = when (plan.mode) {
                             ToolMode.RomZipper -> Icons.Outlined.FolderZip
-                            ToolMode.ChdConverter -> Icons.Outlined.Archive
+                            ToolMode.Converter -> Icons.Outlined.Archive
                             ToolMode.VitaAppIds -> Icons.Outlined.Home
                             ToolMode.EsDeSystems -> Icons.Outlined.Folder
                             else -> Icons.Outlined.Folder
@@ -1895,7 +1895,7 @@ private fun PreviewSummary(
     StyledCard {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Label("PREVIEW")
-            if (plan.mode == ToolMode.ChdConverter) {
+            if (plan.mode == ToolMode.Converter) {
                 Text(
                     "$selectedCount ${if (selectedCount == 1) "job" else "jobs"} selected • ${formatQueueSize(selectedSize)}",
                     style = MaterialTheme.typography.headlineMedium,
@@ -1905,7 +1905,7 @@ private fun PreviewSummary(
                     when (plan.mode) {
                         ToolMode.MultiDiscOrganizer -> "$previewCount multi-disc sets detected; $selectedCount selected."
                         ToolMode.RomZipper -> "$previewCount ROMs matched the zip whitelist; $selectedCount selected."
-                        ToolMode.ChdConverter, ToolMode.VitaAppIds -> "$previewCount items ready; $selectedCount selected."
+                        ToolMode.Converter, ToolMode.VitaAppIds -> "$previewCount items ready; $selectedCount selected."
                         ToolMode.EsDeSystems -> "$previewCount systems ready; $selectedCount selected."
                     },
                     style = MaterialTheme.typography.headlineMedium,

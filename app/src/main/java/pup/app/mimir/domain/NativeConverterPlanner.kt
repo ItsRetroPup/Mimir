@@ -34,7 +34,7 @@ object NativeConverterPlanner {
                 )
             }
         return OperationPlan(
-            mode = ToolMode.ChdConverter,
+            mode = ToolMode.Converter,
             changes = changes,
             operations = changes.flatMap(PlannedChange::operations),
             conflicts = conflicts.distinct(),

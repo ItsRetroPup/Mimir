@@ -17,7 +17,7 @@ class ChdPlannerTest {
             deleteOriginalFiles = false,
         )
 
-        assertEquals(ToolMode.ChdConverter, plan.mode)
+        assertEquals(ToolMode.Converter, plan.mode)
         assertEquals(listOf("dreamcast/Jet Set Radio.chd"), plan.changes.map { it.detailPath })
         val operation = plan.operations.single() as FileOperation.ConvertToChd
         assertEquals("dreamcast/Jet Set Radio.gdi", operation.sourcePath)

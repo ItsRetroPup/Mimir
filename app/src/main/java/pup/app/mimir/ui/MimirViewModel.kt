@@ -61,9 +61,9 @@ data class MimirUiState(
     val scanProgressLabel: String? = null,
     val operationProgressLabel: String? = null,
     val operationProgress: Float? = null,
-    val chdConversionReport: ChdConversionReport? = null,
-    val chdCurrentJobProgress: Float? = null,
-    val chdCurrentJobLabel: String? = null,
+    val conversionReport: ConversionReport? = null,
+    val currentJobProgress: Float? = null,
+    val currentJobLabel: String? = null,
     val storageInfo: RomTreeRepository.StorageInfo? = null,
     val stopRequest: StopRequest = StopRequest.None,
     val previewCount: Int = 0,
@@ -72,7 +72,7 @@ data class MimirUiState(
     val message: String? = null,
 )
 
-data class ChdConversionReport(
+data class ConversionReport(
     val completed: Int,
     val total: Int,
     val spaceSavedBytes: Long = 0L,
@@ -383,7 +383,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update { state ->
             val plan = state.previewPlan ?: return@update state
             state.copy(selectedChangePaths = plan.changes
-                .filterNot { state.selectedMode == ToolMode.ChdConverter && it.targetAlreadyExists }
+                .filterNot { state.selectedMode == ToolMode.Converter && it.targetAlreadyExists }
                 .mapTo(linkedSetOf()) { it.detailPath })
         }
     }
@@ -543,12 +543,12 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         val romUri = currentState.selectedFolderUri
 
         when (mode) {
-            ToolMode.MultiDiscOrganizer, ToolMode.RomZipper, ToolMode.ChdConverter -> {
+            ToolMode.MultiDiscOrganizer, ToolMode.RomZipper, ToolMode.Converter -> {
                 if (romUri == null) {
                     _uiState.update { it.copy(message = "Select a ROM folder first.") }
                     return
                 }
-                if (mode == ToolMode.ChdConverter &&
+                if (mode == ToolMode.Converter &&
                     currentState.selectedConverterTool == ConverterTool.NszNsp &&
                     !currentState.nszKeysConfigured
                 ) {
@@ -601,7 +601,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         RomZipperPlanner.buildPlan(entries)
                     }
 
-                    ToolMode.ChdConverter -> {
+                    ToolMode.Converter -> {
                         when (currentState.selectedConverterTool) {
                             ConverterTool.Chd -> {
                                 val entries = repository.scanChdTree(
@@ -657,17 +657,17 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         scanProgressLabel = null,
                         previewCount = previewCount,
                         previewPlan = plan,
-                        storageInfo = if (mode == ToolMode.ChdConverter) {
+                        storageInfo = if (mode == ToolMode.Converter) {
                             repository.storageInfo(requireNotNull(romUri))
                         } else it.storageInfo,
                         selectedChangePaths = plan.changes
-                            .filterNot { mode == ToolMode.ChdConverter && it.targetAlreadyExists }
+                            .filterNot { mode == ToolMode.Converter && it.targetAlreadyExists }
                             .mapTo(linkedSetOf()) { it.detailPath },
                         message = if (plan.changes.isEmpty()) {
                             when (mode) {
                                 ToolMode.MultiDiscOrganizer -> "No multi-disc games found."
                                 ToolMode.RomZipper -> "No zip-compatible ROMs found."
-                                ToolMode.ChdConverter -> "No compatible ${currentState.selectedConverterTool.displayName} files found."
+                                ToolMode.Converter -> "No compatible ${currentState.selectedConverterTool.displayName} files found."
                                 ToolMode.VitaAppIds -> "No Vita shortcuts queued."
                                 ToolMode.EsDeSystems -> "No ES-DE systems loaded."
                             }
@@ -712,13 +712,13 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                     operationProgressLabel = applyProgressLabel(plan.mode, 0, plan.operations.size),
                     operationProgress = 0f,
                     message = null,
-                    chdConversionReport = if (plan.mode == ToolMode.ChdConverter) {
-                        ChdConversionReport(completed = 0, total = plan.operations.size)
+                    conversionReport = if (plan.mode == ToolMode.Converter) {
+                        ConversionReport(completed = 0, total = plan.operations.size)
                     } else {
-                        it.chdConversionReport
+                        it.conversionReport
                     },
-                    chdCurrentJobProgress = if (plan.mode == ToolMode.ChdConverter) 0f else null,
-                    chdCurrentJobLabel = if (plan.mode == ToolMode.ChdConverter) null else it.chdCurrentJobLabel,
+                    currentJobProgress = if (plan.mode == ToolMode.Converter) 0f else null,
+                    currentJobLabel = if (plan.mode == ToolMode.Converter) null else it.currentJobLabel,
                     stopRequest = StopRequest.None,
                 )
             }
@@ -730,22 +730,22 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         it.copy(
                             operationProgressLabel = applyProgressLabel(plan.mode, completed, total),
                             operationProgress = completed.toFloat() / total,
-                            chdConversionReport = if (plan.mode == ToolMode.ChdConverter) {
-                                ChdConversionReport(
+                            conversionReport = if (plan.mode == ToolMode.Converter) {
+                                ConversionReport(
                                     completed = completed,
                                     total = total,
-                                    spaceSavedBytes = it.chdConversionReport?.spaceSavedBytes ?: 0L,
+                                    spaceSavedBytes = it.conversionReport?.spaceSavedBytes ?: 0L,
                                 )
                             } else {
-                                it.chdConversionReport
+                                it.conversionReport
                             },
-                            chdCurrentJobProgress = if (plan.mode == ToolMode.ChdConverter) 0f else null,
+                            currentJobProgress = if (plan.mode == ToolMode.Converter) 0f else null,
                         )
                     }
                 },
                 onCurrentOperationProgress = { progress ->
-                    if (plan.mode == ToolMode.ChdConverter) {
-                        _uiState.update { it.copy(chdCurrentJobProgress = progress) }
+                    if (plan.mode == ToolMode.Converter) {
+                        _uiState.update { it.copy(currentJobProgress = progress) }
                     }
                 },
                 onOperationStarted = { operation ->
@@ -757,7 +757,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         }
                         _uiState.update {
                             it.copy(
-                                chdCurrentJobLabel = sourcePath
+                                currentJobLabel = sourcePath
                                     .substringAfterLast('/')
                                     .substringBeforeLast('.'),
                             )
@@ -772,17 +772,17 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                             isBusy = false,
                             operationProgressLabel = null,
                             operationProgress = null,
-                            chdCurrentJobProgress = null,
-                            chdCurrentJobLabel = null,
-                            chdConversionReport = if (plan.mode == ToolMode.ChdConverter) {
-                                ChdConversionReport(
+                            currentJobProgress = null,
+                            currentJobLabel = null,
+                            conversionReport = if (plan.mode == ToolMode.Converter) {
+                                ConversionReport(
                                     completed = result.completedOperations,
                                     total = plan.operations.size,
                                     spaceSavedBytes = result.spaceSavedBytes,
                                     stopped = result.stopped,
                                 )
                             } else {
-                                it.chdConversionReport
+                                it.conversionReport
                             },
                             stopRequest = StopRequest.None,
                             message = if (result.stopped) {
@@ -799,16 +799,16 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                             isBusy = false,
                             operationProgressLabel = null,
                             operationProgress = null,
-                            chdCurrentJobProgress = null,
-                            chdCurrentJobLabel = null,
-                            chdConversionReport = if (plan.mode == ToolMode.ChdConverter) {
-                                ChdConversionReport(
-                                    completed = it.chdConversionReport?.completed ?: 0,
+                            currentJobProgress = null,
+                            currentJobLabel = null,
+                            conversionReport = if (plan.mode == ToolMode.Converter) {
+                                ConversionReport(
+                                    completed = it.conversionReport?.completed ?: 0,
                                     total = plan.operations.size,
                                     stopped = error is OperationStoppedException,
                                 )
                             } else {
-                                it.chdConversionReport
+                                it.conversionReport
                             },
                             stopRequest = StopRequest.None,
                             message = if (error is OperationStoppedException) {
@@ -844,7 +844,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         DocumentsContract.getTreeDocumentId(uri).substringAfterLast(':')
 
     private fun OperationPlan.withChdDeleteOriginalFiles(deleteOriginalFiles: Boolean): OperationPlan {
-        if (mode != ToolMode.ChdConverter) return this
+        if (mode != ToolMode.Converter) return this
         fun update(operation: FileOperation): FileOperation = when (operation) {
             is FileOperation.ConvertToChd -> operation.copy(deleteOriginalFiles = deleteOriginalFiles)
             else -> operation
@@ -887,7 +887,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         when (mode) {
             ToolMode.MultiDiscOrganizer -> "Scanning ROM files for multi-disc games…"
             ToolMode.RomZipper -> "Scanning ROM files for zip-compatible formats…"
-            ToolMode.ChdConverter -> "Scanning ROM files for ${_uiState.value.selectedConverterTool.displayName}-compatible files…"
+            ToolMode.Converter -> "Scanning ROM files for ${_uiState.value.selectedConverterTool.displayName}-compatible files…"
             ToolMode.VitaAppIds -> "Scanning ROM files…"
             ToolMode.EsDeSystems -> ""
         }
@@ -897,7 +897,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         val activity = when (mode) {
             ToolMode.MultiDiscOrganizer -> "Scanning for multi-disc games"
             ToolMode.RomZipper -> "Scanning for zip-compatible ROMs"
-            ToolMode.ChdConverter -> "Scanning for ${_uiState.value.selectedConverterTool.displayName}-compatible files"
+            ToolMode.Converter -> "Scanning for ${_uiState.value.selectedConverterTool.displayName}-compatible files"
             ToolMode.VitaAppIds -> "Scanning ROM files"
             ToolMode.EsDeSystems -> ""
         }
@@ -908,7 +908,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         val activity = when (mode) {
             ToolMode.MultiDiscOrganizer -> "Organizing ROMs"
             ToolMode.RomZipper -> "Zipping ROMs"
-            ToolMode.ChdConverter -> "Converting with ${_uiState.value.selectedConverterTool.displayName}"
+            ToolMode.Converter -> "Converting with ${_uiState.value.selectedConverterTool.displayName}"
             ToolMode.VitaAppIds -> "Creating shortcuts"
             ToolMode.EsDeSystems -> "Updating ES-DE systems"
         }
