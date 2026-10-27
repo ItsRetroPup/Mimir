@@ -1,81 +1,1029 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-23T14:28:17Z",
+  "generatedAt": "2026-10-27T00:00:00Z",
   "title": "Design System: Mimir",
   "extensions": {
     "colorMeta": {
-      "primary": { "role": "primary", "displayName": "Workshop Violet", "canonical": "#7B1FA2", "tonalRamp": ["oklch(18% 0.08 315)", "oklch(28% 0.11 315)", "oklch(38% 0.14 315)", "oklch(48% 0.17 315)", "#7B1FA2", "oklch(68% 0.16 315)", "oklch(80% 0.10 315)", "#E0B0FF"] },
-      "secondary": { "role": "secondary", "displayName": "Orchid Signal", "canonical": "#6A1B9A", "tonalRamp": ["oklch(17% 0.07 320)", "oklch(27% 0.10 320)", "oklch(37% 0.13 320)", "#6A1B9A", "oklch(57% 0.17 320)", "oklch(68% 0.15 320)", "oklch(80% 0.10 320)", "#F5B7FF"] },
-      "background": { "role": "neutral", "displayName": "Lilac Paper", "canonical": "#FAF7FC", "tonalRamp": ["#100B14", "#19121F", "#30243A", "oklch(35% 0.04 315)", "#76677A", "#EEE5F2", "#F1EAF5", "#FAF7FC"] },
-      "surface": { "role": "neutral", "displayName": "Clean Surface", "canonical": "#FFFFFF", "tonalRamp": ["#19121F", "#30243A", "oklch(35% 0.03 315)", "#76677A", "#A99AAF", "#EEE5F2", "#F5EDF8", "#FFFFFF"] }
+      "night-field-top": {
+        "role": "neutral",
+        "displayName": "Night Field (top)",
+        "canonical": "#0B1024",
+        "tonalRamp": [
+          "oklch(15% 0.042 271)",
+          "oklch(26% 0.042 271)",
+          "oklch(38% 0.042 271)",
+          "oklch(49% 0.042 271)",
+          "oklch(61% 0.042 271)",
+          "oklch(72% 0.042 271)",
+          "oklch(84% 0.042 271)",
+          "oklch(95% 0.040 271)"
+        ]
+      },
+      "night-field-bottom": {
+        "role": "neutral",
+        "displayName": "Night Field (bottom)",
+        "canonical": "#05070D",
+        "tonalRamp": [
+          "oklch(15% 0.015 266)",
+          "oklch(26% 0.015 266)",
+          "oklch(38% 0.015 266)",
+          "oklch(49% 0.015 266)",
+          "oklch(61% 0.015 266)",
+          "oklch(72% 0.015 266)",
+          "oklch(84% 0.015 266)",
+          "oklch(95% 0.015 266)"
+        ]
+      },
+      "night-grid": {
+        "role": "neutral",
+        "displayName": "Night Slot Grid",
+        "canonical": "#1B2650",
+        "tonalRamp": [
+          "oklch(15% 0.078 270)",
+          "oklch(26% 0.078 270)",
+          "oklch(38% 0.078 270)",
+          "oklch(49% 0.078 270)",
+          "oklch(61% 0.078 270)",
+          "oklch(72% 0.074 270)",
+          "oklch(84% 0.065 270)",
+          "oklch(95% 0.056 270)"
+        ]
+      },
+      "night-panel": {
+        "role": "neutral",
+        "displayName": "Night Panel",
+        "canonical": "#111934",
+        "tonalRamp": [
+          "oklch(15% 0.054 269)",
+          "oklch(26% 0.054 269)",
+          "oklch(38% 0.054 269)",
+          "oklch(49% 0.054 269)",
+          "oklch(61% 0.054 269)",
+          "oklch(72% 0.054 269)",
+          "oklch(84% 0.051 269)",
+          "oklch(95% 0.045 269)"
+        ]
+      },
+      "night-panel-raised": {
+        "role": "neutral",
+        "displayName": "Night Raised Panel",
+        "canonical": "#18224A",
+        "tonalRamp": [
+          "oklch(15% 0.075 270)",
+          "oklch(26% 0.075 270)",
+          "oklch(38% 0.075 270)",
+          "oklch(49% 0.075 270)",
+          "oklch(61% 0.075 270)",
+          "oklch(72% 0.071 270)",
+          "oklch(84% 0.062 270)",
+          "oklch(95% 0.054 270)"
+        ]
+      },
+      "night-edge-light": {
+        "role": "primary",
+        "displayName": "Cold Edge Light (night)",
+        "canonical": "#7FA7FF",
+        "tonalRamp": [
+          "oklch(15% 0.086 265)",
+          "oklch(26% 0.102 265)",
+          "oklch(38% 0.117 265)",
+          "oklch(49% 0.133 265)",
+          "oklch(61% 0.136 265)",
+          "oklch(72% 0.136 265)",
+          "oklch(84% 0.136 265)",
+          "oklch(95% 0.136 265)"
+        ]
+      },
+      "night-text": {
+        "role": "neutral",
+        "displayName": "Ice Text",
+        "canonical": "#E8EEFF",
+        "tonalRamp": [
+          "oklch(15% 0.024 270)",
+          "oklch(26% 0.024 270)",
+          "oklch(38% 0.024 270)",
+          "oklch(49% 0.024 270)",
+          "oklch(61% 0.024 270)",
+          "oklch(72% 0.024 270)",
+          "oklch(84% 0.024 270)",
+          "oklch(95% 0.024 270)"
+        ]
+      },
+      "night-text-muted": {
+        "role": "neutral",
+        "displayName": "Steel Muted",
+        "canonical": "#9AA7CB",
+        "tonalRamp": [
+          "oklch(15% 0.053 269)",
+          "oklch(26% 0.054 269)",
+          "oklch(38% 0.054 269)",
+          "oklch(49% 0.054 269)",
+          "oklch(61% 0.054 269)",
+          "oklch(72% 0.054 269)",
+          "oklch(84% 0.054 269)",
+          "oklch(95% 0.054 269)"
+        ]
+      },
+      "night-caution": {
+        "role": "tertiary",
+        "displayName": "Caution Amber (night)",
+        "canonical": "#FFB347",
+        "tonalRamp": [
+          "oklch(15% 0.079 72)",
+          "oklch(26% 0.096 72)",
+          "oklch(38% 0.113 72)",
+          "oklch(49% 0.130 72)",
+          "oklch(61% 0.147 72)",
+          "oklch(72% 0.149 72)",
+          "oklch(84% 0.149 72)",
+          "oklch(95% 0.149 72)"
+        ]
+      },
+      "night-on-caution": {
+        "role": "tertiary",
+        "displayName": "On Caution (night)",
+        "canonical": "#2A1600",
+        "tonalRamp": [
+          "oklch(15% 0.049 68)",
+          "oklch(26% 0.049 68)",
+          "oklch(38% 0.049 68)",
+          "oklch(49% 0.049 68)",
+          "oklch(61% 0.049 68)",
+          "oklch(72% 0.049 68)",
+          "oklch(84% 0.049 68)",
+          "oklch(95% 0.043 68)"
+        ]
+      },
+      "night-error": {
+        "role": "error",
+        "displayName": "Error (night)",
+        "canonical": "#FF7A7A",
+        "tonalRamp": [
+          "oklch(15% 0.098 22)",
+          "oklch(26% 0.116 22)",
+          "oklch(38% 0.135 22)",
+          "oklch(49% 0.153 22)",
+          "oklch(61% 0.163 22)",
+          "oklch(72% 0.163 22)",
+          "oklch(84% 0.163 22)",
+          "oklch(95% 0.158 22)"
+        ]
+      },
+      "day-field-top": {
+        "role": "neutral",
+        "displayName": "Daylight Field (top)",
+        "canonical": "#E6ECF8",
+        "tonalRamp": [
+          "oklch(15% 0.017 264)",
+          "oklch(26% 0.017 264)",
+          "oklch(38% 0.017 264)",
+          "oklch(49% 0.017 264)",
+          "oklch(61% 0.017 264)",
+          "oklch(72% 0.017 264)",
+          "oklch(84% 0.017 264)",
+          "oklch(95% 0.017 264)"
+        ]
+      },
+      "day-field-bottom": {
+        "role": "neutral",
+        "displayName": "Daylight Field (bottom)",
+        "canonical": "#D3DBEC",
+        "tonalRamp": [
+          "oklch(15% 0.025 266)",
+          "oklch(26% 0.025 266)",
+          "oklch(38% 0.025 266)",
+          "oklch(49% 0.025 266)",
+          "oklch(61% 0.025 266)",
+          "oklch(72% 0.025 266)",
+          "oklch(84% 0.025 266)",
+          "oklch(95% 0.025 266)"
+        ]
+      },
+      "day-grid": {
+        "role": "neutral",
+        "displayName": "Daylight Slot Grid",
+        "canonical": "#BCC8E2",
+        "tonalRamp": [
+          "oklch(15% 0.039 266)",
+          "oklch(26% 0.039 266)",
+          "oklch(38% 0.039 266)",
+          "oklch(49% 0.039 266)",
+          "oklch(61% 0.039 266)",
+          "oklch(72% 0.039 266)",
+          "oklch(84% 0.039 266)",
+          "oklch(95% 0.039 266)"
+        ]
+      },
+      "day-panel": {
+        "role": "neutral",
+        "displayName": "Daylight Panel",
+        "canonical": "#F7F9FD",
+        "tonalRamp": [
+          "oklch(15% 0.006 265)",
+          "oklch(26% 0.006 265)",
+          "oklch(38% 0.006 265)",
+          "oklch(49% 0.006 265)",
+          "oklch(61% 0.006 265)",
+          "oklch(72% 0.006 265)",
+          "oklch(84% 0.006 265)",
+          "oklch(95% 0.006 265)"
+        ]
+      },
+      "day-panel-raised": {
+        "role": "neutral",
+        "displayName": "Daylight Raised Panel",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "oklch(15% 0.000 90)",
+          "oklch(26% 0.000 90)",
+          "oklch(38% 0.000 90)",
+          "oklch(49% 0.000 90)",
+          "oklch(61% 0.000 90)",
+          "oklch(72% 0.000 90)",
+          "oklch(84% 0.000 90)",
+          "oklch(95% 0.000 90)"
+        ]
+      },
+      "day-edge-light": {
+        "role": "primary",
+        "displayName": "Cold Edge Light (daylight)",
+        "canonical": "#3550C8",
+        "tonalRamp": [
+          "oklch(15% 0.155 269)",
+          "oklch(26% 0.177 269)",
+          "oklch(38% 0.189 269)",
+          "oklch(49% 0.189 269)",
+          "oklch(61% 0.189 269)",
+          "oklch(72% 0.174 269)",
+          "oklch(84% 0.153 269)",
+          "oklch(95% 0.131 269)"
+        ]
+      },
+      "day-text": {
+        "role": "neutral",
+        "displayName": "Ink Navy Text",
+        "canonical": "#0C1430",
+        "tonalRamp": [
+          "oklch(15% 0.057 269)",
+          "oklch(26% 0.057 269)",
+          "oklch(38% 0.057 269)",
+          "oklch(49% 0.057 269)",
+          "oklch(61% 0.057 269)",
+          "oklch(72% 0.057 269)",
+          "oklch(84% 0.051 269)",
+          "oklch(95% 0.044 269)"
+        ]
+      },
+      "day-text-muted": {
+        "role": "neutral",
+        "displayName": "Slate Muted",
+        "canonical": "#475478",
+        "tonalRamp": [
+          "oklch(15% 0.062 269)",
+          "oklch(26% 0.062 269)",
+          "oklch(38% 0.062 269)",
+          "oklch(49% 0.062 269)",
+          "oklch(61% 0.062 269)",
+          "oklch(72% 0.062 269)",
+          "oklch(84% 0.062 269)",
+          "oklch(95% 0.061 269)"
+        ]
+      },
+      "day-caution": {
+        "role": "tertiary",
+        "displayName": "Caution Amber (daylight)",
+        "canonical": "#A85200",
+        "tonalRamp": [
+          "oklch(15% 0.114 53)",
+          "oklch(26% 0.129 53)",
+          "oklch(38% 0.136 53)",
+          "oklch(49% 0.136 53)",
+          "oklch(61% 0.136 53)",
+          "oklch(72% 0.136 53)",
+          "oklch(84% 0.125 53)",
+          "oklch(95% 0.110 53)"
+        ]
+      },
+      "day-on-caution": {
+        "role": "tertiary",
+        "displayName": "On Caution (daylight)",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "oklch(15% 0.000 90)",
+          "oklch(26% 0.000 90)",
+          "oklch(38% 0.000 90)",
+          "oklch(49% 0.000 90)",
+          "oklch(61% 0.000 90)",
+          "oklch(72% 0.000 90)",
+          "oklch(84% 0.000 90)",
+          "oklch(95% 0.000 90)"
+        ]
+      },
+      "day-error": {
+        "role": "error",
+        "displayName": "Error (daylight)",
+        "canonical": "#C62828",
+        "tonalRamp": [
+          "oklch(15% 0.148 27)",
+          "oklch(26% 0.171 27)",
+          "oklch(38% 0.193 27)",
+          "oklch(49% 0.194 27)",
+          "oklch(61% 0.194 27)",
+          "oklch(72% 0.188 27)",
+          "oklch(84% 0.166 27)",
+          "oklch(95% 0.144 27)"
+        ]
+      },
+      "ink-multidisc-night": {
+        "role": "primary",
+        "displayName": "Disc Orange (night)",
+        "canonical": "#FF8A3D",
+        "tonalRamp": [
+          "oklch(15% 0.097 51)",
+          "oklch(26% 0.116 51)",
+          "oklch(38% 0.135 51)",
+          "oklch(49% 0.154 51)",
+          "oklch(61% 0.167 51)",
+          "oklch(72% 0.167 51)",
+          "oklch(84% 0.167 51)",
+          "oklch(95% 0.163 51)"
+        ],
+        "tool": "Multi-disc Organizer",
+        "art": "DiscStack"
+      },
+      "ink-multidisc-day": {
+        "role": "primary",
+        "displayName": "Disc Orange (daylight)",
+        "canonical": "#C2520F",
+        "tonalRamp": [
+          "oklch(15% 0.122 45)",
+          "oklch(26% 0.140 45)",
+          "oklch(38% 0.158 45)",
+          "oklch(49% 0.159 45)",
+          "oklch(61% 0.159 45)",
+          "oklch(72% 0.159 45)",
+          "oklch(84% 0.148 45)",
+          "oklch(95% 0.130 45)"
+        ],
+        "tool": "Multi-disc Organizer",
+        "art": "DiscStack"
+      },
+      "ink-vita-night": {
+        "role": "primary",
+        "displayName": "Vita Cobalt (night)",
+        "canonical": "#5B95FF",
+        "tonalRamp": [
+          "oklch(15% 0.109 261)",
+          "oklch(26% 0.128 261)",
+          "oklch(38% 0.148 261)",
+          "oklch(49% 0.167 261)",
+          "oklch(61% 0.168 261)",
+          "oklch(72% 0.168 261)",
+          "oklch(84% 0.168 261)",
+          "oklch(95% 0.153 261)"
+        ],
+        "tool": "Vita Shortcuts",
+        "art": "VitaCard"
+      },
+      "ink-vita-day": {
+        "role": "primary",
+        "displayName": "Vita Cobalt (daylight)",
+        "canonical": "#2558D0",
+        "tonalRamp": [
+          "oklch(15% 0.155 264)",
+          "oklch(26% 0.178 264)",
+          "oklch(38% 0.194 264)",
+          "oklch(49% 0.194 264)",
+          "oklch(61% 0.194 264)",
+          "oklch(72% 0.181 264)",
+          "oklch(84% 0.159 264)",
+          "oklch(95% 0.137 264)"
+        ],
+        "tool": "Vita Shortcuts",
+        "art": "VitaCard"
+      },
+      "ink-esde-night": {
+        "role": "primary",
+        "displayName": "Folder Mint (night)",
+        "canonical": "#34D399",
+        "tonalRamp": [
+          "oklch(15% 0.088 163)",
+          "oklch(26% 0.105 163)",
+          "oklch(38% 0.123 163)",
+          "oklch(49% 0.140 163)",
+          "oklch(61% 0.153 163)",
+          "oklch(72% 0.153 163)",
+          "oklch(84% 0.153 163)",
+          "oklch(95% 0.153 163)"
+        ],
+        "tool": "ES-DE Systems",
+        "art": "Folders"
+      },
+      "ink-esde-day": {
+        "role": "primary",
+        "displayName": "Folder Mint (daylight)",
+        "canonical": "#087A53",
+        "tonalRamp": [
+          "oklch(15% 0.100 162)",
+          "oklch(26% 0.110 162)",
+          "oklch(38% 0.110 162)",
+          "oklch(49% 0.110 162)",
+          "oklch(61% 0.110 162)",
+          "oklch(72% 0.110 162)",
+          "oklch(84% 0.105 162)",
+          "oklch(95% 0.092 162)"
+        ],
+        "tool": "ES-DE Systems",
+        "art": "Folders"
+      },
+      "ink-nsz-night": {
+        "role": "primary",
+        "displayName": "Switch Magenta (night)",
+        "canonical": "#FF5C93",
+        "tonalRamp": [
+          "oklch(15% 0.120 3)",
+          "oklch(26% 0.143 3)",
+          "oklch(38% 0.166 3)",
+          "oklch(49% 0.190 3)",
+          "oklch(61% 0.202 3)",
+          "oklch(72% 0.202 3)",
+          "oklch(84% 0.202 3)",
+          "oklch(95% 0.182 3)"
+        ],
+        "tool": "NSZ to NSP",
+        "art": "SwitchCart"
+      },
+      "ink-nsz-day": {
+        "role": "primary",
+        "displayName": "Switch Magenta (daylight)",
+        "canonical": "#C81E5E",
+        "tonalRamp": [
+          "oklch(15% 0.153 6)",
+          "oklch(26% 0.176 6)",
+          "oklch(38% 0.199 6)",
+          "oklch(49% 0.203 6)",
+          "oklch(61% 0.203 6)",
+          "oklch(72% 0.198 6)",
+          "oklch(84% 0.174 6)",
+          "oklch(95% 0.151 6)"
+        ],
+        "tool": "NSZ to NSP",
+        "art": "SwitchCart"
+      },
+      "ink-romzipper-night": {
+        "role": "primary",
+        "displayName": "Zip Gold (night)",
+        "canonical": "#FFC93C",
+        "tonalRamp": [
+          "oklch(15% 0.076 86)",
+          "oklch(26% 0.094 86)",
+          "oklch(38% 0.112 86)",
+          "oklch(49% 0.131 86)",
+          "oklch(61% 0.149 86)",
+          "oklch(72% 0.159 86)",
+          "oklch(84% 0.159 86)",
+          "oklch(95% 0.159 86)"
+        ],
+        "tool": "RomZipper",
+        "art": "ZipCart"
+      },
+      "ink-romzipper-day": {
+        "role": "primary",
+        "displayName": "Zip Gold (daylight)",
+        "canonical": "#9A6B00",
+        "tonalRamp": [
+          "oklch(15% 0.099 78)",
+          "oklch(26% 0.112 78)",
+          "oklch(38% 0.117 78)",
+          "oklch(49% 0.117 78)",
+          "oklch(61% 0.117 78)",
+          "oklch(72% 0.117 78)",
+          "oklch(84% 0.115 78)",
+          "oklch(95% 0.102 78)"
+        ],
+        "tool": "RomZipper",
+        "art": "ZipCart"
+      },
+      "ink-chdman-night": {
+        "role": "primary",
+        "displayName": "Packed Cyan (night)",
+        "canonical": "#2DD4E6",
+        "tonalRamp": [
+          "oklch(15% 0.075 206)",
+          "oklch(26% 0.090 206)",
+          "oklch(38% 0.105 206)",
+          "oklch(49% 0.120 206)",
+          "oklch(61% 0.129 206)",
+          "oklch(72% 0.129 206)",
+          "oklch(84% 0.129 206)",
+          "oklch(95% 0.129 206)"
+        ],
+        "tool": "CHDMan",
+        "art": "PackedDisc"
+      },
+      "ink-chdman-day": {
+        "role": "primary",
+        "displayName": "Packed Cyan (daylight)",
+        "canonical": "#0B7F8E",
+        "tonalRamp": [
+          "oklch(15% 0.086 210)",
+          "oklch(26% 0.092 210)",
+          "oklch(38% 0.092 210)",
+          "oklch(49% 0.092 210)",
+          "oklch(61% 0.092 210)",
+          "oklch(72% 0.092 210)",
+          "oklch(84% 0.092 210)",
+          "oklch(95% 0.085 210)"
+        ],
+        "tool": "CHDMan",
+        "art": "PackedDisc"
+      },
+      "ink-rvz-night": {
+        "role": "primary",
+        "displayName": "Mini-disc Violet (night)",
+        "canonical": "#B197FC",
+        "tonalRamp": [
+          "oklch(15% 0.089 294)",
+          "oklch(26% 0.106 294)",
+          "oklch(38% 0.122 294)",
+          "oklch(49% 0.139 294)",
+          "oklch(61% 0.144 294)",
+          "oklch(72% 0.144 294)",
+          "oklch(84% 0.144 294)",
+          "oklch(95% 0.144 294)"
+        ],
+        "tool": "Dolphin RVZ",
+        "art": "MiniDisc"
+      },
+      "ink-rvz-day": {
+        "role": "primary",
+        "displayName": "Mini-disc Violet (daylight)",
+        "canonical": "#6A47D6",
+        "tonalRamp": [
+          "oklch(15% 0.160 288)",
+          "oklch(26% 0.184 288)",
+          "oklch(38% 0.207 288)",
+          "oklch(49% 0.207 288)",
+          "oklch(61% 0.207 288)",
+          "oklch(72% 0.195 288)",
+          "oklch(84% 0.172 288)",
+          "oklch(95% 0.148 288)"
+        ],
+        "tool": "Dolphin RVZ",
+        "art": "MiniDisc"
+      },
+      "ink-zcci-night": {
+        "role": "primary",
+        "displayName": "Handheld Lime (night)",
+        "canonical": "#B5E853",
+        "tonalRamp": [
+          "oklch(15% 0.082 126)",
+          "oklch(26% 0.103 126)",
+          "oklch(38% 0.124 126)",
+          "oklch(49% 0.145 126)",
+          "oklch(61% 0.166 126)",
+          "oklch(72% 0.183 126)",
+          "oklch(84% 0.183 126)",
+          "oklch(95% 0.183 126)"
+        ],
+        "tool": "Azahar ZCCI",
+        "art": "HandheldCart"
+      },
+      "ink-zcci-day": {
+        "role": "primary",
+        "displayName": "Handheld Lime (daylight)",
+        "canonical": "#55800B",
+        "tonalRamp": [
+          "oklch(15% 0.116 130)",
+          "oklch(26% 0.132 130)",
+          "oklch(38% 0.142 130)",
+          "oklch(49% 0.142 130)",
+          "oklch(61% 0.142 130)",
+          "oklch(72% 0.142 130)",
+          "oklch(84% 0.131 130)",
+          "oklch(95% 0.115 130)"
+        ],
+        "tool": "Azahar ZCCI",
+        "art": "HandheldCart"
+      },
+      "ink-xiso-night": {
+        "role": "primary",
+        "displayName": "Trim Green (night)",
+        "canonical": "#4ADE80",
+        "tonalRamp": [
+          "oklch(15% 0.094 152)",
+          "oklch(26% 0.114 152)",
+          "oklch(38% 0.135 152)",
+          "oklch(49% 0.156 152)",
+          "oklch(61% 0.177 152)",
+          "oklch(72% 0.182 152)",
+          "oklch(84% 0.182 152)",
+          "oklch(95% 0.182 152)"
+        ],
+        "tool": "Xbox XISO",
+        "art": "TrimmedDisc"
+      },
+      "ink-xiso-day": {
+        "role": "primary",
+        "displayName": "Trim Green (daylight)",
+        "canonical": "#13803B",
+        "tonalRamp": [
+          "oklch(15% 0.117 150)",
+          "oklch(26% 0.133 150)",
+          "oklch(38% 0.139 150)",
+          "oklch(49% 0.139 150)",
+          "oklch(61% 0.139 150)",
+          "oklch(72% 0.139 150)",
+          "oklch(84% 0.126 150)",
+          "oklch(95% 0.110 150)"
+        ],
+        "tool": "Xbox XISO",
+        "art": "TrimmedDisc"
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Operational Display", "purpose": "Key page-level states and large summaries." },
-      "headline": { "displayName": "Workshop Headline", "purpose": "Section titles and operational summaries." },
-      "title": { "displayName": "Task Title", "purpose": "Cards and secondary headings." },
-      "body": { "displayName": "Clear Body", "purpose": "Descriptions, folder names, and explanatory copy." },
-      "label": { "displayName": "Technical Label", "purpose": "Concise labels, metadata, and status markers." }
+      "display": {
+        "displayName": "Display",
+        "purpose": "The Mimir name in the About panel only. Material displaySmall."
+      },
+      "headline-large": {
+        "displayName": "Headline Large",
+        "purpose": "Focused tool name in the home info panel; the scale-contrast moment."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Data-pane headings and empty-pane titles. Material headlineSmall."
+      },
+      "title-large": {
+        "displayName": "Title Large",
+        "purpose": "Header strip name and ink crumb, slot titles, report title."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Row titles, Reads/Writes values, the A enter prompt, progress labels. Material titleMedium."
+      },
+      "title-small": {
+        "displayName": "Title Small",
+        "purpose": "Setup option labels and selected folder name."
+      },
+      "body-large": {
+        "displayName": "Body Large",
+        "purpose": "Home prompt and dialog option text."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Descriptions, status line text. Material bodyMedium."
+      },
+      "body-small": {
+        "displayName": "Body Small",
+        "purpose": "File paths, option details, inline amber and error lines."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, chips, legend labels, Reads/Writes captions. Material labelLarge. Sentence case."
+      },
+      "label-small": {
+        "displayName": "Label Small",
+        "purpose": "Save-block names, format badges, field captions. Material labelMedium."
+      },
+      "figures": {
+        "displayName": "Figures",
+        "purpose": "Label with tabular figures for sizes, counts, free space, IDs, progress."
+      }
     },
-    "shadows": [
-      { "name": "tonal-action-lift", "value": "6dp tonal elevation", "purpose": "Persistent bottom action surface." }
+    "fontSource": {
+      "family": "Rubik",
+      "file": "app/src/main/res/font/rubik.ttf",
+      "license": "OFL-1.1",
+      "weights": [
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "axis": "wght"
+    },
+    "materialRoleMapping": {
+      "primary": "edge-light (replaced by the tool ink inside InkTheme)",
+      "onPrimary": "field-bottom on night, white in daylight",
+      "primaryContainer": "panel-raised",
+      "secondary": "edge-light (tool ink inside InkTheme)",
+      "tertiary": "caution",
+      "onTertiary": "on-caution",
+      "background": "field-bottom",
+      "surface": "panel",
+      "surfaceVariant": "panel-raised",
+      "surfaceContainerLowest..surfaceContainer": "panel",
+      "surfaceContainerHigh..Highest": "panel-raised",
+      "onSurfaceVariant": "text-muted",
+      "outline": "edge-light at 55% (ink at 60% inside InkTheme)",
+      "outlineVariant": "grid",
+      "error": "error",
+      "onError": "field-bottom"
+    },
+    "alphaRecipes": [
+      {
+        "name": "panel-edge-rest",
+        "value": "edge-light @ 28%",
+        "purpose": "1dp border of a console panel with no tool accent."
+      },
+      {
+        "name": "panel-edge-ink",
+        "value": "ink @ 55%",
+        "purpose": "1dp border of a panel that belongs to a tool."
+      },
+      {
+        "name": "block-edge-rest",
+        "value": "edge-light @ 22%",
+        "purpose": "Save-block cell border at rest."
+      },
+      {
+        "name": "block-selected",
+        "value": "ink @ 60%",
+        "purpose": "Border of the last-opened save block."
+      },
+      {
+        "name": "block-focused-fill",
+        "value": "ink @ 16%",
+        "purpose": "Save-block cell fill while focused."
+      },
+      {
+        "name": "row-selected",
+        "value": "ink @ 10%",
+        "purpose": "Selected data row / change row fill."
+      },
+      {
+        "name": "badge-fill",
+        "value": "ink @ 14%",
+        "purpose": "Format badge background."
+      },
+      {
+        "name": "status-tint",
+        "value": "ink or error @ 12%",
+        "purpose": "Status line background."
+      },
+      {
+        "name": "legend-emphasis",
+        "value": "ink @ 18% fill, ink @ 60% outline",
+        "purpose": "Primary legend action."
+      },
+      {
+        "name": "legend-disabled",
+        "value": "38% opacity",
+        "purpose": "Unavailable legend action."
+      },
+      {
+        "name": "legend-surface",
+        "value": "panel @ 94%",
+        "purpose": "Legend bar background."
+      },
+      {
+        "name": "grid-line",
+        "value": "grid @ 55% night, 70% daylight; 1px",
+        "purpose": "48dp field gridlines."
+      },
+      {
+        "name": "empty-art",
+        "value": "ink @ 55%",
+        "purpose": "Tool object drawn at 96dp in empty data panes."
+      }
     ],
-    "motion": [],
+    "focus": [
+      {
+        "name": "focus-ring",
+        "value": "3dp border in Material primary (the page ink), pill by default, circle on icon buttons, 16dp on save blocks",
+        "purpose": "Every focusable control; Material's own focus layer is too faint on a handheld."
+      },
+      {
+        "name": "focus-ripple",
+        "value": "focused 0.32, pressed 0.16, dragged 0.16, hovered 0.08",
+        "purpose": "App-wide ripple alphas for ripple-based controls."
+      },
+      {
+        "name": "ink-button-focus",
+        "value": "focused ripple 0; fill lerp 22% toward white on night only",
+        "purpose": "Filled buttons never darken on focus; daylight relies on ring and lift so the white label keeps contrast."
+      }
+    ],
+    "shadows": [],
+    "motion": [
+      {
+        "name": "focus-lift",
+        "value": "scale 1.0 -> 1.06, translateY -(scale-1)*60px; spring damping 0.45, stiffness MediumLow (400)",
+        "purpose": "Focused save blocks and ink buttons rise and settle with a small bounce."
+      },
+      {
+        "name": "save-block-turn",
+        "value": "rotationY -18deg <-> 18deg, tween 1800ms FastOutSlowIn, reverse, infinite; cameraDistance 12*density",
+        "purpose": "The focused save block only. Parked at 0deg when the animator duration scale is 0."
+      },
+      {
+        "name": "block-meter-sweep",
+        "value": "lit group of ~5 segments, tween 1400ms linear, reverse, infinite",
+        "purpose": "Indeterminate progress. Parked when the animator duration scale is 0."
+      }
+    ],
     "breakpoints": [
-      { "name": "expanded-landscape", "value": "840dp width and 480dp height" }
-    ]
+      {
+        "name": "home-two-column",
+        "value": "600dp",
+        "purpose": "Slots 60% / info panel 40%; narrower stacks."
+      },
+      {
+        "name": "tool-two-pane",
+        "value": "700dp",
+        "purpose": "Setup 42% / data 58%; narrower stacks."
+      }
+    ],
+    "controller": {
+      "A": "Select / open",
+      "B": "Back (home)",
+      "X": "Scan folder; Download on ES-DE",
+      "Y": "Apply or Convert (with selected count); Install on ES-DE; Theme on home",
+      "rules": [
+        "First directional press on a screen lands in content, not the header.",
+        "Returning home refocuses the block that was opened.",
+        "Touch input never shows focus.",
+        "Search field stays read-only until A, Enter or a tap; Up/Down always leave it.",
+        "Entering a chip row lands on the selected chip.",
+        "The legend bar lists exactly the actions the face buttons perform."
+      ]
+    },
+    "blockMeters": [
+      {
+        "name": "progress",
+        "segments": 24,
+        "height": "12dp",
+        "gap": "3dp"
+      },
+      {
+        "name": "size-bar",
+        "segments": 16,
+        "height": "5dp",
+        "width": "160dp",
+        "gap": "3dp"
+      },
+      {
+        "name": "storage-header",
+        "segments": 12,
+        "height": "8dp",
+        "width": "96dp",
+        "ink": "text-muted"
+      }
+    ],
+    "slotGrid": {
+      "cellsPerSlot": 5,
+      "cellGap": "10dp",
+      "slotGap": "14dp",
+      "slotTitleHeight": "24dp",
+      "blockLabelLines": 2,
+      "emptyCell": "1.5dp dashed (10/8) grid-colour frame, 16dp corners"
+    }
   },
   "components": [
     {
-      "name": "Selected Tool Card",
-      "kind": "card",
-      "refersTo": "tool-card-selected",
-      "description": "A vertical task-list item with a selected workshop-violet state.",
-      "html": "<article class=\"ds-tool-card ds-tool-card--selected\"><span class=\"ds-tool-icon\">↻</span><span><strong>Organise multi-disc games</strong><small>Create frontend-ready folders and playlists.</small></span><b>›</b></article>",
-      "css": ".ds-tool-card{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid rgba(118,103,122,.5);border-radius:12px;background:#fff;color:#1a111f;font:16px/24px sans-serif}.ds-tool-card--selected{background:rgba(123,31,162,.12);border-color:rgba(118,103,122,.9)}.ds-tool-card strong,.ds-tool-card small{display:block}.ds-tool-card small{opacity:.78;font-size:14px;line-height:20px}.ds-tool-card b{margin-left:auto;color:#7b1fa2;font-size:24px}.ds-tool-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:10px;background:#7b1fa2;color:#fff;font-size:24px}.ds-tool-card:hover{border-color:#7b1fa2}.ds-tool-card:focus-visible{outline:3px solid #7b1fa2;outline-offset:2px}"
-    },
-    {
-      "name": "Primary Action",
+      "name": "Ink Button",
       "kind": "button",
-      "refersTo": "floating-action-surface",
-      "description": "The direct next operation within a softly elevated action surface.",
-      "html": "<button class=\"ds-primary-btn\">SCAN SELECTED FOLDER</button>",
-      "css": ".ds-primary-btn{width:100%;min-height:48px;border:0;border-radius:999px;background:#7b1fa2;color:#fff;padding:0 24px;font:500 14px/20px monospace;letter-spacing:.8px;cursor:pointer}.ds-primary-btn:hover{background:#6a1b9a}.ds-primary-btn:active{transform:translateY(1px)}.ds-primary-btn:focus-visible{outline:3px solid #e0b0ff;outline-offset:2px}"
+      "refersTo": "button-ink",
+      "description": "Primary forward action on a pane, filled in the page ink (Vita cobalt shown). Focus: 3dp ink ring, lift, and on night a 22% brighter fill.",
+      "html": "<button class=\"ds-btn-ink\">Choose folder</button>",
+      "css": ".ds-btn-ink{font-family:'Rubik',system-ui,sans-serif;font-size:14px;font-weight:600;letter-spacing:.01em;background:#5B95FF;color:#05070D;border:none;border-radius:9999px;padding:10px 24px;outline:3px solid transparent;outline-offset:3px;transition:transform .25s cubic-bezier(.34,1.56,.64,1),background .15s;}.ds-btn-ink:hover{background:#7aa9ff;}.ds-btn-ink:focus-visible{outline-color:#5B95FF;background:#7aa9ff;transform:scale(1.06) translateY(-2px);}.ds-btn-ink:active{background:#4a82e8;}"
     },
     {
-      "name": "Option Chip",
-      "kind": "chip",
-      "refersTo": "chip",
-      "description": "A compact filter choice for non-destructive configuration.",
-      "html": "<button class=\"ds-chip\">PLAYLIST FORMAT</button>",
-      "css": ".ds-chip{min-height:40px;border:1px solid #76677a;border-radius:999px;background:#eee5f2;color:#1a111f;padding:0 16px;font:500 12px/16px monospace;letter-spacing:1px;cursor:pointer}.ds-chip:hover{border-color:#7b1fa2}.ds-chip:focus-visible{outline:3px solid #7b1fa2;outline-offset:2px}"
+      "name": "Caution Button",
+      "kind": "button",
+      "refersTo": "button-caution",
+      "description": "Only for writes that cannot be taken back: confirm apply/convert, replace output, remove shortcut, stop now.",
+      "html": "<button class=\"ds-btn-caution\">Start 12 conversions</button>",
+      "css": ".ds-btn-caution{font-family:'Rubik',system-ui,sans-serif;font-size:14px;font-weight:600;letter-spacing:.01em;background:#FFB347;color:#2A1600;border:none;border-radius:9999px;padding:10px 24px;outline:3px solid transparent;outline-offset:3px;transition:transform .25s cubic-bezier(.34,1.56,.64,1),background .15s;}.ds-btn-caution:focus-visible{outline-color:#FFB347;background:#ffc670;transform:scale(1.06) translateY(-2px);}.ds-btn-caution:active{background:#f0a032;}"
     },
     {
-      "name": "Confirmation Dialog",
-      "kind": "custom",
-      "refersTo": "material-alert-dialog",
-      "description": "A plain-language checkpoint before an irreversible file operation.",
-      "html": "<section class=\"ds-dialog\"><strong>Apply changes?</strong><p>Original files may be moved or removed as shown in the preview.</p><span><button class=\"ds-cancel\">CANCEL</button><button class=\"ds-confirm\">APPLY CHANGES</button></span></section>",
-      "css": ".ds-dialog{max-width:300px;border-radius:28px;background:#fff;color:#1a111f;padding:24px;font:16px/24px sans-serif;box-shadow:0 8px 24px rgba(26,17,31,.18)}.ds-dialog strong{font-size:20px;line-height:28px}.ds-dialog p{margin:12px 0 20px}.ds-dialog span{display:flex;justify-content:flex-end;gap:8px}.ds-dialog button{min-height:40px;border-radius:999px;padding:0 14px;font:500 12px/16px monospace;letter-spacing:.8px;cursor:pointer}.ds-cancel{border:1px solid #76677a;background:transparent;color:#7b1fa2}.ds-confirm{border:0;background:#7b1fa2;color:#fff}.ds-dialog button:focus-visible{outline:3px solid #7b1fa2;outline-offset:2px}"
+      "name": "Outlined Button",
+      "kind": "button",
+      "refersTo": "button-outlined",
+      "description": "Cancel and secondary actions: ink text with a 60% ink outline.",
+      "html": "<button class=\"ds-btn-outlined\">Cancel</button>",
+      "css": ".ds-btn-outlined{font-family:'Rubik',system-ui,sans-serif;font-size:14px;font-weight:600;background:transparent;color:#7FA7FF;border:1px solid rgba(127,167,255,.6);border-radius:9999px;padding:10px 24px;outline:3px solid transparent;outline-offset:2px;}.ds-btn-outlined:hover{background:rgba(127,167,255,.08);}.ds-btn-outlined:focus-visible{outline-color:#7FA7FF;}"
     },
     {
-      "name": "Landscape Navigation Rail",
+      "name": "Legend Bar",
       "kind": "nav",
-      "refersTo": "material-navigation-rail",
-      "description": "Expanded landscape navigation that leaves the work area as one vertical task sequence.",
-      "html": "<nav class=\"ds-rail\"><b>M</b><button class=\"ds-rail-active\">⌂<small>HOME</small></button><button>◈<small>TOOLS</small></button></nav>",
-      "css": ".ds-rail{display:grid;gap:12px;width:72px;min-height:240px;padding:16px 8px;border-radius:0 18px 18px 0;background:rgba(255,255,255,.96);color:#1a111f;text-align:center;font:500 11px/16px monospace}.ds-rail b{color:#7b1fa2;font:600 20px/24px sans-serif}.ds-rail button{display:grid;gap:3px;justify-items:center;min-height:52px;border:0;border-radius:16px;background:transparent;color:inherit;cursor:pointer}.ds-rail button:hover,.ds-rail-active{background:rgba(123,31,162,.12)!important;color:#7b1fa2!important}.ds-rail small{font:500 10px/12px monospace}.ds-rail button:focus-visible{outline:3px solid #7b1fa2;outline-offset:2px}"
+      "refersTo": "legend-bar",
+      "description": "Face-button legend along the foot of every screen; drawn glyphs, sentence-case labels, primary action emphasised in ink, disabled at 38%.",
+      "html": "<div class=\"ds-legend\"><span class=\"ds-legend-item\"><span class=\"ds-glyph\" style=\"background:#E8EEFF\">A</span>Select</span><span class=\"ds-legend-item\"><span class=\"ds-glyph\" style=\"background:#E8EEFF\">B</span>Back</span><span class=\"ds-legend-item ds-legend-emph\"><span class=\"ds-glyph\" style=\"background:#FF8A3D\">X</span>Scan folder</span><span class=\"ds-legend-item ds-legend-off\"><span class=\"ds-glyph\" style=\"background:#E8EEFF\">Y</span>Apply</span></div>",
+      "css": ".ds-legend{font-family:'Rubik',system-ui,sans-serif;display:flex;justify-content:flex-end;gap:8px;background:rgba(17,25,52,.94);padding:2px 16px;min-height:48px;align-items:center;}.ds-legend-item{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border-radius:9999px;color:#E8EEFF;font-size:14px;font-weight:600;border:1px solid transparent;}.ds-legend-emph{color:#FF8A3D;background:rgba(255,138,61,.18);border-color:rgba(255,138,61,.6);}.ds-legend-off{opacity:.38;}.ds-legend-item:focus-visible{outline:3px solid #FF8A3D;}.ds-glyph{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;color:#05070D;font-weight:800;font-size:12px;}"
+    },
+    {
+      "name": "Save Block",
+      "kind": "custom",
+      "refersTo": "save-block",
+      "description": "A tool as a drawn object in a memory-card slot cell. Focused: ink fill 16%, 3dp ink border, lift, and the object rocks about its vertical axis.",
+      "html": "<div class=\"ds-slot\"><button class=\"ds-block\"><span class=\"ds-block-cell\"><svg viewBox=\"0 0 64 64\" width=\"70%\" height=\"70%\" class=\"ds-turn\"><circle cx=\"32\" cy=\"35\" r=\"24\" fill=\"#2a6f45\"/><circle cx=\"32\" cy=\"32\" r=\"24\" fill=\"#4ADE80\"/><path d=\"M14 22a22 22 0 0 1 10-8\" stroke=\"rgba(255,255,255,.5)\" stroke-width=\"2.5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"32\" cy=\"32\" r=\"6\" fill=\"#a8f0c4\"/><circle cx=\"32\" cy=\"32\" r=\"2.4\" fill=\"#111934\"/></svg></span><span class=\"ds-block-name\">Xbox XISO</span></button><span class=\"ds-empty\"></span></div>",
+      "css": ".ds-slot{display:flex;gap:10px;background:#05070D;padding:16px;}.ds-block{font-family:'Rubik',system-ui,sans-serif;width:120px;background:none;border:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:transform .35s cubic-bezier(.34,1.56,.64,1);}.ds-block-cell{width:120px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:#111934;border:1px solid rgba(127,167,255,.22);border-radius:16px;}.ds-block-name{font-size:12px;font-weight:600;letter-spacing:.02em;color:#9AA7CB;}.ds-block:hover .ds-block-cell,.ds-block:focus-visible .ds-block-cell{background:rgba(74,222,128,.16);border:3px solid #4ADE80;}.ds-block:focus-visible{outline:none;transform:scale(1.06) translateY(-4px);}.ds-block:focus-visible .ds-block-name{color:#E8EEFF;}.ds-block:focus-visible .ds-turn{animation:ds-rock 1.8s ease-in-out infinite alternate;}@keyframes ds-rock{from{transform:perspective(300px) rotateY(-18deg)}to{transform:perspective(300px) rotateY(18deg)}}@media (prefers-reduced-motion:reduce){.ds-block:focus-visible .ds-turn{animation:none}}.ds-empty{width:120px;aspect-ratio:1;border:1.5px dashed #1B2650;border-radius:16px;}"
+    },
+    {
+      "name": "Console Panel",
+      "kind": "card",
+      "refersTo": "console-panel",
+      "description": "Solid panel with a 1dp cold edge light (ink at 55% when it belongs to a tool); hosts setup, info, About, progress and report.",
+      "html": "<div class=\"ds-panel\"><div class=\"ds-panel-title\">Xbox XISO</div><p class=\"ds-panel-body\">Trim Redump Xbox ISOs to XISO for Hakux and xemu.</p><hr class=\"ds-rule\"><div class=\"ds-fmt\"><span>Reads</span><b>Redump .iso</b></div><div class=\"ds-fmt\"><span>Writes</span><b class=\"ds-ink\">XISO .iso</b></div></div>",
+      "css": ".ds-panel{font-family:'Rubik',system-ui,sans-serif;background:#111934;border:1px solid rgba(74,222,128,.55);border-radius:16px;padding:18px;color:#E8EEFF;display:flex;flex-direction:column;gap:10px;max-width:420px;}.ds-panel-title{font-size:28px;font-weight:700;line-height:32px;letter-spacing:-.01em;}.ds-panel-body{margin:0;font-size:14px;line-height:20px;color:#9AA7CB;}.ds-rule{border:none;height:1px;background:#1B2650;margin:2px 0;width:100%;}.ds-fmt{display:flex;gap:12px;align-items:center;}.ds-fmt span{width:64px;font-size:14px;font-weight:600;color:#9AA7CB;}.ds-fmt b{font-size:16px;font-weight:600;}.ds-ink{color:#4ADE80;}"
+    },
+    {
+      "name": "Data Row with Size Bar",
+      "kind": "custom",
+      "refersTo": "data-row",
+      "description": "A file-list entry in the data pane: checkbox, title, block-meter size bar, target name, tabular size; amber line when output will be replaced.",
+      "html": "<label class=\"ds-row ds-row-on\"><input type=\"checkbox\" checked><span class=\"ds-row-main\"><span class=\"ds-row-title\">Halo 2 (USA)</span><span class=\"ds-meter\"><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i></i><i></i><i></i><i></i><i></i></span><span class=\"ds-row-sub\">Halo 2 (USA).iso</span><span class=\"ds-row-warn\">Existing output will be replaced</span></span><span class=\"ds-row-size\">7.3 GB</span></label>",
+      "css": ".ds-row{font-family:'Rubik',system-ui,sans-serif;display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 12px;border-radius:12px;background:#111934;color:#E8EEFF;max-width:520px;}.ds-row-on{background:rgba(74,222,128,.10);}.ds-row:focus-within{outline:3px solid #4ADE80;}.ds-row input{accent-color:#4ADE80;width:18px;height:18px;}.ds-row-main{flex:1;display:flex;flex-direction:column;gap:3px;}.ds-row-title{font-size:16px;font-weight:600;}.ds-row-sub{font-size:12px;color:#9AA7CB;}.ds-row-warn{font-size:12px;color:#FFB347;}.ds-row-size{font-size:14px;font-weight:600;color:#9AA7CB;font-feature-settings:'tnum';}.ds-meter{display:flex;gap:3px;width:160px;height:5px;}.ds-meter i{flex:1;border-radius:2px;background:#1B2650;}.ds-meter i.on{background:#4ADE80;}"
+    },
+    {
+      "name": "Choice Chips",
+      "kind": "chip",
+      "refersTo": "choice-chip",
+      "description": "Mutually exclusive options; selected takes the ink fill. Entering the row with a controller lands on the current choice.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip ds-chip-on\">ES-DE</button><button class=\"ds-chip\">Other</button></div>",
+      "css": ".ds-chips{display:flex;gap:8px;flex-wrap:wrap;}.ds-chip{font-family:'Rubik',system-ui,sans-serif;font-size:14px;font-weight:600;padding:8px 16px;border-radius:9999px;background:#18224A;color:#E8EEFF;border:1px solid rgba(127,167,255,.55);}.ds-chip-on{background:#FF8A3D;color:#05070D;border-color:#FF8A3D;}.ds-chip:focus-visible{outline:3px solid #FF8A3D;outline-offset:2px;}"
+    },
+    {
+      "name": "Status Line",
+      "kind": "custom",
+      "refersTo": "status-line",
+      "description": "Info in the ink at 12%, failures in the error role at 12%; never amber.",
+      "html": "<div class=\"ds-status\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#FF7A7A\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v6M12 16.5v.5\"/></svg><span>Storage is low: 1.2 GB free, 7.3 GB needed.</span></div>",
+      "css": ".ds-status{font-family:'Rubik',system-ui,sans-serif;display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:rgba(255,122,122,.12);color:#E8EEFF;font-size:14px;line-height:20px;max-width:520px;}"
     }
   ],
   "narrative": {
-    "northStar": "The Violet Workshop",
-    "overview": "Mimir is a warm, approachable Android workshop for careful library maintenance. Violet connects the app's tools and decisions; generous, gently lifted surfaces make the operational work feel manageable rather than clinical. The interface is Material 3 first. It uses clear task labels, native Android controls, and deliberate confirmation points to make local file work feel trustworthy. Dark mode is a first-class violet-night scheme, never an inverted light screen.",
-    "keyCharacteristics": ["Warm violet accents on pale lilac or near-black plum surfaces.", "Landscape-first operation with a persistent navigation rail and a readable vertical task list.", "Gently lifted cards, plain-language task copy, and technical mono labels for statuses and small metadata."],
-    "rules": [
-      { "name": "Accent-Has-A-Job", "body": "Violet is for action, selection, and navigation context. Let the neutral surface do most of the visual work.", "section": "colors" },
-      { "name": "Plain-Task", "body": "Use normal language for decisions and consequences; reserve mono treatment for concise labels and technical detail.", "section": "typography" },
-      { "name": "Gentle-Lift", "body": "Elevation should clarify a control's readiness or action priority; it must not make every surface look floating.", "section": "elevation" }
+    "northStar": "The Memory Card Manager",
+    "overview": "Mimir is drawn as a console's own system data browser. The tools are save blocks sitting in two memory-card slots on a night-blue field ruled with faint slot gridlines; a tool page is the card's data view, with what to read on the left and the files Mimir found, as file entries with block-meter size bars, on the right. Writing anything is a ceremony the console would recognise: a plain dialog, a named count, an amber button only when the write cannot be taken back.\n\nThe world is controller-first on a 1920x1080 handheld and touch-second. Every screen carries a header strip on top and a face-button legend bar at the foot; the legend is the literal map of what A, B, X and Y do here, and its entries are touch targets too. Each of the nine tools owns one ink and speaks in it everywhere on its page.\n\nThere are two lighting states of the same world, night (default) and daylight, and every token comes in both.",
+    "keyCharacteristics": [
+      "Night-blue field with a 48dp slot grid over a vertical fade; solid panels with a 1dp cold edge light.",
+      "One ink per tool, with a night value and a darker daylight value.",
+      "Tools are drawn objects, never icon-font tiles.",
+      "Drawn A/B/X/Y face-button glyphs.",
+      "One turning object at a time: the focused save block.",
+      "Rubik throughout; rank by weight and reversal; tabular figures for every number."
     ],
-    "dos": ["Do make landscape the reference layout: rail plus one vertical task sequence.", "Do treat dark mode as a complete violet-night palette with readable surface contrast.", "Do use primary violet to show action, navigation context, and selected work.", "Do keep destructive file operations behind clear Material confirmation dialogs."],
-    "donts": ["Don't turn the landscape workspace into a multi-column tool grid.", "Don't use violet as a full-screen fill or add decorative neon effects.", "Don't replace native Material 3 controls with iOS-like controls or custom equivalents.", "Don't use mono for paragraphs or instructional copy."]
+    "rules": [
+      {
+        "name": "The Amber Is A Warning Rule",
+        "body": "Amber appears only on a control that destroys or replaces data, or on the line warning that it will. Errors use the error role.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Ink Per Page Rule",
+        "body": "A tool page speaks only in its own ink plus the cold edge light for system chrome.",
+        "section": "colors"
+      },
+      {
+        "name": "The Paired Lighting Rule",
+        "body": "Every colour exists as a night and a daylight value.",
+        "section": "colors"
+      },
+      {
+        "name": "The Sentence Case Rule",
+        "body": "Buttons, legend labels, chips and titles are sentence case; only file-extension badges are uppercase, as data.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Figures Rule",
+        "body": "Any number that can change or be compared is set with tnum.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Kicker Rule",
+        "body": "No eyebrow or kicker text above headings.",
+        "section": "typography"
+      },
+      {
+        "name": "The Two Pane Rule",
+        "body": "A tool page is always setup on the left, data on the right on wide screens.",
+        "section": "layout"
+      },
+      {
+        "name": "The Lift Not Shadow Rule",
+        "body": "Focus raises an element with scale and a bouncy settle; nothing gets a drop shadow to show state.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do give every new tool exactly one ink with a night and a darker daylight value, and its own drawn object.",
+      "Do show focus with a 3dp ink ring and the focus lift; on night, filled buttons may also brighten.",
+      "Do route every face-button action through the legend.",
+      "Do confirm every write in a dialog that names the count, destructive confirm in caution amber, Cancel outlined.",
+      "Do park all looping motion when the animation scale is 0.",
+      "Do keep exactly one object turning at a time: the focused save block."
+    ],
+    "donts": [
+      "Don't show focus by dimming or darkening an element.",
+      "Don't use amber for errors, highlights or anything that can be undone.",
+      "Don't represent a tool with an icon-font glyph or a Material icon tile.",
+      "Don't add eyebrow or kicker text above headings, or uppercase labels.",
+      "Don't stack Material cards in one scrolling column on a wide screen.",
+      "Don't draw progress as a continuous bar; use the block meter.",
+      "Don't let a text field open the keyboard just because a controller passed over it."
+    ]
   }
 }

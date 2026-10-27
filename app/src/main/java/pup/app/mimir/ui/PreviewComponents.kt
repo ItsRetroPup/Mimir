@@ -124,7 +124,7 @@ internal fun ChangeRow(
                 ) { Text(stringResource(R.string.action_replace_output)) }
             },
             dismissButton = {
-                OutlinedButton(onClick = { showOverwriteWarning = false }) { Text(stringResource(R.string.action_cancel)) }
+                OutlinedButton(onClick = { showOverwriteWarning = false }, modifier = Modifier.focusRing()) { Text(stringResource(R.string.action_cancel)) }
             },
         )
     }

@@ -92,7 +92,7 @@ internal fun ApplyConfirmationDialog(
             }
         },
         dismissButton = {
-            OutlinedButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+            OutlinedButton(onClick = onDismiss, modifier = Modifier.focusRing()) { Text(stringResource(R.string.action_cancel)) }
         },
     )
 }
@@ -111,7 +111,7 @@ internal fun EsDeInstallDialog(
             InkButton(onClick = onConfirm) { Text(stringResource(R.string.action_install_systems)) }
         },
         dismissButton = {
-            OutlinedButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+            OutlinedButton(onClick = onDismiss, modifier = Modifier.focusRing()) { Text(stringResource(R.string.action_cancel)) }
         },
     )
 }
@@ -131,7 +131,7 @@ internal fun VitaShortcutAddDialog(
             InkButton(onClick = onConfirm) { Text(stringResource(R.string.action_create_shortcut)) }
         },
         dismissButton = {
-            OutlinedButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+            OutlinedButton(onClick = onDismiss, modifier = Modifier.focusRing()) { Text(stringResource(R.string.action_cancel)) }
         },
     )
 }
@@ -154,7 +154,7 @@ internal fun VitaShortcutRemoveDialog(
             ) { Text(stringResource(R.string.action_remove_shortcut)) }
         },
         dismissButton = {
-            OutlinedButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+            OutlinedButton(onClick = onDismiss, modifier = Modifier.focusRing()) { Text(stringResource(R.string.action_cancel)) }
         },
     )
 }

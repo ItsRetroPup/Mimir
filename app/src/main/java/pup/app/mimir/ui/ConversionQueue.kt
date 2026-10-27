@@ -250,7 +250,7 @@ internal fun ConversionQueueList(
                 ) { Text(stringResource(R.string.action_replace_output)) }
             },
             dismissButton = {
-                OutlinedButton(onClick = { pendingOverwrite = null }) { Text(stringResource(R.string.action_cancel)) }
+                OutlinedButton(onClick = { pendingOverwrite = null }, modifier = Modifier.focusRing()) { Text(stringResource(R.string.action_cancel)) }
             },
         )
     }

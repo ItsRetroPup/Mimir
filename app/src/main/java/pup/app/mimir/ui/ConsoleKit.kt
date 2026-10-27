@@ -189,7 +189,7 @@ private fun LegendItem(action: LegendAction) {
     }
 }
 
-/** A status line for the current tool; errors take the caution colour and an error icon. */
+/** A status line for the current tool; errors take the error colour and an error icon. */
 @Composable
 internal fun StatusLine(message: StatusMessage, modifier: Modifier = Modifier) {
     val palette = LocalMimirPalette.current
