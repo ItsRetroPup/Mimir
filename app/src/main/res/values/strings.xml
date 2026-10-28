@@ -10,31 +10,31 @@
     <!-- Home tool cards: the goal is shown first; the backend name is supporting context. -->
     <string name="goal_fix_multidisc">Fix multi-disc games</string>
     <string name="tool_multidisc">Multi-disc Organizer</string>
-    <string name="tool_multidisc_description">Create frontend-ready folders and playlists.</string>
+    <string name="tool_multidisc_description">Finds games that span more than one disc and writes an .m3u playlist for each, so your frontend lists the game once and can swap discs. For ES-DE, the discs also move into a folder that appears as a single game.</string>
     <string name="goal_create_vita_shortcuts">Create Vita shortcuts</string>
     <string name="tool_vita_shortcuts">Vita Shortcuts</string>
-    <string name="tool_vita_shortcuts_description">Make .psvita or .dpt shortcuts from the built-in database.</string>
+    <string name="tool_vita_shortcuts_description">Search the built-in PS Vita title list and save a .psvita or .dpt shortcut for a game installed in Vita3K, so your frontend can list and launch it.</string>
     <string name="goal_setup_esde">Set up ES-DE</string>
     <string name="tool_esde_systems">ES-DE Systems</string>
-    <string name="tool_esde_systems_description">Install custom systems and map their ROM folders.</string>
+    <string name="tool_esde_systems_description">Downloads the latest community custom systems for ES-DE on Android, points each one at its ROM folder, and installs them into ES-DE\'s custom_systems folder. Restart ES-DE to load them.</string>
     <string name="goal_convert_switch_packages">Convert Switch packages</string>
     <string name="tool_nsz_to_nsp">NSZ to NSP</string>
-    <string name="tool_nsz_to_nsp_description">Decompress NSZ files into NSP packages.</string>
+    <string name="tool_nsz_to_nsp_description">Decompresses Switch .nsz files back into full .nsp packages for emulators that can\'t read NSZ. Needs your own prod.keys. Your .nsz files are kept.</string>
     <string name="goal_compress_cartridge_roms">Compress cartridge ROMs</string>
     <string name="tool_romzipper">RomZipper</string>
-    <string name="tool_romzipper_description">Archive supported cartridge ROMs as .zip files.</string>
+    <string name="tool_romzipper_description">Zips each cartridge ROM (Game Boy, GBA, DS, NES, SNES, N64, Genesis and more) into its own .zip to save space. Most emulators open the zip directly. The unzipped ROM is removed.</string>
     <string name="goal_compress_disc_images">Compress disc images</string>
     <string name="tool_chdman">CHDMan</string>
-    <string name="tool_chdman_description">Convert PSX, PS2, PSP, Saturn, Dreamcast, and Sega CD images to CHD.</string>
+    <string name="tool_chdman_description">Compresses PS1, PS2, PSP, Saturn, Dreamcast and Sega CD disc images (.cue/.bin, .gdi, .iso) into one .chd file per game. Lossless, so games play the same in less space.</string>
     <string name="goal_shrink_gamecube_wii">Shrink GameCube and Wii games</string>
     <string name="tool_dolphin_rvz">Dolphin RVZ</string>
-    <string name="tool_dolphin_rvz_description">Convert ISO images to RVZ.</string>
+    <string name="tool_dolphin_rvz_description">Compresses GameCube and Wii .iso files to .rvz, Dolphin\'s lossless format. Games play the same and take far less space. Your .iso files are kept.</string>
     <string name="goal_shrink_3ds">Shrink Nintendo 3DS games</string>
     <string name="tool_azahar_zcci">Azahar ZCCI</string>
-    <string name="tool_azahar_zcci_description">Compress decrypted 3DS and CCI images to ZCCI.</string>
+    <string name="tool_azahar_zcci_description">Compresses decrypted 3DS games (.3ds, .cci) to .zcci, which Azahar plays directly. Encrypted dumps can\'t be converted. Your original files are kept.</string>
     <string name="goal_shrink_xbox">Shrink Xbox games</string>
     <string name="tool_xbox_xiso">Xbox XISO</string>
-    <string name="tool_xbox_xiso_description">Trim Redump Xbox ISOs to XISO for Hakux and xemu.</string>
+    <string name="tool_xbox_xiso_description">Strips the unused video partition and padding from Redump Xbox .iso files. The trimmed XISO replaces the original and runs in xemu and Hakux.</string>
 
     <!-- Shared persisted labels. Do not translate filesystem names or extensions. -->
     <string name="no_rom_folder_selected">No ROM folder selected</string>
