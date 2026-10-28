@@ -1,4 +1,6 @@
+<p align="center">
 <img width="256" height="256" alt="newlogo" src="https://github.com/user-attachments/assets/e2e9a687-f345-47ae-8829-ba7512e9a6bd" />
+</p>
 
 <img width="960" height="540" alt="Screenshot_20261028-171639" src="https://github.com/user-attachments/assets/1dc6feb7-c007-4b09-8ddb-88ce5bfcb0e1" />
 
