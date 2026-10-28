@@ -23,7 +23,7 @@ class ToolPlanBuilder(
         ToolMode.RomZipper -> strings.text(R.string.scan_start_zip)
         ToolMode.Converter -> strings.text(R.string.scan_start_tool, state.selectedConverterTool.displayName)
         ToolMode.VitaAppIds -> strings.text(R.string.scan_start_files)
-        ToolMode.EsDeSystems -> ""
+        ToolMode.EsDeSystems, ToolMode.RomPatcher -> ""
     }
 
     /** Shown when a scan finds nothing for the active tool. */
@@ -33,6 +33,7 @@ class ToolPlanBuilder(
         ToolMode.Converter -> strings.text(R.string.msg_none_converter, state.selectedConverterTool.displayName)
         ToolMode.VitaAppIds -> strings.text(R.string.msg_none_vita)
         ToolMode.EsDeSystems -> strings.text(R.string.msg_none_esde)
+        ToolMode.RomPatcher -> ""
     }
 
     fun build(
@@ -98,7 +99,7 @@ class ToolPlanBuilder(
                 NativeConverterPlanner.buildPlan(entries, tool)
             }
 
-            ToolMode.VitaAppIds, ToolMode.EsDeSystems -> error("This tool does not use ROM scanning.")
+            ToolMode.VitaAppIds, ToolMode.EsDeSystems, ToolMode.RomPatcher -> error("This tool does not use ROM scanning.")
         }
     }
 
@@ -108,7 +109,7 @@ class ToolPlanBuilder(
             ToolMode.RomZipper -> strings.text(R.string.scan_activity_zip)
             ToolMode.Converter -> strings.text(R.string.scan_activity_tool, state.selectedConverterTool.displayName)
             ToolMode.VitaAppIds -> strings.text(R.string.scan_activity_files)
-            ToolMode.EsDeSystems -> ""
+            ToolMode.EsDeSystems, ToolMode.RomPatcher -> ""
         }
         return strings.plural(R.plurals.scan_files_checked, scannedFiles, activity, scannedFiles)
     }

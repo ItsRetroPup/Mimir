@@ -27,6 +27,7 @@ enum class ToolMode(val displayName: String) {
     Converter("Converter Tools"),
     VitaAppIds("Vita App IDs"),
     EsDeSystems("ES-DE Systems"),
+    RomPatcher("ROM Patcher"),
 }
 
 /** How a converter runs on the device. */

@@ -33,6 +33,9 @@
     <string name="goal_shrink_xbox">Réduire les jeux Xbox</string>
     <string name="tool_xbox_xiso">Xbox XISO</string>
     <string name="tool_xbox_xiso_description">Supprime la partition vidéo inutilisée et le remplissage des fichiers .iso Xbox Redump. Le XISO réduit remplace l’original et fonctionne dans xemu et Hakux.</string>
+    <string name="goal_patch_rom">Patcher une ROM</string>
+    <string name="tool_rom_patcher">Patcheur de ROM</string>
+    <string name="tool_rom_patcher_description">Applique un patch IPS, UPS ou BPS à une ROM, comme une traduction, un romhack ou un correctif, et enregistre la copie patchée dans le même dossier que la ROM. La ROM d’origine reste intacte.</string>
 
     <string name="no_rom_folder_selected">Aucun dossier de ROMs sélectionné</string>
     <string name="no_vita_output_directory_selected">Aucun dossier de sortie Vita sélectionné</string>
@@ -308,4 +311,38 @@
     <string name="storage_internal">Stockage interne</string>
     <string name="storage_sd_card">Carte SD</string>
     <string name="action_close">Fermer</string>
+
+    <!-- ROM Patcher. -->
+    <string name="patch_rom_label">ROM</string>
+    <string name="patch_file_label">Fichier de patch</string>
+    <string name="patch_no_rom">Aucune ROM sélectionnée</string>
+    <string name="patch_no_patch">Aucun patch sélectionné</string>
+    <string name="action_choose_rom">Choisir la ROM</string>
+    <string name="action_choose_patch">Choisir le patch</string>
+    <string name="patch_format_detail">Patch %1$s</string>
+    <string name="patch_empty_title">Choisissez une ROM et un patch</string>
+    <string name="patch_empty_body">Mimir applique les patchs IPS, UPS et BPS. La copie patchée est enregistrée à côté de la ROM, et l’original reste intact.</string>
+    <string name="patch_output_title">Copie patchée</string>
+    <string name="patch_output_folder">Enregistrée dans %1$s, à côté de la ROM</string>
+    <string name="patch_output_exists">Un fichier portant ce nom existe déjà dans ce dossier et sera remplacé.</string>
+    <string name="patch_folder_access_title">Autoriser l’enregistrement à côté de la ROM</string>
+    <string name="patch_folder_access_body">Mimir ne peut pas encore écrire dans le dossier qui contient %1$s. Choisissez ce dossier pour que Mimir puisse y enregistrer la copie patchée.</string>
+    <string name="patch_confirm_title">Patcher cette ROM ?</string>
+    <string name="patch_confirm_body">Le patch %1$s sera appliqué à %2$s et le résultat sera enregistré sous le nom %3$s dans le même dossier. La ROM d’origine n’est pas modifiée.</string>
+    <string name="patch_confirm_replace">%1$s existe déjà et sera remplacé. Mimir ne peut pas annuler cette action.</string>
+    <string name="action_patch_rom">Patcher la ROM</string>
+    <string name="legend_patch">Patcher</string>
+    <string name="apply_activity_patching">Application du patch</string>
+    <string name="msg_patching">Application du patch à %1$s…</string>
+    <string name="msg_patched">%1$s enregistré dans %2$s.</string>
+    <string name="msg_patch_failed">Échec de l’application du patch.</string>
+    <string name="msg_patch_read_failed">Impossible de lire le fichier sélectionné.</string>
+    <string name="msg_patch_unknown_format">%1$s n’est pas un patch IPS, UPS ou BPS.</string>
+    <string name="msg_patch_not_supported">Ce fichier n’est pas un patch IPS, UPS ou BPS.</string>
+    <string name="msg_patch_malformed">Ce fichier de patch est incomplet ou corrompu. Essayez de le télécharger à nouveau.</string>
+    <string name="msg_patch_damaged">Ce fichier de patch est endommagé : sa somme de contrôle ne correspond pas. Essayez de le télécharger à nouveau.</string>
+    <string name="msg_patch_wrong_rom">Ce patch a été conçu pour une autre version de cette ROM. Vérifiez la région et la révision demandées par le patch.</string>
+    <string name="msg_patch_result_mismatch">La ROM patchée ne correspond pas à ce qu’attend le patch. La ROM est probablement une autre version que celle prévue par le patch.</string>
+    <string name="msg_patch_too_large">Cette ROM est trop volumineuse pour être patchée sur cet appareil.</string>
+    <string name="msg_patch_folder_mismatch">Ce dossier ne contient pas %1$s. Choisissez le dossier où se trouve la ROM.</string>
 </resources>

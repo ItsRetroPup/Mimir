@@ -35,6 +35,9 @@
     <string name="goal_shrink_xbox">Shrink Xbox games</string>
     <string name="tool_xbox_xiso">Xbox XISO</string>
     <string name="tool_xbox_xiso_description">Strips the unused video partition and padding from Redump Xbox .iso files. The trimmed XISO replaces the original and runs in xemu and Hakux.</string>
+    <string name="goal_patch_rom">Patch a ROM</string>
+    <string name="tool_rom_patcher">ROM Patcher</string>
+    <string name="tool_rom_patcher_description">Applies an IPS, UPS, or BPS patch to a ROM, such as a translation, romhack, or bug fix, and saves the patched copy in the same folder as the ROM. The original ROM is left as it is.</string>
 
     <!-- Shared persisted labels. Do not translate filesystem names or extensions. -->
     <string name="no_rom_folder_selected">No ROM folder selected</string>
@@ -288,4 +291,38 @@
     <string name="storage_internal">Internal storage</string>
     <string name="storage_sd_card">SD card</string>
     <string name="action_close">Close</string>
+
+    <!-- ROM Patcher. -->
+    <string name="patch_rom_label">ROM</string>
+    <string name="patch_file_label">Patch file</string>
+    <string name="patch_no_rom">No ROM selected</string>
+    <string name="patch_no_patch">No patch selected</string>
+    <string name="action_choose_rom">Choose ROM</string>
+    <string name="action_choose_patch">Choose patch</string>
+    <string name="patch_format_detail">%1$s patch</string>
+    <string name="patch_empty_title">Pick a ROM and a patch</string>
+    <string name="patch_empty_body">Mimir applies IPS, UPS, and BPS patches. The patched copy is saved next to the ROM, and the original stays as it is.</string>
+    <string name="patch_output_title">Patched copy</string>
+    <string name="patch_output_folder">Saves to %1$s, next to the ROM</string>
+    <string name="patch_output_exists">A file with this name is already in that folder and will be replaced.</string>
+    <string name="patch_folder_access_title">Allow saving next to the ROM</string>
+    <string name="patch_folder_access_body">Mimir can\'t write to the folder that holds %1$s yet. Choose that folder so Mimir can save the patched copy there.</string>
+    <string name="patch_confirm_title">Patch this ROM?</string>
+    <string name="patch_confirm_body">This will apply %1$s to %2$s and save the result as %3$s in the same folder. The original ROM is not changed.</string>
+    <string name="patch_confirm_replace">%1$s already exists and will be replaced. Mimir cannot undo this.</string>
+    <string name="action_patch_rom">Patch ROM</string>
+    <string name="legend_patch">Patch</string>
+    <string name="apply_activity_patching">Patching ROM</string>
+    <string name="msg_patching">Patching %1$s…</string>
+    <string name="msg_patched">Saved %1$s in %2$s.</string>
+    <string name="msg_patch_failed">Patching failed.</string>
+    <string name="msg_patch_read_failed">Unable to read the selected file.</string>
+    <string name="msg_patch_unknown_format">%1$s isn\'t an IPS, UPS, or BPS patch.</string>
+    <string name="msg_patch_not_supported">That file isn\'t an IPS, UPS, or BPS patch.</string>
+    <string name="msg_patch_malformed">This patch file is incomplete or corrupt. Try downloading it again.</string>
+    <string name="msg_patch_damaged">This patch file is damaged: its checksum doesn\'t match. Try downloading it again.</string>
+    <string name="msg_patch_wrong_rom">This patch was made for a different version of this ROM. Check which region and revision the patch needs.</string>
+    <string name="msg_patch_result_mismatch">The patched ROM doesn\'t match what the patch expects. The ROM is probably a different version from the one the patch was made for.</string>
+    <string name="msg_patch_too_large">This ROM is too large to patch on this device.</string>
+    <string name="msg_patch_folder_mismatch">That folder doesn\'t contain %1$s. Choose the folder the ROM is in.</string>
 </resources>

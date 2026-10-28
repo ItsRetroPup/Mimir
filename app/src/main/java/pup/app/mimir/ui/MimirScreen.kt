@@ -110,12 +110,17 @@ internal fun MimirScreen(
     onApply: () -> Unit,
     onStopNow: () -> Unit,
     onStopAfterCurrent: () -> Unit,
+    onSelectPatchRom: () -> Unit,
+    onSelectPatchFile: () -> Unit,
+    onGrantPatchFolder: () -> Unit,
+    onApplyPatch: () -> Unit,
 ) {
     val context = LocalContext.current
     val palette = LocalMimirPalette.current
     var currentSection by rememberSaveable { mutableStateOf(AppSection.Home) }
     var showApplyConfirmation by rememberSaveable { mutableStateOf(false) }
     var showEsDeConfirmation by rememberSaveable { mutableStateOf(false) }
+    var showPatchConfirmation by rememberSaveable { mutableStateOf(false) }
     var pendingVitaAdd by remember { mutableStateOf<VitaApp?>(null) }
     var pendingVitaRemove by remember { mutableStateOf<VitaApp?>(null) }
     var showAbout by rememberSaveable { mutableStateOf(false) }
@@ -155,6 +160,7 @@ internal fun MimirScreen(
         onApply = { showApplyConfirmation = true },
         onDownloadEsDe = onRefreshEsDeSystems,
         onInstallEsDe = { showEsDeConfirmation = true },
+        onPatch = { showPatchConfirmation = true },
     )
     // X and Y run the legend's actions, as a console's face buttons would.
     val faceButtons = Modifier.onPreviewKeyEvent { event ->
@@ -225,6 +231,9 @@ internal fun MimirScreen(
                         onDeselectAllChanges = onDeselectAllChanges,
                         onStopNow = onStopNow,
                         onStopAfterCurrent = onStopAfterCurrent,
+                        onSelectPatchRom = onSelectPatchRom,
+                        onSelectPatchFile = onSelectPatchFile,
+                        onGrantPatchFolder = onGrantPatchFolder,
                         modifier = Modifier.padding(innerPadding),
                     )
                 }
@@ -259,6 +268,22 @@ internal fun MimirScreen(
                 onConfirm = {
                     showEsDeConfirmation = false
                     onApplyEsDeSystems()
+                },
+            )
+        }
+
+        val patch = uiState.romPatch
+        val patchOutputName = patch.outputName
+        if (showPatchConfirmation && patch.rom != null && patch.patch != null && patchOutputName != null) {
+            RomPatchDialog(
+                romName = patch.rom.name,
+                patchName = patch.patch.name,
+                outputName = patchOutputName,
+                replacesExisting = patch.outputExists,
+                onDismiss = { showPatchConfirmation = false },
+                onConfirm = {
+                    showPatchConfirmation = false
+                    onApplyPatch()
                 },
             )
         }
@@ -303,6 +328,7 @@ private fun legendFor(
     onApply: () -> Unit,
     onDownloadEsDe: () -> Unit,
     onInstallEsDe: () -> Unit,
+    onPatch: () -> Unit,
 ): List<LegendAction> {
     if (tool == null) {
         return listOf(
@@ -317,6 +343,15 @@ private fun legendFor(
         add(LegendAction("B", stringResource(R.string.legend_back), onClick = onHome))
         when (tool.mode) {
             ToolMode.VitaAppIds -> Unit
+            ToolMode.RomPatcher -> add(
+                LegendAction(
+                    "Y",
+                    stringResource(R.string.legend_patch),
+                    enabled = idle && uiState.romPatch.ready,
+                    emphasised = uiState.romPatch.ready,
+                    onClick = onPatch,
+                ),
+            )
             ToolMode.EsDeSystems -> {
                 add(LegendAction("X", stringResource(R.string.legend_download), enabled = idle && uiState.esDeRootUri != null, onClick = onDownloadEsDe))
                 add(
@@ -474,6 +509,9 @@ private fun ToolScreen(
     onDeselectAllChanges: () -> Unit,
     onStopNow: () -> Unit,
     onStopAfterCurrent: () -> Unit,
+    onSelectPatchRom: () -> Unit,
+    onSelectPatchFile: () -> Unit,
+    onGrantPatchFolder: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val idle = !uiState.isBusy
@@ -489,6 +527,13 @@ private fun ToolScreen(
                     )
                     VitaFormatOptions(uiState.vitaShortcutFormat, enabled = idle, onSelected = onVitaShortcutFormatSelected)
                 }
+                ToolMode.RomPatcher -> RomPatchOptions(
+                    state = uiState.romPatch,
+                    enabled = idle,
+                    onSelectRom = onSelectPatchRom,
+                    onSelectPatch = onSelectPatchFile,
+                    buttonModifier = Modifier.focusRequester(contentFocus),
+                )
                 ToolMode.EsDeSystems -> {
                     FolderRow(
                         label = stringResource(R.string.esde_selected_folder),
@@ -551,6 +596,12 @@ private fun ToolScreen(
                 onRemove = onVitaShortcutRemove,
             )
             ToolMode.EsDeSystems -> EsDeSystemsPane(uiState.esDeSystems, isBusy = uiState.isBusy, onPickFolder = onPickEsDeSystemFolder)
+            ToolMode.RomPatcher -> {
+                val palette = LocalMimirPalette.current
+                RomPatchPane(uiState.romPatch, isBusy = uiState.isBusy, onGrantFolder = onGrantPatchFolder) {
+                    SaveBlockArt(tool.art, MaterialTheme.colorScheme.primary.copy(alpha = 0.55f), hole = palette.fieldTop, modifier = Modifier.size(96.dp))
+                }
+            }
             else -> ScanResults(
                 tool = tool,
                 uiState = uiState,

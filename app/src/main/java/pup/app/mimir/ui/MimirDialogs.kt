@@ -173,6 +173,43 @@ internal fun VitaShortcutRemoveDialog(
     )
 }
 
+/** Confirms writing a patched copy; the button turns amber only when it replaces an existing file. */
+@Composable
+internal fun RomPatchDialog(
+    romName: String,
+    patchName: String,
+    outputName: String,
+    replacesExisting: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    val palette = LocalMimirPalette.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.patch_confirm_title)) },
+        text = {
+            Text(
+                listOfNotNull(
+                    stringResource(R.string.patch_confirm_body, patchName, romName, outputName),
+                    stringResource(R.string.patch_confirm_replace, outputName).takeIf { replacesExisting },
+                ).joinToString(" "),
+            )
+        },
+        confirmButton = {
+            if (replacesExisting) {
+                InkButton(onClick = onConfirm, containerColor = palette.caution, contentColor = palette.onCaution) {
+                    Text(stringResource(R.string.action_patch_rom))
+                }
+            } else {
+                InkButton(onClick = onConfirm) { Text(stringResource(R.string.action_patch_rom)) }
+            }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = onDismiss, modifier = Modifier.focusRing()) { Text(stringResource(R.string.action_cancel)) }
+        },
+    )
+}
+
 /** About Mimir, opened from the footer link on home: who makes it and how to support it. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

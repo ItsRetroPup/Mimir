@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 
@@ -43,6 +44,8 @@ enum class ToolArt {
     HandheldCart,
     /** Xbox XISO: a disc with its unused slice trimmed off. */
     TrimmedDisc,
+    /** ROM Patcher: a cartridge with a bandage stuck across its label. */
+    PatchedCart,
 }
 
 /** A tool's ink in the night and daylight palettes. */
@@ -91,6 +94,7 @@ internal fun SaveBlockArt(
             ToolArt.MiniDisc -> miniDisc(ink, hole)
             ToolArt.HandheldCart -> handheldCart(ink)
             ToolArt.TrimmedDisc -> trimmedDisc(ink, hole)
+            ToolArt.PatchedCart -> patchedCart(ink)
         }
     }
 }
@@ -291,4 +295,26 @@ private fun DrawScope.trimmedDisc(ink: Color, hole: Color) {
     // The trimmed-off slice, drifting away.
     val slice = c + Offset(r * 0.32f, -r * 0.02f)
     drawArc(ink.copy(alpha = 0.35f), startAngle = -40f, sweepAngle = 60f, useCenter = true, topLeft = slice - Offset(r, r), size = box)
+}
+
+private fun DrawScope.patchedCart(ink: Color) {
+    val w = size.width * 0.54f
+    val h = size.height * 0.62f
+    val rect = Rect(center.x - w / 2, center.y - h / 2, center.x + w / 2, center.y + h / 2)
+    card(rect, ink, corner = w * 0.08f, notch = w * 0.18f)
+    label(Rect(rect.left + w * 0.14f, rect.top + h * 0.1f, rect.right - w * 0.14f, rect.top + h * 0.5f), ink)
+    // The patch: a bandage stuck on the slant across the cartridge, with its pad and air holes.
+    val pivot = Offset(center.x, rect.top + h * 0.56f)
+    rotate(-32f, pivot) {
+        val bw = w * 1.02f
+        val bh = h * 0.2f
+        val topLeft = Offset(pivot.x - bw / 2, pivot.y - bh / 2)
+        drawRoundRect(shade(ink, 0.5f), topLeft + Offset(0f, bh * 0.14f), Size(bw, bh), CornerRadius(bh / 2))
+        drawRoundRect(light(ink, 0.82f), topLeft, Size(bw, bh), CornerRadius(bh / 2))
+        drawRoundRect(light(ink, 0.5f), topLeft + Offset(bw * 0.36f, bh * 0.18f), Size(bw * 0.28f, bh * 0.64f), CornerRadius(bh * 0.14f))
+        val holes = shade(ink, 0.3f).copy(alpha = 0.5f)
+        listOf(0.12f, 0.22f, 0.78f, 0.88f).forEach { f ->
+            drawCircle(holes, bh * 0.08f, Offset(topLeft.x + bw * f, pivot.y))
+        }
+    }
 }

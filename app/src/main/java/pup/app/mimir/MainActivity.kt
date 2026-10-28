@@ -88,6 +88,29 @@ class MainActivity : ComponentActivity() {
                     viewModel.onEsDeSystemFolderSelected(systemName, uri)
                 }
             }
+            val patchRomLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.OpenDocument(),
+            ) { uri ->
+                uri ?: return@rememberLauncherForActivityResult
+                viewModel.onPatchRomSelected(uri)
+            }
+            val patchFileLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.OpenDocument(),
+            ) { uri ->
+                uri ?: return@rememberLauncherForActivityResult
+                viewModel.onPatchFileSelected(uri)
+            }
+            // Asked for only when no granted folder holds the picked ROM, so the copy can be saved beside it.
+            val patchFolderLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.OpenDocumentTree(),
+            ) { uri ->
+                uri ?: return@rememberLauncherForActivityResult
+                contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+                )
+                viewModel.onPatchFolderGranted(uri)
+            }
             MimirTheme(useDarkMode = uiState.useDarkMode) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     MimirScreen(
@@ -121,6 +144,10 @@ class MainActivity : ComponentActivity() {
                         onApply = viewModel::applyChanges,
                         onStopNow = viewModel::stopNow,
                         onStopAfterCurrent = viewModel::stopAfterCurrentConversion,
+                        onSelectPatchRom = { patchRomLauncher.launch(arrayOf("*/*")) },
+                        onSelectPatchFile = { patchFileLauncher.launch(arrayOf("*/*")) },
+                        onGrantPatchFolder = { patchFolderLauncher.launch(uiState.romPatch.rom?.uri) },
+                        onApplyPatch = viewModel::applyPatch,
                     )
                 }
             }

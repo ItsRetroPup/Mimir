@@ -64,6 +64,7 @@ internal enum class AppSection {
     Nsz,
     Xiso,
     Vita,
+    Patcher,
 }
 
 internal data class ToolEntry(
@@ -100,6 +101,11 @@ internal val utilities = listOf(
         R.string.goal_convert_switch_packages, R.string.tool_nsz_to_nsp, R.string.tool_nsz_to_nsp_description,
         ToolMode.Converter, AppSection.Nsz, ConverterTool.NszNsp, art = ToolArt.SwitchCart,
         ink = ToolInk(Color(0xFFFF5C93), Color(0xFFC81E5E)), reads = ".nsz", writes = ".nsp",
+    ),
+    ToolEntry(
+        R.string.goal_patch_rom, R.string.tool_rom_patcher, R.string.tool_rom_patcher_description,
+        ToolMode.RomPatcher, AppSection.Patcher, art = ToolArt.PatchedCart,
+        ink = ToolInk(Color(0xFFE879F9), Color(0xFFA21CAF)), reads = "ROM + .ips  .ups  .bps", writes = "Patched copy",
     ),
 )
 

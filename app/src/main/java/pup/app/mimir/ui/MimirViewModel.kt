@@ -20,6 +20,7 @@ import pup.app.mimir.data.EsDeSystemsRepository
 import pup.app.mimir.data.OperationCancellation
 import pup.app.mimir.data.OperationStoppedException
 import pup.app.mimir.data.PlanExecutor
+import pup.app.mimir.data.RomPatchRunner
 import pup.app.mimir.data.RomTreeRepository
 import pup.app.mimir.data.StopRequest
 import pup.app.mimir.domain.ChdDiscType
@@ -28,6 +29,10 @@ import pup.app.mimir.domain.ConverterTool
 import pup.app.mimir.domain.FileOperation
 import pup.app.mimir.domain.FrontendPreset
 import pup.app.mimir.domain.OperationPlan
+import pup.app.mimir.domain.PatchException
+import pup.app.mimir.domain.PatchFailure
+import pup.app.mimir.domain.PatchFormat
+import pup.app.mimir.domain.RomPatcher
 import pup.app.mimir.domain.ToolMode
 import pup.app.mimir.domain.VitaAppIdPlanner
 import pup.app.mimir.domain.VitaShortcutFormat
@@ -68,8 +73,24 @@ data class MimirUiState(
     val previewCount: Int = 0,
     val previewPlan: OperationPlan? = null,
     val selectedChangePaths: Set<String> = emptySet(),
+    val romPatch: RomPatchState = RomPatchState(),
     val message: StatusMessage? = null,
 )
+
+/** The ROM Patcher's picks and where the patched copy will be written. */
+data class RomPatchState(
+    val rom: RomPatchRunner.PickedFile? = null,
+    val patch: RomPatchRunner.PickedFile? = null,
+    val format: PatchFormat? = null,
+    /** The ROM's own folder, once Mimir holds write access to it. */
+    val outputFolder: RomPatchRunner.OutputFolder? = null,
+    val outputExists: Boolean = false,
+) {
+    val outputName: String?
+        get() = if (rom != null && patch != null) RomPatcher.outputFileName(rom.name, patch.name) else null
+
+    val ready: Boolean get() = outputName != null && outputFolder != null
+}
 
 /** A status line for the current tool; [isError] marks failures. */
 data class StatusMessage(val text: String, val isError: Boolean = false)
@@ -86,6 +107,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
     private val strings = AppStrings(application)
     private val planBuilder = ToolPlanBuilder(repository, strings)
     private val executor = PlanExecutor(application)
+    private val patchRunner = RomPatchRunner(application)
     private val esDeRepository = EsDeSystemsRepository(application)
     private val prefs = application.getSharedPreferences("mimir_prefs", 0)
     private var vitaCatalog: List<pup.app.mimir.domain.VitaApp> = emptyList()
@@ -544,6 +566,87 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun onPatchRomSelected(uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val rom = patchRunner.describe(uri)
+                rom to patchRunner.outputFolderFor(rom)
+            }
+                .onSuccess { (rom, folder) ->
+                    _uiState.update {
+                        it.copy(romPatch = it.romPatch.copy(rom = rom, outputFolder = folder, outputExists = false), message = null)
+                    }
+                    refreshPatchOutput()
+                }
+                .onFailure { error -> _uiState.update { it.copy(message = failure(error, R.string.msg_patch_read_failed)) } }
+        }
+    }
+
+    fun onPatchFileSelected(uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching { patchRunner.describe(uri) to patchRunner.detectFormat(uri) }
+                .onSuccess { (patch, format) ->
+                    if (format == null) {
+                        _uiState.update { it.copy(message = failure(R.string.msg_patch_unknown_format, patch.name)) }
+                        return@onSuccess
+                    }
+                    _uiState.update {
+                        it.copy(romPatch = it.romPatch.copy(patch = patch, format = format, outputExists = false), message = null)
+                    }
+                    refreshPatchOutput()
+                }
+                .onFailure { error -> _uiState.update { it.copy(message = failure(error, R.string.msg_patch_read_failed)) } }
+        }
+    }
+
+    /** The user granted a folder because Mimir could not yet write beside the picked ROM. */
+    fun onPatchFolderGranted(uri: Uri) {
+        val rom = _uiState.value.romPatch.rom ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            val folder = runCatching { patchRunner.outputFolderFromGrant(rom, uri) }.getOrNull()
+            if (folder == null) {
+                _uiState.update { it.copy(message = failure(R.string.msg_patch_folder_mismatch, rom.name)) }
+                return@launch
+            }
+            _uiState.update { it.copy(romPatch = it.romPatch.copy(outputFolder = folder), message = null) }
+            refreshPatchOutput()
+        }
+    }
+
+    fun applyPatch() {
+        val patchState = _uiState.value.romPatch
+        val rom = patchState.rom ?: return
+        val patch = patchState.patch ?: return
+        val folder = patchState.outputFolder ?: return
+        val outputName = patchState.outputName ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update {
+                it.copy(isBusy = true, operationProgressLabel = strings.text(R.string.msg_patching, rom.name), operationProgress = null, message = null)
+            }
+            runCatching { patchRunner.patch(rom, patch, folder, outputName) }
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(
+                            isBusy = false,
+                            operationProgressLabel = null,
+                            volumes = repository.deviceVolumes(),
+                            romPatch = it.romPatch.copy(outputExists = true),
+                            message = info(R.string.msg_patched, outputName, folder.label),
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    Log.e(PATCH_TAG, "Unable to patch ${rom.name}", error)
+                    val message = when {
+                        error is PatchException -> failure(patchFailureText(error.failure))
+                        error is OutOfMemoryError -> failure(R.string.msg_patch_too_large)
+                        else -> failure(error, R.string.msg_patch_failed)
+                    }
+                    _uiState.update { it.copy(isBusy = false, operationProgressLabel = null, message = message) }
+                }
+        }
+    }
+
     fun scan() {
         val currentState = _uiState.value
         val mode = currentState.selectedMode
@@ -563,7 +666,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                     return
                 }
             }
-            ToolMode.VitaAppIds, ToolMode.EsDeSystems -> return
+            ToolMode.VitaAppIds, ToolMode.EsDeSystems, ToolMode.RomPatcher -> return
         }
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -624,7 +727,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             ?: return
         val uri = when (plan.mode) {
             ToolMode.VitaAppIds -> current.vitaOutputUri
-            ToolMode.EsDeSystems -> null
+            ToolMode.EsDeSystems, ToolMode.RomPatcher -> null
             else -> current.selectedFolderUri
         } ?: return
         viewModelScope.launch(Dispatchers.IO) {
@@ -753,6 +856,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
         private const val TAG = "Mimir.ESDE"
+        private const val PATCH_TAG = "Mimir.Patcher"
         private const val KEY_URI = "rom_tree_uri"
         private const val KEY_LABEL = "rom_tree_label"
         private const val KEY_VITA_OUTPUT_URI = "vita_output_uri"
@@ -768,6 +872,28 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun info(@StringRes id: Int, vararg args: Any) = StatusMessage(strings.text(id, *args))
+
+    /** Checks whether the patched copy's name is already taken in the ROM's folder. */
+    private fun refreshPatchOutput() {
+        val patchState = _uiState.value.romPatch
+        val folder = patchState.outputFolder ?: return
+        val name = patchState.outputName ?: return
+        val exists = runCatching { patchRunner.outputExists(folder, name) }.getOrDefault(false)
+        _uiState.update {
+            if (it.romPatch.outputFolder != folder || it.romPatch.outputName != name) it
+            else it.copy(romPatch = it.romPatch.copy(outputExists = exists))
+        }
+    }
+
+    @StringRes
+    private fun patchFailureText(failure: PatchFailure): Int = when (failure) {
+        PatchFailure.UnknownFormat -> R.string.msg_patch_not_supported
+        PatchFailure.Malformed -> R.string.msg_patch_malformed
+        PatchFailure.PatchDamaged -> R.string.msg_patch_damaged
+        PatchFailure.WrongRom -> R.string.msg_patch_wrong_rom
+        PatchFailure.ResultMismatch -> R.string.msg_patch_result_mismatch
+        PatchFailure.TooLarge -> R.string.msg_patch_too_large
+    }
 
     private fun failure(@StringRes id: Int, vararg args: Any) = StatusMessage(strings.text(id, *args), isError = true)
 
@@ -824,6 +950,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             ToolMode.Converter -> strings.text(R.string.apply_activity_converting, _uiState.value.selectedConverterTool.displayName)
             ToolMode.VitaAppIds -> strings.text(R.string.apply_activity_shortcuts)
             ToolMode.EsDeSystems -> strings.text(R.string.apply_activity_esde)
+            ToolMode.RomPatcher -> strings.text(R.string.apply_activity_patching)
         }
         return strings.text(R.string.apply_progress, activity, completed, total)
     }

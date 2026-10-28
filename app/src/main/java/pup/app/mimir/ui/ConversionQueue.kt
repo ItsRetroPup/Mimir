@@ -145,6 +145,7 @@ internal fun PlanHeader(
                 ToolMode.RomZipper -> R.plurals.preview_zip_summary
                 ToolMode.Converter, ToolMode.VitaAppIds -> R.plurals.preview_items_summary
                 ToolMode.EsDeSystems -> R.plurals.preview_systems_summary
+                ToolMode.RomPatcher -> R.plurals.preview_items_summary
             }
             pluralStringResource(summary, previewCount, previewCount, selectedCount)
         },

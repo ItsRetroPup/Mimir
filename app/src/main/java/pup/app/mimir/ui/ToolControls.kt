@@ -18,6 +18,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.InsertDriveFile
 import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,6 +47,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -66,7 +68,7 @@ internal fun SetupPanel(content: @Composable ColumnScope.() -> Unit) {
     ConsolePanel(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp), content = content)
 }
 
-/** Which folder the tool reads or writes, and the button that changes it. */
+/** Which folder (or, with a file [icon], which file) the tool reads or writes, and the button that changes it. */
 @Composable
 internal fun FolderRow(
     label: String,
@@ -75,16 +77,19 @@ internal fun FolderRow(
     enabled: Boolean = true,
     primary: Boolean = true,
     buttonModifier: Modifier = Modifier,
+    icon: ImageVector = Icons.Outlined.Folder,
+    buttonLabel: String = stringResource(R.string.action_choose_folder),
+    detail: String? = null,
 ) {
     val palette = LocalMimirPalette.current
     // The folder gets the row's full width so a picked path is never cut short; the button sits under it.
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(label, style = MaterialTheme.typography.labelMedium, color = palette.textMuted)
         Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            Icon(Icons.Outlined.Folder, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
             Text(folderName, style = MaterialTheme.typography.titleSmall, color = palette.text, maxLines = 3, overflow = TextOverflow.Ellipsis)
         }
-        val buttonLabel = stringResource(R.string.action_choose_folder)
+        if (detail != null) Text(detail, style = MaterialTheme.typography.bodySmall, color = palette.textMuted)
         if (primary) {
             InkButton(onClick = onSelect, enabled = enabled, modifier = buttonModifier) { Text(buttonLabel, maxLines = 1) }
         } else {
@@ -280,6 +285,90 @@ internal fun EsDeSystemsPane(
             OutlinedButton(onClick = { onPickFolder(system.name) }, enabled = !isBusy, modifier = Modifier.focusRing()) {
                 Text(stringResource(R.string.action_choose_folder))
             }
+        }
+    }
+}
+
+/** The ROM Patcher's setup: the ROM to patch and the patch to apply. */
+@Composable
+internal fun RomPatchOptions(
+    state: RomPatchState,
+    enabled: Boolean,
+    onSelectRom: () -> Unit,
+    onSelectPatch: () -> Unit,
+    buttonModifier: Modifier = Modifier,
+) {
+    FolderRow(
+        label = stringResource(R.string.patch_rom_label),
+        folderName = state.rom?.name ?: stringResource(R.string.patch_no_rom),
+        onSelect = onSelectRom,
+        enabled = enabled,
+        // The next step is the filled button: the ROM, then the patch, then Y to patch.
+        primary = state.rom == null,
+        buttonModifier = buttonModifier,
+        icon = Icons.Outlined.InsertDriveFile,
+        buttonLabel = stringResource(R.string.action_choose_rom),
+    )
+    PanelRule()
+    FolderRow(
+        label = stringResource(R.string.patch_file_label),
+        folderName = state.patch?.name ?: stringResource(R.string.patch_no_patch),
+        onSelect = onSelectPatch,
+        enabled = enabled,
+        primary = state.rom != null && state.patch == null,
+        icon = Icons.Outlined.InsertDriveFile,
+        buttonLabel = stringResource(R.string.action_choose_patch),
+        detail = state.format?.let { stringResource(R.string.patch_format_detail, it.displayName) },
+    )
+}
+
+/** The ROM Patcher's data pane: the patched copy Mimir will write, and where. */
+@Composable
+internal fun RomPatchPane(
+    state: RomPatchState,
+    isBusy: Boolean,
+    onGrantFolder: () -> Unit,
+    art: @Composable () -> Unit,
+) {
+    val palette = LocalMimirPalette.current
+    val outputName = state.outputName
+    if (outputName == null) {
+        EmptyPane(title = stringResource(R.string.patch_empty_title), body = stringResource(R.string.patch_empty_body), art = art)
+        return
+    }
+    Text(stringResource(R.string.patch_output_title), style = MaterialTheme.typography.headlineSmall, color = palette.text)
+    DataRow(selected = state.outputFolder != null) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(outputName, style = MaterialTheme.typography.titleMedium, color = palette.text, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            state.outputFolder?.let { folder ->
+                Text(stringResource(R.string.patch_output_folder, folder.label), style = MaterialTheme.typography.bodySmall, color = palette.textMuted)
+            }
+            if (state.outputExists) {
+                Text(stringResource(R.string.patch_output_exists), style = MaterialTheme.typography.bodySmall, color = palette.caution)
+            }
+        }
+        state.format?.let { format ->
+            Text(
+                format.displayName,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.extraSmall)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f))
+                    .padding(horizontal = 8.dp, vertical = 3.dp),
+            )
+        }
+    }
+    if (state.outputFolder == null) {
+        // Android lets Mimir write only inside folders the user has granted.
+        ConsolePanel(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(stringResource(R.string.patch_folder_access_title), style = MaterialTheme.typography.titleSmall, color = palette.text)
+            Text(
+                stringResource(R.string.patch_folder_access_body, state.rom?.name.orEmpty()),
+                style = MaterialTheme.typography.bodyMedium,
+                color = palette.textMuted,
+            )
+            InkButton(onClick = onGrantFolder, enabled = !isBusy) { Text(stringResource(R.string.action_choose_folder), maxLines = 1) }
         }
     }
 }
