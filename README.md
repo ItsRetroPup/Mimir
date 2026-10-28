@@ -1,4 +1,5 @@
-<img width="512" height="512" alt="mimir1" src="https://github.com/user-attachments/assets/7edde894-cf4a-4ad8-822e-5a50af306fd8" />
+<img width="1254" height="1254" alt="newlogo" src="https://github.com/user-attachments/assets/e2e9a687-f345-47ae-8829-ba7512e9a6bd" />
+
 
 # Mimir
 
