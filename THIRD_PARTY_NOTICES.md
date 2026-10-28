@@ -62,3 +62,13 @@ This app downloads and uses the Android custom-system definitions maintained by 
 - The upstream `es_systems.xml` and `es_find_rules.xml` files are downloaded at runtime and
   installed in the user's ES-DE `custom_systems` directory. They remain subject to the terms of
   the upstream repository.
+
+## Rubik typeface
+
+The app's interface type is set in Rubik, bundled as `app/src/main/res/font/rubik.ttf` (the
+variable-weight build from the Google Fonts repository).
+
+- Source: https://github.com/googlefonts/rubik
+- Copyright 2015 The Rubik Project Authors
+- License: SIL Open Font License 1.1; the license text is included at
+  `app/src/main/assets/licenses/Rubik-OFL-1.1.txt`.

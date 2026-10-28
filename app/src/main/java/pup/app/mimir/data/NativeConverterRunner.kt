@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
+import pup.app.mimir.domain.ConverterBackend
 import pup.app.mimir.domain.ConverterTool
 import pup.app.mimir.domain.FileOperation
 import java.io.File
@@ -21,14 +22,16 @@ class NativeConverterRunner(private val context: Context) {
         cancellation: OperationCancellation? = null,
         onProgress: ((Float) -> Unit)? = null,
     ): ConversionResult {
-        if (operation.tool == ConverterTool.NszNsp) {
-            return convertNsz(root, operation, cancellation, onProgress)
+        val executableName = when (val backend = operation.tool.backend) {
+            is ConverterBackend.NativeExecutable -> backend.fileName
+            ConverterBackend.EmbeddedPython -> return convertNsz(root, operation, cancellation, onProgress)
+            ConverterBackend.InPlaceKotlin -> error("${operation.tool.displayName} conversions are run by XisoRunner.")
         }
-        val executable = File(context.applicationInfo.nativeLibraryDir, operation.tool.executableName)
+        val executable = File(context.applicationInfo.nativeLibraryDir, executableName)
         require(executable.isFile && executable.canExecute()) {
             "${operation.tool.displayName} is not bundled for this device's CPU architecture."
         }
-        val source = findFile(root, operation.sourcePath)
+        val source = root.findRelative(operation.sourcePath)
             ?: error("Missing source image: ${operation.sourcePath}")
         val workspace = File(context.cacheDir, "converter/${UUID.randomUUID()}")
         require(workspace.mkdirs()) { "Unable to prepare converter workspace." }
@@ -48,14 +51,7 @@ class NativeConverterRunner(private val context: Context) {
             onProgress?.invoke(0f)
             var outputLog = ""
             val logReader = thread(start = true, isDaemon = true) {
-                outputLog = process.inputStream.bufferedReader().useLines { lines ->
-                    lines.joinToString(separator = "\n") { line ->
-                        PERCENT_PATTERN.findAll(line).lastOrNull()?.groupValues?.get(1)?.toFloatOrNull()?.let {
-                            onProgress?.invoke((it / 100f).coerceIn(0f, 1f))
-                        }
-                        line
-                    }
-                }
+                outputLog = readConverterOutput(process.inputStream, onProgress)
             }
             while (process.isAlive) {
                 if (cancellation?.shouldInterruptCurrentOperation() == true) {
@@ -84,7 +80,7 @@ class NativeConverterRunner(private val context: Context) {
         cancellation: OperationCancellation?,
         onProgress: ((Float) -> Unit)?,
     ): ConversionResult {
-        val source = findFile(root, operation.sourcePath)
+        val source = root.findRelative(operation.sourcePath)
             ?: error("Missing source package: ${operation.sourcePath}")
         val workspace = File(context.cacheDir, "converter/${UUID.randomUUID()}")
         require(workspace.mkdirs()) { "Unable to prepare converter workspace." }
@@ -153,24 +149,12 @@ class NativeConverterRunner(private val context: Context) {
         ConverterTool.AzaharZcci -> listOf(
             executable.absolutePath, "-c", source.absolutePath, "-o", workspace.absolutePath,
         )
-        ConverterTool.NszNsp -> error("NSZ conversions are run by embedded Python.")
-        ConverterTool.Chd -> error("CHD conversions are run by CHDMan.")
-    }
-
-    private fun findFile(root: DocumentFile, relativePath: String): DocumentFile? {
-        var current = root
-        val parts = relativePath.split('/').filter(String::isNotBlank)
-        parts.forEachIndexed { index, part ->
-            val child = current.findFile(part) ?: return null
-            if (index == parts.lastIndex) return child
-            current = child
-        }
-        return null
+        ConverterTool.Chd, ConverterTool.NszNsp, ConverterTool.XboxXiso ->
+            error("${tool.displayName} is not run through NativeConverterRunner's command line.")
     }
 
     private companion object {
         const val TAG = "Mimir.NSZ"
-        val PERCENT_PATTERN = Regex("""(\d{1,3}(?:\.\d+)?)\s*%""")
         const val PROCESS_POLL_INTERVAL_MS = 100L
     }
 }

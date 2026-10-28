@@ -24,51 +24,77 @@ enum class VitaShortcutFormat(
 enum class ToolMode(val displayName: String) {
     MultiDiscOrganizer("Multi-disc Organizer"),
     RomZipper("RomZipper"),
-    ChdConverter("Converter Tools"),
+    Converter("Converter Tools"),
     VitaAppIds("Vita App IDs"),
     EsDeSystems("ES-DE Systems"),
+    RomPatcher("ROM Patcher"),
+}
+
+/** How a converter runs on the device. */
+sealed interface ConverterBackend {
+    /** A bundled ARM64 executable in the app's native library directory. */
+    data class NativeExecutable(val fileName: String) : ConverterBackend
+
+    /** The NSZ Python package running in the embedded Chaquopy runtime. */
+    data object EmbeddedPython : ConverterBackend
+
+    /** Kotlin code that streams the source and replaces it under the same name. */
+    data object InPlaceKotlin : ConverterBackend
 }
 
 enum class ConverterTool(
     val displayName: String,
-    val description: String,
     val sourceExtensions: Set<String>,
     val outputExtension: String,
     val folderAliases: Set<String>,
-    val executableName: String,
+    val backend: ConverterBackend,
+    /** Short output label shown on queued conversions. */
+    val badge: String,
 ) {
     Chd(
         displayName = "CHDMan",
-        description = "Disc images to space-saving CHD files",
         sourceExtensions = emptySet(),
         outputExtension = "chd",
         folderAliases = emptySet(),
-        executableName = "libchdman.so",
+        backend = ConverterBackend.NativeExecutable("libchdman.so"),
+        badge = "CHD",
     ),
     DolphinRvz(
         displayName = "Dolphin RVZ",
-        description = "GameCube and Wii ISO images to RVZ",
         sourceExtensions = setOf("iso"),
         outputExtension = "rvz",
         folderAliases = setOf("gamecube", "gc", "nintendo gamecube", "wii", "nintendo wii"),
-        executableName = "libdolphintool.so",
+        backend = ConverterBackend.NativeExecutable("libdolphintool.so"),
+        badge = "RVZ",
     ),
     AzaharZcci(
         displayName = "Azahar ZCCI",
-        description = "Decrypted 3DS/CCI images to compressed ZCCI",
         sourceExtensions = setOf("3ds", "cci"),
         outputExtension = "zcci",
         folderAliases = setOf("3ds", "nintendo 3ds"),
-        executableName = "libazahar.so",
+        backend = ConverterBackend.NativeExecutable("libazahar.so"),
+        badge = "ZCCI",
     ),
     NszNsp(
         displayName = "NSZ to NSP",
-        description = "Decompress Nintendo Switch NSZ packages to NSP",
         sourceExtensions = setOf("nsz"),
         outputExtension = "nsp",
         folderAliases = setOf("switch", "nintendo switch"),
-        executableName = "",
+        backend = ConverterBackend.EmbeddedPython,
+        badge = "NSP",
     ),
+    XboxXiso(
+        displayName = "Xbox XISO",
+        sourceExtensions = setOf("iso"),
+        outputExtension = "iso",
+        folderAliases = setOf("xbox", "microsoft xbox"),
+        backend = ConverterBackend.InPlaceKotlin,
+        badge = "XISO",
+    ),
+    ;
+
+    /** True when the converted image replaces its source under the same name. */
+    val replacesSource: Boolean get() = backend == ConverterBackend.InPlaceKotlin
 }
 
 enum class ChdDiscType(
@@ -98,6 +124,11 @@ enum class ChdSystem(
         displayName = "PS2",
         supportedExtensions = setOf("iso"),
         folderAliases = setOf("playstation 2", "ps2"),
+    ),
+    PlayStation3(
+        displayName = "PS3",
+        supportedExtensions = setOf("iso"),
+        folderAliases = setOf("playstation 3", "ps3"),
     ),
     SegaCd(
         displayName = "Sega CD",
@@ -175,6 +206,15 @@ data class OperationPlan(
     val operations: List<FileOperation>,
     val conflicts: List<String>,
 ) {
+    /** How many changes were fully applied once the first [completedOperations] operations ran. */
+    fun completedChanges(completedOperations: Int): Int {
+        var remaining = completedOperations
+        return changes.takeWhile { change ->
+            remaining -= change.operations.size
+            remaining >= 0
+        }.size
+    }
+
     fun forSelectedChanges(selectedDetailPaths: Set<String>): OperationPlan {
         val selectedChanges = changes.filter { it.detailPath in selectedDetailPaths }
         return copy(

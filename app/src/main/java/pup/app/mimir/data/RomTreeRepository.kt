@@ -3,6 +3,7 @@ package pup.app.mimir.data
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.StatFs
 import android.os.storage.StorageManager
 import androidx.documentfile.provider.DocumentFile
@@ -14,6 +15,32 @@ import pup.app.mimir.domain.VitaShortcutFormat
 class RomTreeRepository(private val context: Context) {
     data class StorageInfo(val totalBytes: Long, val freeBytes: Long)
 
+    enum class VolumeKind { Internal, SdCard }
+
+    data class VolumeSpace(val kind: VolumeKind, val info: StorageInfo)
+
+    /**
+     * Free space on the device's shared storage and, when one is inserted, its SD card. Each
+     * mounted volume gets an app-specific directory, so the SD card is the first removable one.
+     */
+    fun deviceVolumes(): List<VolumeSpace> = buildList {
+        primaryStorageInfo()?.let { add(VolumeSpace(VolumeKind.Internal, it)) }
+        val sdRoot = runCatching {
+            context.getExternalFilesDirs(null)
+                .drop(1)
+                .filterNotNull()
+                .firstOrNull { Environment.isExternalStorageRemovable(it) && Environment.getExternalStorageState(it) == Environment.MEDIA_MOUNTED }
+                ?.path
+                ?.substringBefore("/Android/")
+        }.getOrNull()
+        sdRoot?.let { path ->
+            runCatching {
+                val stat = StatFs(path)
+                StorageInfo(totalBytes = stat.totalBytes, freeBytes = stat.availableBytes)
+            }.getOrNull()?.let { add(VolumeSpace(VolumeKind.SdCard, it)) }
+        }
+    }
+
     fun storageInfo(rootUri: Uri): StorageInfo? {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return null
         return runCatching {
@@ -23,6 +50,12 @@ class RomTreeRepository(private val context: Context) {
             StorageInfo(totalBytes = stat.totalBytes, freeBytes = stat.availableBytes)
         }.getOrNull()
     }
+
+    /** Space on the device's shared storage, for the header readout before any folder is picked. */
+    fun primaryStorageInfo(): StorageInfo? = runCatching {
+        val stat = StatFs(Environment.getExternalStorageDirectory().path)
+        StorageInfo(totalBytes = stat.totalBytes, freeBytes = stat.availableBytes)
+    }.getOrNull()
 
     fun loadVitaShortcutCatalog(): List<VitaApp> =
         context.assets.open("vita_shortcuts.tsv").bufferedReader().useLines { lines ->
@@ -110,6 +143,23 @@ class RomTreeRepository(private val context: Context) {
         }
     }
 
+    /** Keeps the Xbox disc images that still carry a Redump video partition. */
+    fun filterXboxImagesNeedingXiso(
+        rootUri: Uri,
+        entries: List<RomEntry>,
+        shouldStop: (() -> Boolean)? = null,
+    ): List<RomEntry> {
+        val root = DocumentFile.fromTreeUri(context, rootUri) ?: return emptyList()
+        val xisoRunner = XisoRunner(context)
+        return entries.filter { entry ->
+            if (shouldStop?.invoke() == true) throw OperationStoppedException("Scan stopped by user.")
+            if (!entry.fileName.endsWith(".iso", ignoreCase = true)) return@filter true
+            val file = root.findRelative(entry.relativePath) ?: return@filter false
+            val offset = xisoRunner.partitionOffset(file)
+            offset != null && offset != 0L
+        }
+    }
+
     fun loadExistingVitaShortcuts(
         rootUri: Uri,
         format: VitaShortcutFormat,
@@ -126,7 +176,7 @@ class RomTreeRepository(private val context: Context) {
         return entries
             .filter { it.fileName.endsWith(".${format.extension}", ignoreCase = true) }
             .mapNotNull { entry ->
-                val file = findFile(root, entry.relativePath) ?: return@mapNotNull null
+                val file = root.findRelative(entry.relativePath) ?: return@mapNotNull null
                 val appId = runCatching {
                     context.contentResolver.openInputStream(file.uri).use { input ->
                         requireNotNull(input) { "Unable to read ${entry.relativePath}" }
@@ -311,19 +361,6 @@ class RomTreeRepository(private val context: Context) {
             .map { it.groupValues[1] }
             .distinct()
             .sumOf { fileName -> parent.findFile(fileName)?.length() ?: 0L }
-    }
-
-    private fun findFile(root: DocumentFile, relativePath: String): DocumentFile? {
-        val parts = relativePath.split('/').filter { it.isNotBlank() }
-        var current = root
-        parts.forEachIndexed { index, part ->
-            val child = current.findFile(part) ?: return null
-            if (index == parts.lastIndex) {
-                return child
-            }
-            current = child
-        }
-        return null
     }
 
     private companion object {

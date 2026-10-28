@@ -1,14 +1,289 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Mimir</string><string name="home">Início</string><string name="go_home">Ir para o início</string><string name="toggle_dark_mode">Alternar modo escuro</string><string name="status">Status</string><string name="open_tool">Abrir %1$s</string>
-    <string name="home_intro">Boas-vindas ao Mimir!</string><string name="home_prompt">Escolha uma ferramenta na lista abaixo para começar</string><string name="home_prepare_library">Ferramentas úteis</string><string name="home_make_room">Economize espaço no seu dispositivo</string>
-    <string name="goal_fix_multidisc">Corrigir jogos com vários discos</string><string name="tool_multidisc">Organizador multidisco</string><string name="tool_multidisc_description">Criar pastas e listas de reprodução prontas para o frontend.</string>
-    <string name="goal_create_vita_shortcuts">Criar atalhos do Vita</string><string name="tool_vita_shortcuts">Atalhos do Vita</string><string name="tool_vita_shortcuts_description">Criar atalhos .psvita ou .dpt a partir do banco de dados integrado.</string>
-    <string name="goal_setup_esde">Configurar o ES-DE</string><string name="tool_esde_systems">Sistemas ES-DE</string><string name="tool_esde_systems_description">Instalar sistemas personalizados e mapear suas pastas de ROMs.</string>
-    <string name="goal_convert_switch_packages">Converter pacotes do Switch</string><string name="tool_nsz_to_nsp">NSZ para NSP</string><string name="tool_nsz_to_nsp_description">Descompactar arquivos NSZ em pacotes NSP.</string>
-    <string name="goal_compress_cartridge_roms">Compactar ROMs de cartucho</string><string name="tool_romzipper">RomZipper</string><string name="tool_romzipper_description">Arquivar ROMs de cartucho compatíveis como arquivos .zip.</string>
-    <string name="goal_compress_disc_images">Compactar imagens de disco</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">Converter imagens de PSX, PS2, PSP, Saturn, Dreamcast e Sega CD para CHD.</string>
-    <string name="goal_shrink_gamecube_wii">Reduzir jogos de GameCube e Wii</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">Converter imagens ISO para RVZ.</string>
-    <string name="goal_shrink_3ds">Reduzir jogos de Nintendo 3DS</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">Compactar imagens 3DS e CCI descriptografadas para ZCCI.</string><string name="tool_card_description">%1$s \u2022 %2$s</string>
-    <string name="no_rom_folder_selected">Nenhuma pasta de ROM selecionada</string><string name="no_vita_output_directory_selected">Nenhuma pasta de saída do Vita selecionada</string><string name="no_esde_folder_selected">Nenhuma pasta do ES-DE selecionada</string>
+    <string name="app_name">Mimir</string><string name="go_home">Ir para o início</string><string name="toggle_dark_mode">Alternar modo escuro</string><string name="open_tool">Abrir %1$s</string>
+<string name="home_prompt">Escolha uma ferramenta na lista abaixo para começar</string>    <string name="goal_fix_multidisc">Corrigir jogos com vários discos</string><string name="tool_multidisc">Organizador multidisco</string><string name="tool_multidisc_description">Encontra jogos que ocupam mais de um disco e cria uma playlist .m3u para cada um, para que seu frontend mostre o jogo uma única vez e possa trocar de disco. No ES-DE, os discos também são movidos para uma pasta que aparece como um único jogo.</string>
+    <string name="goal_create_vita_shortcuts">Criar atalhos do Vita</string><string name="tool_vita_shortcuts">Atalhos do Vita</string><string name="tool_vita_shortcuts_description">Pesquise na lista integrada de títulos de PS Vita e salve um atalho .psvita ou .dpt para um jogo instalado no Vita3K, para que seu frontend possa listá-lo e iniciá-lo.</string>
+    <string name="goal_setup_esde">Configurar o ES-DE</string><string name="tool_esde_systems">Sistemas ES-DE</string><string name="tool_esde_systems_description">Baixa os sistemas personalizados mais recentes da comunidade para o ES-DE no Android, associa cada um à sua pasta de ROMs e os instala na pasta custom_systems do ES-DE. Reinicie o ES-DE para carregá-los.</string>
+    <string name="goal_convert_switch_packages">Converter pacotes do Switch</string><string name="tool_nsz_to_nsp">NSZ para NSP</string><string name="tool_nsz_to_nsp_description">Descompacta arquivos .nsz do Switch em pacotes .nsp completos para emuladores que não leem NSZ. Requer seu próprio prod.keys. Seus arquivos .nsz são mantidos.</string>
+    <string name="goal_compress_cartridge_roms">Compactar ROMs de cartucho</string><string name="tool_romzipper">RomZipper</string><string name="tool_romzipper_description">Compacta cada ROM de cartucho (Game Boy, GBA, DS, NES, SNES, N64, Mega Drive e outros) em seu próprio .zip para economizar espaço. A maioria dos emuladores abre o zip diretamente. A ROM descompactada é removida.</string>
+    <string name="goal_compress_disc_images">Compactar imagens de disco</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">Compacta imagens de disco de PS1, PS2, PS3, PSP, Saturn, Dreamcast e Sega CD (.cue/.bin, .gdi, .iso) em um único arquivo .chd por jogo. Sem perdas, então os jogos rodam igual e ocupam menos espaço.</string>
+    <string name="goal_shrink_gamecube_wii">Reduzir jogos de GameCube e Wii</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">Compacta arquivos .iso de GameCube e Wii para .rvz, o formato sem perdas do Dolphin. Os jogos rodam igual e ocupam muito menos espaço. Seus arquivos .iso são mantidos.</string>
+    <string name="goal_shrink_3ds">Reduzir jogos de Nintendo 3DS</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">Compacta jogos de 3DS descriptografados (.3ds, .cci) para .zcci, que o Azahar executa diretamente. Dumps criptografados não podem ser convertidos. Seus arquivos originais são mantidos.</string><string name="goal_shrink_xbox">Reduzir jogos de Xbox</string><string name="tool_xbox_xiso">Xbox XISO</string><string name="tool_xbox_xiso_description">Remove a partição de vídeo não usada e o preenchimento dos arquivos .iso de Xbox da Redump. O XISO reduzido substitui o original e roda no xemu e no Hakux.</string>
+    <string name="goal_patch_rom">Aplicar patch em uma ROM</string>
+    <string name="tool_rom_patcher">Patcher de ROM</string>
+    <string name="tool_rom_patcher_description">Aplica um patch IPS, UPS ou BPS a uma ROM, como uma tradução, romhack ou correção, e salva a cópia modificada na mesma pasta da ROM. A ROM original não é alterada.</string>    <string name="no_rom_folder_selected">Nenhuma pasta de ROM selecionada</string><string name="no_vita_output_directory_selected">Nenhuma pasta de saída do Vita selecionada</string><string name="no_esde_folder_selected">Nenhuma pasta do ES-DE selecionada</string>
+
+    <!-- Tool screens, dialogs and status messages. -->
+    <string name="action_cancel">Cancelar</string>
+    <string name="sort_name_ascending">Nome A–Z</string>
+    <string name="sort_name_descending">Nome Z–A</string>
+    <string name="sort_size_largest">Maiores primeiro</string>
+    <string name="sort_size_smallest">Menores primeiro</string>
+    <string name="action_select_all">Selecionar tudo</string>
+    <string name="action_deselect_all">Desmarcar tudo</string>
+    <string name="storage_body">%1$s livres de %2$s. Esta fila precisa de cerca de %3$s de espaço de trabalho.</string>
+    <string name="storage_low_warning">Aviso: talvez não haja espaço livre suficiente para converter a fila selecionada. Desmarque alguns itens ou libere espaço primeiro.</string>
+    <string name="queue_existing_output">Saída existente — selecione individualmente para substituir</string>
+    <string name="replace_output_title">Substituir a saída existente?</string>
+    <string name="replace_output_body_selected">%1$s já existe e será substituído se selecionado.</string>
+    <string name="action_replace_output">Substituir saída</string>
+    <string name="report_space_saved">Espaço líquido economizado: %1$s.</string>
+    <string name="report_size_increase">Aumento líquido de tamanho: %1$s.</string>
+    <string name="report_no_size_change">Sem alteração líquida de tamanho.</string>
+    <string name="report_title">Relatório de conversão</string>
+    <plurals name="report_completed">
+        <item quantity="one">%1$d de %2$d conversão concluída.</item>
+        <item quantity="many">%1$d de %2$d conversões concluídas.</item>
+        <item quantity="other">%1$d de %2$d conversões concluídas.</item>
+    </plurals>
+    <string name="report_stopped">Interrompido pelo usuário.</string>
+    <string name="progress_converting">Convertendo %1$s: %2$d%%</string>
+    <string name="progress_selected_image">imagem selecionada</string>
+    <string name="progress_queue">Fila: tarefa %1$d de %2$d</string>
+    <string name="action_stop_after_current">Parar após a conversão atual</string>
+    <string name="action_stop_now">Parar agora</string>
+    <string name="support_body" formatted="false">O Mimir é, e sempre será, 100% gratuito e sem anúncios. Se quiser demonstrar seu apoio, confira meu canal no YouTube ou faça uma doação.</string>
+    <string name="home_footer">Criado por RetroPup</string>
+    <string name="app_logo">Logotipo do Mimir</string>
+    <string name="apply_title_convert">Converter as imagens selecionadas?</string>
+    <string name="apply_title_changes">Aplicar alterações?</string>
+    <plurals name="apply_body_changes">
+        <item quantity="one">Isso aplicará %1$d alteração planejada à pasta de ROMs selecionada. Os arquivos originais podem ser movidos ou removidos conforme mostrado na prévia, e o Mimir não pode desfazer esta ação.</item>
+        <item quantity="many">Isso aplicará %1$d alterações planejadas à pasta de ROMs selecionada. Os arquivos originais podem ser movidos ou removidos conforme mostrado na prévia, e o Mimir não pode desfazer esta ação.</item>
+        <item quantity="other">Isso aplicará %1$d alterações planejadas à pasta de ROMs selecionada. Os arquivos originais podem ser movidos ou removidos conforme mostrado na prévia, e o Mimir não pode desfazer esta ação.</item>
+    </plurals>
+    <plurals name="apply_body_replace_xiso">
+        <item quantity="one">Isso substituirá %1$d imagem de Xbox selecionada por um XISO reduzido com o mesmo nome. O original só é excluído depois que seu XISO é gravado, e o Mimir não pode desfazer esta ação.</item>
+        <item quantity="many">Isso substituirá %1$d imagens de Xbox selecionadas por XISOs reduzidos com o mesmo nome. Cada original só é excluído depois que seu XISO é gravado, e o Mimir não pode desfazer esta ação.</item>
+        <item quantity="other">Isso substituirá %1$d imagens de Xbox selecionadas por XISOs reduzidos com o mesmo nome. Cada original só é excluído depois que seu XISO é gravado, e o Mimir não pode desfazer esta ação.</item>
+    </plurals>
+    <plurals name="apply_body_convert">
+        <item quantity="one">Isso converterá %1$d arquivo selecionado para .%2$s.</item>
+        <item quantity="many">Isso converterá %1$d arquivos selecionados para .%2$s.</item>
+        <item quantity="other">Isso converterá %1$d arquivos selecionados para .%2$s.</item>
+    </plurals>
+    <plurals name="apply_body_overwrite">
+        <item quantity="one">%1$d saída selecionada já existe e será substituída.</item>
+        <item quantity="many">%1$d saídas selecionadas já existem e serão substituídas.</item>
+        <item quantity="other">%1$d saídas selecionadas já existem e serão substituídas.</item>
+    </plurals>
+    <string name="apply_body_cannot_undo">O Mimir não pode desfazer esta ação.</string>
+    <string name="apply_delete_originals">Excluir arquivos originais</string>
+    <string name="apply_delete_originals_detail">Também remove faixas da mesma pasta referenciadas por um arquivo .cue ou .gdi após a conversão bem-sucedida.</string>
+    <string name="action_start_conversions">Iniciar conversões</string>
+    <string name="action_apply_changes">Aplicar alterações</string>
+    <string name="esde_install_title">Instalar sistemas personalizados?</string>
+    <plurals name="esde_install_body">
+        <item quantity="one">Isso instalará %1$d sistema configurado no diretório custom_systems da pasta do ES-DE selecionada. Os arquivos de sistemas personalizados existentes podem ser atualizados. Reinicie o ES-DE após a instalação.</item>
+        <item quantity="many">Isso instalará %1$d sistemas configurados no diretório custom_systems da pasta do ES-DE selecionada. Os arquivos de sistemas personalizados existentes podem ser atualizados. Reinicie o ES-DE após a instalação.</item>
+        <item quantity="other">Isso instalará %1$d sistemas configurados no diretório custom_systems da pasta do ES-DE selecionada. Os arquivos de sistemas personalizados existentes podem ser atualizados. Reinicie o ES-DE após a instalação.</item>
+    </plurals>
+    <string name="action_install_systems">Instalar sistemas</string>
+    <string name="vita_add_title">Criar atalho do Vita?</string>
+    <string name="vita_add_body">Isso criará um atalho .%1$s para %2$s (%3$s) na pasta de saída selecionada.</string>
+    <string name="action_create_shortcut">Criar atalho</string>
+    <string name="vita_remove_title">Remover atalho do Vita?</string>
+    <string name="vita_remove_body">Isso excluirá o atalho de %1$s (%2$s) da pasta de saída selecionada.</string>
+    <string name="action_remove_shortcut">Remover atalho</string>
+    <plurals name="chip_discs">
+        <item quantity="one">%1$d DISCO</item>
+        <item quantity="many">%1$d DISCOS</item>
+        <item quantity="other">%1$d DISCOS</item>
+    </plurals>
+    <string name="preview_existing_output">Já existe um .%1$s correspondente. Selecione este item para substituí-lo.</string>
+    <string name="preview_sources">Origens</string>
+    <string name="preview_targets">Destinos</string>
+    <string name="replace_output_body_convert">%1$s já existe e será substituído se você converter esta imagem.</string>
+    <plurals name="preview_jobs_selected">
+        <item quantity="one">%1$d tarefa selecionada • %2$s</item>
+        <item quantity="many">%1$d tarefas selecionadas • %2$s</item>
+        <item quantity="other">%1$d tarefas selecionadas • %2$s</item>
+    </plurals>
+    <plurals name="preview_multidisc_summary">
+        <item quantity="one">%1$d conjunto multidisco detectado; %2$d selecionados.</item>
+        <item quantity="many">%1$d conjuntos multidisco detectados; %2$d selecionados.</item>
+        <item quantity="other">%1$d conjuntos multidisco detectados; %2$d selecionados.</item>
+    </plurals>
+    <plurals name="preview_zip_summary">
+        <item quantity="one">%1$d ROM corresponde à lista de ZIP; %2$d selecionadas.</item>
+        <item quantity="many">%1$d ROMs correspondem à lista de ZIP; %2$d selecionadas.</item>
+        <item quantity="other">%1$d ROMs correspondem à lista de ZIP; %2$d selecionadas.</item>
+    </plurals>
+    <plurals name="preview_items_summary">
+        <item quantity="one">%1$d item pronto; %2$d selecionados.</item>
+        <item quantity="many">%1$d itens prontos; %2$d selecionados.</item>
+        <item quantity="other">%1$d itens prontos; %2$d selecionados.</item>
+    </plurals>
+    <plurals name="preview_systems_summary">
+        <item quantity="one">%1$d sistema pronto; %2$d selecionados.</item>
+        <item quantity="many">%1$d sistemas prontos; %2$d selecionados.</item>
+        <item quantity="other">%1$d sistemas prontos; %2$d selecionados.</item>
+    </plurals>
+    <string name="control_selected_rom_folder">Pasta de ROMs selecionada</string>
+    <string name="esde_selected_folder">Pasta do ES-DE selecionada</string>
+    <string name="esde_rom_root">Pasta raiz de ROMs</string>
+    <string name="esde_download_hint">Baixe os XMLs mais recentes para configurar os sistemas personalizados do Android. Eles serão instalados em custom_systems.</string>
+    <string name="esde_rom_folders">Pastas de ROMs</string>
+    <string name="esde_default_folder">Padrão</string>
+    <string name="action_choose_folder">Escolher pasta</string>
+    <string name="vita_output_directory">Pasta de saída dos atalhos</string>
+    <string name="vita_file_type">Tipo de arquivo do atalho</string>
+    <string name="vita_cocoon_hint">Para usuários do Cocoon, selecione .dpt</string>
+    <string name="vita_database">Banco de dados de atalhos</string>
+    <plurals name="vita_database_size">
+        <item quantity="one">%1$d título pronto para pesquisa</item>
+        <item quantity="many">%1$d títulos prontos para pesquisa</item>
+        <item quantity="other">%1$d títulos prontos para pesquisa</item>
+    </plurals>
+    <string name="vita_search_label">Pesquisar título ou ID do app</string>
+    <string name="vita_search_results">Resultados da pesquisa</string>
+    <string name="vita_delete_shortcut">Excluir atalho de %1$s</string>
+    <string name="action_quick_add">Adição rápida</string>
+    <string name="organizer_frontend_target">Frontend de destino</string>
+    <string name="preset_other">Outro</string>
+    <string name="organizer_scan_hidden">Verificar pastas ocultas</string>
+    <string name="organizer_scan_hidden_detail">Extrai ROMs de pastas iniciadas por ponto para a pasta do sistema antes de organizar.</string>
+    <string name="nsz_keys_title">Chaves NSZ</string>
+    <string name="nsz_keys_configured">prod.keys foi importado e será mantido no armazenamento privado do Mimir.</string>
+    <string name="nsz_keys_missing">Importe seu arquivo prod.keys obtido legalmente antes de verificar ou converter pacotes NSZ.</string>
+    <string name="action_replace_keys">Substituir prod.keys</string>
+    <string name="action_import_keys">Importar prod.keys</string>
+    <string name="chd_system">Sistema</string>
+    <string name="chd_conversion_type">Tipo de conversão</string>
+    <string name="chd_compatibility_body">Use CD com o NetherSX2 e DVD com o ARMSX2.</string>
+    <string name="msg_rom_path_unresolved">Não foi possível resolver o caminho da pasta de ROMs selecionada.</string>
+    <string name="msg_select_esde_first">Selecione primeiro a pasta do ES-DE.</string>
+    <string name="msg_select_rom_root_find">Selecione primeiro a pasta raiz de ROMs para que o Mimir encontre seus sistemas.</string>
+    <string name="msg_esde_downloading">Baixando os sistemas personalizados mais recentes do ES-DE…</string>
+    <plurals name="msg_esde_downloaded">
+        <item quantity="one">%1$d sistema do ES-DE baixado. Revise a pasta e depois aplique.</item>
+        <item quantity="many">%1$d sistemas do ES-DE baixados. Revise as pastas e depois aplique.</item>
+        <item quantity="other">%1$d sistemas do ES-DE baixados. Revise as pastas e depois aplique.</item>
+    </plurals>
+    <string name="msg_esde_download_failed">Não foi possível baixar os sistemas do ES-DE.</string>
+    <string name="msg_esde_download_first">Baixe primeiro os sistemas mais recentes do ES-DE.</string>
+    <string name="msg_select_rom_root_map">Selecione primeiro a pasta raiz de ROMs para que o Mimir mapeie seus sistemas.</string>
+    <string name="msg_esde_installing">Instalando sistemas personalizados do ES-DE…</string>
+    <plurals name="msg_esde_installed">
+        <item quantity="one">%1$d sistema instalado em custom_systems. Reinicie o ES-DE para carregá-lo.</item>
+        <item quantity="many">%1$d sistemas instalados em custom_systems. Reinicie o ES-DE para carregá-los.</item>
+        <item quantity="other">%1$d sistemas instalados em custom_systems. Reinicie o ES-DE para carregá-los.</item>
+    </plurals>
+    <string name="msg_esde_install_failed">Não foi possível instalar os sistemas do ES-DE.</string>
+    <string name="msg_stopping">Parando…</string>
+    <string name="msg_stop_after_current">Vai parar após a conversão atual.</string>
+    <string name="msg_select_vita_output_first">Selecione primeiro uma pasta de saída para os atalhos do Vita.</string>
+    <string name="msg_vita_add_unable">Não foi possível adicionar o atalho de %1$s.</string>
+    <string name="msg_vita_added">Atalho adicionado: %1$s</string>
+    <string name="msg_vita_add_failed">Falha ao adicionar o atalho.</string>
+    <string name="msg_vita_removed">Atalho removido: %1$s</string>
+    <string name="msg_vita_remove_failed">Falha ao remover o atalho.</string>
+    <string name="msg_keys_directory_failed">Não foi possível preparar a pasta de chaves NSZ do Mimir.</string>
+    <string name="msg_keys_unreadable">Não foi possível ler o arquivo prod.keys selecionado.</string>
+    <string name="msg_keys_empty">O arquivo prod.keys selecionado está vazio.</string>
+    <string name="msg_keys_finish_failed">Não foi possível concluir a importação de prod.keys.</string>
+    <string name="msg_keys_imported">prod.keys importado e salvo neste dispositivo.</string>
+    <string name="msg_keys_import_failed">Não foi possível importar prod.keys.</string>
+    <string name="msg_select_rom_folder_first">Selecione primeiro uma pasta de ROMs.</string>
+    <string name="msg_import_keys_first">Importe um arquivo prod.keys antes de verificar pacotes NSZ.</string>
+    <plurals name="scan_checking_multidisc">
+        <item quantity="one">Verificando %1$d arquivo de ROM em busca de jogos multidisco…</item>
+        <item quantity="many">Verificando %1$d arquivos de ROM em busca de jogos multidisco…</item>
+        <item quantity="other">Verificando %1$d arquivos de ROM em busca de jogos multidisco…</item>
+    </plurals>
+    <plurals name="scan_checking_zip">
+        <item quantity="one">Verificando %1$d arquivo de ROM em busca de formatos compatíveis com ZIP…</item>
+        <item quantity="many">Verificando %1$d arquivos de ROM em busca de formatos compatíveis com ZIP…</item>
+        <item quantity="other">Verificando %1$d arquivos de ROM em busca de formatos compatíveis com ZIP…</item>
+    </plurals>
+    <plurals name="scan_checking_chd">
+        <item quantity="one">Verificando %1$d imagem de %2$s para conversão em CHD…</item>
+        <item quantity="many">Verificando %1$d imagens de %2$s para conversão em CHD…</item>
+        <item quantity="other">Verificando %1$d imagens de %2$s para conversão em CHD…</item>
+    </plurals>
+    <plurals name="scan_checking_tool">
+        <item quantity="one">Verificando %1$d arquivo para conversão com %2$s…</item>
+        <item quantity="many">Verificando %1$d arquivos para conversão com %2$s…</item>
+        <item quantity="other">Verificando %1$d arquivos para conversão com %2$s…</item>
+    </plurals>
+    <string name="msg_none_multidisc">Nenhum jogo multidisco encontrado.</string>
+    <string name="msg_none_zip">Nenhuma ROM compatível com ZIP encontrada.</string>
+    <string name="msg_none_converter">Nenhum arquivo compatível com %1$s encontrado.</string>
+    <string name="msg_none_vita">Nenhum atalho do Vita na fila.</string>
+    <string name="msg_none_esde">Nenhum sistema do ES-DE carregado.</string>
+    <string name="msg_scan_stopped">Verificação interrompida.</string>
+    <string name="msg_scan_failed">Falha na verificação.</string>
+    <plurals name="msg_stopped_after">
+        <item quantity="one">Interrompido após %1$d de %2$d conversão.</item>
+        <item quantity="many">Interrompido após %1$d de %2$d conversões.</item>
+        <item quantity="other">Interrompido após %1$d de %2$d conversões.</item>
+    </plurals>
+    <string name="msg_changes_applied">Alterações aplicadas.</string>
+    <string name="msg_conversion_stopped">Conversão interrompida.</string>
+    <string name="msg_apply_failed">Falha ao aplicar.</string>
+    <string name="scan_start_multidisc">Verificando arquivos de ROM em busca de jogos multidisco…</string>
+    <string name="scan_start_zip">Verificando arquivos de ROM em busca de formatos compatíveis com ZIP…</string>
+    <string name="scan_start_tool">Verificando arquivos de ROM em busca de arquivos compatíveis com %1$s…</string>
+    <string name="scan_start_files">Verificando arquivos de ROM…</string>
+    <string name="scan_activity_multidisc">Procurando jogos multidisco</string>
+    <string name="scan_activity_zip">Procurando ROMs compatíveis com ZIP</string>
+    <string name="scan_activity_tool">Procurando arquivos compatíveis com %1$s</string>
+    <string name="scan_activity_files">Verificando arquivos de ROM</string>
+    <plurals name="scan_files_checked">
+        <item quantity="one">%1$s: %2$d arquivo verificado</item>
+        <item quantity="many">%1$s: %2$d arquivos verificados</item>
+        <item quantity="other">%1$s: %2$d arquivos verificados</item>
+    </plurals>
+    <string name="apply_activity_organizing">Organizando ROMs</string>
+    <string name="apply_activity_zipping">Compactando ROMs em ZIP</string>
+    <string name="apply_activity_converting">Convertendo com %1$s</string>
+    <string name="apply_activity_shortcuts">Criando atalhos</string>
+    <string name="apply_activity_esde">Atualizando sistemas do ES-DE</string>
+    <string name="apply_progress">%1$s: %2$d de %3$d</string>
+
+    <!-- Memory-card shell: home, legend bar and empty states. -->
+    <string name="about_mimir">Sobre o Mimir</string>
+    <string name="info_reads">Lê</string>
+    <string name="info_writes">Grava</string>
+    <string name="legend_open">Abrir</string>
+    <string name="legend_theme">Tema</string>
+    <string name="legend_select">Selecionar</string>
+    <string name="legend_back">Voltar</string>
+    <string name="legend_download">Baixar</string>
+    <string name="legend_install">Instalar</string>
+    <string name="legend_scan">Verificar pasta</string>
+    <plurals name="legend_convert">
+        <item quantity="one">Converter %1$d</item>
+        <item quantity="many">Converter %1$d</item>
+        <item quantity="other">Converter %1$d</item>
+    </plurals>
+    <plurals name="legend_apply">
+        <item quantity="one">Aplicar %1$d</item>
+        <item quantity="many">Aplicar %1$d</item>
+        <item quantity="other">Aplicar %1$d</item>
+    </plurals>
+    <string name="storage_free_header">%1$s livres</string>
+    <string name="vita_search_hint">Digite o título de um jogo ou um ID de título, como PCSB01256.</string>
+    <string name="data_no_folder_title">Escolha uma pasta de ROMs</string>
+    <string name="data_no_folder_body">Escolha a pasta que o Mimir deve ler e depois verifique-a.</string>
+    <string name="data_not_scanned_title">Pronto para verificar</string>
+    <string name="data_not_scanned_body">Pressione X ou toque em Verificar pasta para examinar %1$s.</string>
+    <string name="data_nothing_found_title">Nada para alterar</string>
+    <string name="data_nothing_found_body">O Mimir não encontrou nessa pasta arquivos com os quais esta ferramenta possa trabalhar.</string>
+
+    <!-- Legend labels with nothing selected. -->
+    <string name="legend_convert_idle">Converter</string>
+    <string name="legend_apply_idle">Aplicar</string>
+
+    <!-- Memory-card slot names. -->
+    <string name="slot_utilities">Slot 1 · Utilitários</string>
+    <string name="slot_space_savers">Slot 2 · Economia de espaço</string>
+
+    <!-- Storage volumes and About. -->
+    <string name="storage_internal">Armazenamento interno</string>
+    <string name="storage_sd_card">Cartão SD</string>
+    <string name="action_close">Fechar</string>
+
+    <!-- Stats. -->
+    <string name="stats">Estatísticas</string>
 </resources>

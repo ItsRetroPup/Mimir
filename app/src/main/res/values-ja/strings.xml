@@ -1,14 +1,243 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Mimir</string><string name="home">ホーム</string><string name="go_home">ホームに戻る</string><string name="toggle_dark_mode">ダークモードを切り替え</string><string name="status">状態</string><string name="open_tool">%1$sを開く</string>
-    <string name="home_intro">Mimirへようこそ！</string><string name="home_prompt">下の一覧からツールを選んで始めましょう</string><string name="home_prepare_library">便利なツール</string><string name="home_make_room">端末の空き容量を増やす</string>
-    <string name="goal_fix_multidisc">複数ディスクのゲームを整理する</string><string name="tool_multidisc">複数ディスクの整理</string><string name="tool_multidisc_description">フロントエンド向けのフォルダーとプレイリストを作成します。</string>
-    <string name="goal_create_vita_shortcuts">Vitaショートカットを作成する</string><string name="tool_vita_shortcuts">Vitaショートカット</string><string name="tool_vita_shortcuts_description">内蔵データベースから.psvitaまたは.dptのショートカットを作成します。</string>
-    <string name="goal_setup_esde">ES-DEを設定する</string><string name="tool_esde_systems">ES-DEシステム</string><string name="tool_esde_systems_description">カスタムシステムをインストールし、ROMフォルダーを割り当てます。</string>
-    <string name="goal_convert_switch_packages">Switchパッケージを変換する</string><string name="tool_nsz_to_nsp">NSZからNSP</string><string name="tool_nsz_to_nsp_description">NSZファイルをNSPパッケージに展開します。</string>
-    <string name="goal_compress_cartridge_roms">カートリッジROMを圧縮する</string><string name="tool_romzipper">RomZipper</string><string name="tool_romzipper_description">対応するカートリッジROMを.zipファイルにアーカイブします。</string>
-    <string name="goal_compress_disc_images">ディスクイメージを圧縮する</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">PSX、PS2、PSP、Saturn、Dreamcast、Sega CDのイメージをCHDに変換します。</string>
-    <string name="goal_shrink_gamecube_wii">GameCubeとWiiのゲームを圧縮する</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">ISOイメージをRVZに変換します。</string>
-    <string name="goal_shrink_3ds">Nintendo 3DSのゲームを圧縮する</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">復号済みの3DSおよびCCIイメージをZCCIに圧縮します。</string><string name="tool_card_description">%1$s \u2022 %2$s</string>
-    <string name="no_rom_folder_selected">ROMフォルダーが選択されていません</string><string name="no_vita_output_directory_selected">Vita出力フォルダーが選択されていません</string><string name="no_esde_folder_selected">ES-DEフォルダーが選択されていません</string>
+    <string name="app_name">Mimir</string><string name="go_home">ホームに戻る</string><string name="toggle_dark_mode">ダークモードを切り替え</string><string name="open_tool">%1$sを開く</string>
+<string name="home_prompt">下の一覧からツールを選んで始めましょう</string>    <string name="goal_fix_multidisc">複数ディスクのゲームを整理する</string><string name="tool_multidisc">複数ディスクの整理</string><string name="tool_multidisc_description">複数のディスクに分かれたゲームを見つけ、それぞれに.m3uプレイリストを作成します。フロントエンドではゲームが1つにまとまり、ディスクを切り替えられます。ES-DEの場合は、1つのゲームとして表示されるフォルダーにディスクを移動します。</string>
+    <string name="goal_create_vita_shortcuts">Vitaショートカットを作成する</string><string name="tool_vita_shortcuts">Vitaショートカット</string><string name="tool_vita_shortcuts_description">内蔵のPS Vitaタイトル一覧を検索し、Vita3Kにインストール済みのゲームの.psvitaまたは.dptショートカットを保存します。フロントエンドから一覧表示と起動ができるようになります。</string>
+    <string name="goal_setup_esde">ES-DEを設定する</string><string name="tool_esde_systems">ES-DEシステム</string><string name="tool_esde_systems_description">Android版ES-DE向けのコミュニティ製カスタムシステムの最新版をダウンロードし、各システムをROMフォルダーに関連付けて、ES-DEのcustom_systemsフォルダーにインストールします。読み込むにはES-DEを再起動してください。</string>
+    <string name="goal_convert_switch_packages">Switchパッケージを変換する</string><string name="tool_nsz_to_nsp">NSZからNSP</string><string name="tool_nsz_to_nsp_description">Switchの.nszファイルを、NSZを読めないエミュレーター向けに完全な.nspパッケージへ展開します。ご自身のprod.keysが必要です。.nszファイルはそのまま残ります。</string>
+    <string name="goal_compress_cartridge_roms">カートリッジROMを圧縮する</string><string name="tool_romzipper">RomZipper</string><string name="tool_romzipper_description">カートリッジROM（Game Boy、GBA、DS、NES、SNES、N64、Mega Driveなど）を1本ずつ.zipにまとめて容量を節約します。ほとんどのエミュレーターはzipを直接開けます。圧縮前のROMは削除されます。</string>
+    <string name="goal_compress_disc_images">ディスクイメージを圧縮する</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">PS1、PS2、PS3、PSP、Saturn、Dreamcast、Sega CDのディスクイメージ（.cue/.bin、.gdi、.iso）をゲームごとに1つの.chdファイルへ圧縮します。可逆圧縮なので、同じようにプレイでき容量は小さくなります。</string>
+    <string name="goal_shrink_gamecube_wii">GameCubeとWiiのゲームを圧縮する</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">GameCubeとWiiの.isoファイルを、Dolphinの可逆圧縮形式である.rvzに圧縮します。同じようにプレイでき、容量は大幅に小さくなります。.isoファイルはそのまま残ります。</string>
+    <string name="goal_shrink_3ds">Nintendo 3DSのゲームを圧縮する</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">復号済みの3DSゲーム（.3ds、.cci）を、Azaharで直接遊べる.zcciに圧縮します。暗号化されたダンプは変換できません。元のファイルはそのまま残ります。</string><string name="goal_shrink_xbox">Xboxのゲームを圧縮する</string><string name="tool_xbox_xiso">Xbox XISO</string><string name="tool_xbox_xiso_description">Redump形式のXbox .isoファイルから、未使用のビデオパーティションと余白を取り除きます。トリミングしたXISOが元のファイルを置き換え、xemuとHakuxで動作します。</string>
+    <string name="goal_patch_rom">ROMにパッチを当てる</string>
+    <string name="tool_rom_patcher">ROMパッチャー</string>
+    <string name="tool_rom_patcher_description">翻訳、改造、バグ修正などのIPS・UPS・BPSパッチをROMに適用し、パッチ済みのコピーをROMと同じフォルダーに保存します。元のROMはそのまま残ります。</string>    <string name="no_rom_folder_selected">ROMフォルダーが選択されていません</string><string name="no_vita_output_directory_selected">Vita出力フォルダーが選択されていません</string><string name="no_esde_folder_selected">ES-DEフォルダーが選択されていません</string>
+
+    <!-- Tool screens, dialogs and status messages. -->
+    <string name="action_cancel">キャンセル</string>
+    <string name="sort_name_ascending">名前 A–Z</string>
+    <string name="sort_name_descending">名前 Z–A</string>
+    <string name="sort_size_largest">サイズが大きい順</string>
+    <string name="sort_size_smallest">サイズが小さい順</string>
+    <string name="action_select_all">すべて選択</string>
+    <string name="action_deselect_all">すべて選択解除</string>
+    <string name="storage_body">空き容量 %1$s / %2$s。このキューには約 %3$s の作業領域が必要です。</string>
+    <string name="storage_low_warning">警告: 選択したキューを変換するのに十分な空き容量がない可能性があります。いくつかの項目の選択を解除するか、先に空き容量を確保してください。</string>
+    <string name="queue_existing_output">既存の出力 — 置き換えるには個別に選択してください</string>
+    <string name="replace_output_title">既存の出力を置き換えますか？</string>
+    <string name="replace_output_body_selected">%1$s はすでに存在し、選択すると上書きされます。</string>
+    <string name="action_replace_output">出力を置き換える</string>
+    <string name="report_space_saved">正味の節約容量: %1$s。</string>
+    <string name="report_size_increase">正味のサイズ増加: %1$s。</string>
+    <string name="report_no_size_change">正味のサイズ変化はありません。</string>
+    <string name="report_title">変換レポート</string>
+    <plurals name="report_completed">
+        <item quantity="other">%2$d 件中 %1$d 件の変換が完了しました。</item>
+    </plurals>
+    <string name="report_stopped">ユーザーにより停止されました。</string>
+    <string name="progress_converting">%1$s を変換中: %2$d%%</string>
+    <string name="progress_selected_image">選択したイメージ</string>
+    <string name="progress_queue">キュー: %2$d 件中 %1$d 件目</string>
+    <string name="action_stop_after_current">現在の変換後に停止</string>
+    <string name="action_stop_now">今すぐ停止</string>
+    <string name="support_body" formatted="false">Mimir はこれからもずっと 100% 無料で、広告もありません。応援していただける方は、YouTube チャンネルをご覧いただくか、寄付をご検討ください。</string>
+    <string name="home_footer">RetroPup が開発</string>
+    <string name="app_logo">Mimir のロゴ</string>
+    <string name="apply_title_convert">選択したイメージを変換しますか？</string>
+    <string name="apply_title_changes">変更を適用しますか？</string>
+    <plurals name="apply_body_changes">
+        <item quantity="other">選択した ROM フォルダーに %1$d 件の予定された変更を適用します。元のファイルはプレビューのとおりに移動または削除される場合があり、Mimir はこの操作を元に戻せません。</item>
+    </plurals>
+    <plurals name="apply_body_replace_xiso">
+        <item quantity="other">選択した %1$d 件の Xbox イメージを、同じ名前のトリミング済み XISO に置き換えます。元のファイルは XISO の書き込み後にのみ削除され、Mimir はこの操作を元に戻せません。</item>
+    </plurals>
+    <plurals name="apply_body_convert">
+        <item quantity="other">選択した %1$d 件のファイルを .%2$s に変換します。</item>
+    </plurals>
+    <plurals name="apply_body_overwrite">
+        <item quantity="other">選択した出力のうち %1$d 件はすでに存在し、上書きされます。</item>
+    </plurals>
+    <string name="apply_body_cannot_undo">Mimir はこの操作を元に戻せません。</string>
+    <string name="apply_delete_originals">元のファイルを削除</string>
+    <string name="apply_delete_originals_detail">変換が成功した後、.cue または .gdi ファイルが参照している同じフォルダー内のトラックも削除します。</string>
+    <string name="action_start_conversions">変換を開始</string>
+    <string name="action_apply_changes">変更を適用</string>
+    <string name="esde_install_title">カスタムシステムをインストールしますか？</string>
+    <plurals name="esde_install_body">
+        <item quantity="other">選択した ES-DE フォルダーの custom_systems ディレクトリに、設定済みの %1$d 件のシステムをインストールします。既存のカスタムシステムファイルが更新される場合があります。インストール完了後に ES-DE を再起動してください。</item>
+    </plurals>
+    <string name="action_install_systems">システムをインストール</string>
+    <string name="vita_add_title">Vita ショートカットを作成しますか？</string>
+    <string name="vita_add_body">選択した出力フォルダーに %2$s (%3$s) の .%1$s ショートカットを作成します。</string>
+    <string name="action_create_shortcut">ショートカットを作成</string>
+    <string name="vita_remove_title">Vita ショートカットを削除しますか？</string>
+    <string name="vita_remove_body">選択した出力フォルダーから %1$s (%2$s) のショートカットを削除します。</string>
+    <string name="action_remove_shortcut">ショートカットを削除</string>
+    <plurals name="chip_discs">
+        <item quantity="other">%1$d 枚</item>
+    </plurals>
+    <string name="preview_existing_output">一致する .%1$s がすでに存在します。置き換えるにはこの項目を選択してください。</string>
+    <string name="preview_sources">ソース</string>
+    <string name="preview_targets">ターゲット</string>
+    <string name="replace_output_body_convert">%1$s はすでに存在し、このイメージを変換すると上書きされます。</string>
+    <plurals name="preview_jobs_selected">
+        <item quantity="other">%1$d 件のジョブを選択 • %2$s</item>
+    </plurals>
+    <plurals name="preview_multidisc_summary">
+        <item quantity="other">%1$d 件のマルチディスクセットを検出、%2$d 件を選択。</item>
+    </plurals>
+    <plurals name="preview_zip_summary">
+        <item quantity="other">%1$d 件の ROM が ZIP の対象リストに一致、%2$d 件を選択。</item>
+    </plurals>
+    <plurals name="preview_items_summary">
+        <item quantity="other">%1$d 件の項目が準備完了、%2$d 件を選択。</item>
+    </plurals>
+    <plurals name="preview_systems_summary">
+        <item quantity="other">%1$d 件のシステムが準備完了、%2$d 件を選択。</item>
+    </plurals>
+    <string name="control_selected_rom_folder">選択した ROM フォルダー</string>
+    <string name="esde_selected_folder">選択した ES-DE フォルダー</string>
+    <string name="esde_rom_root">ROM ルートフォルダー</string>
+    <string name="esde_download_hint">最新の XML をダウンロードして、Android 用カスタムシステムを設定します。custom_systems にインストールされます。</string>
+    <string name="esde_rom_folders">ROM フォルダー</string>
+    <string name="esde_default_folder">デフォルト</string>
+    <string name="action_choose_folder">フォルダーを選択</string>
+    <string name="vita_output_directory">ショートカットの出力フォルダー</string>
+    <string name="vita_file_type">ショートカットのファイル形式</string>
+    <string name="vita_cocoon_hint">Cocoon を使う場合は .dpt を選択</string>
+    <string name="vita_database">ショートカットデータベース</string>
+    <plurals name="vita_database_size">
+        <item quantity="other">%1$d 件のタイトルを検索できます</item>
+    </plurals>
+    <string name="vita_search_label">タイトルまたはアプリ ID を検索</string>
+    <string name="vita_search_results">検索結果</string>
+    <string name="vita_delete_shortcut">%1$s のショートカットを削除</string>
+    <string name="action_quick_add">クイック追加</string>
+    <string name="organizer_frontend_target">フロントエンドの対象</string>
+    <string name="preset_other">その他</string>
+    <string name="organizer_scan_hidden">隠しフォルダーをスキャン</string>
+    <string name="organizer_scan_hidden_detail">整理する前に、名前が「.」で始まるフォルダーから ROM をシステムフォルダーに取り出します。</string>
+    <string name="nsz_keys_title">NSZ キー</string>
+    <string name="nsz_keys_configured">prod.keys はインポート済みで、Mimir のプライベートストレージに保存されます。</string>
+    <string name="nsz_keys_missing">NSZ パッケージをスキャンまたは変換する前に、合法的に入手した prod.keys ファイルをインポートしてください。</string>
+    <string name="action_replace_keys">prod.keys を置き換え</string>
+    <string name="action_import_keys">prod.keys をインポート</string>
+    <string name="chd_system">システム</string>
+    <string name="chd_conversion_type">変換タイプ</string>
+    <string name="chd_compatibility_body">NetherSX2 では CD、ARMSX2 では DVD を使用してください。</string>
+    <string name="msg_rom_path_unresolved">選択した ROM フォルダーのパスを解決できません。</string>
+    <string name="msg_select_esde_first">先に ES-DE フォルダーを選択してください。</string>
+    <string name="msg_select_rom_root_find">Mimir がシステムを見つけられるよう、先に ROM ルートフォルダーを選択してください。</string>
+    <string name="msg_esde_downloading">最新の ES-DE カスタムシステムをダウンロード中…</string>
+    <plurals name="msg_esde_downloaded">
+        <item quantity="other">%1$d 件の ES-DE システムをダウンロードしました。フォルダーを確認してから適用してください。</item>
+    </plurals>
+    <string name="msg_esde_download_failed">ES-DE システムをダウンロードできません。</string>
+    <string name="msg_esde_download_first">先に最新の ES-DE システムをダウンロードしてください。</string>
+    <string name="msg_select_rom_root_map">Mimir がシステムを割り当てられるよう、先に ROM ルートフォルダーを選択してください。</string>
+    <string name="msg_esde_installing">ES-DE カスタムシステムをインストール中…</string>
+    <plurals name="msg_esde_installed">
+        <item quantity="other">custom_systems に %1$d 件のシステムをインストールしました。読み込むには ES-DE を再起動してください。</item>
+    </plurals>
+    <string name="msg_esde_install_failed">ES-DE システムをインストールできません。</string>
+    <string name="msg_stopping">停止中…</string>
+    <string name="msg_stop_after_current">現在の変換後に停止します。</string>
+    <string name="msg_select_vita_output_first">先に Vita ショートカットの出力フォルダーを選択してください。</string>
+    <string name="msg_vita_add_unable">%1$s のショートカットを追加できません。</string>
+    <string name="msg_vita_added">ショートカットを追加しました: %1$s</string>
+    <string name="msg_vita_add_failed">ショートカットの追加に失敗しました。</string>
+    <string name="msg_vita_removed">ショートカットを削除しました: %1$s</string>
+    <string name="msg_vita_remove_failed">ショートカットの削除に失敗しました。</string>
+    <string name="msg_keys_directory_failed">Mimir の NSZ キーフォルダーを準備できません。</string>
+    <string name="msg_keys_unreadable">選択した prod.keys ファイルを読み取れません。</string>
+    <string name="msg_keys_empty">選択した prod.keys ファイルは空です。</string>
+    <string name="msg_keys_finish_failed">prod.keys のインポートを完了できません。</string>
+    <string name="msg_keys_imported">prod.keys をインポートし、このデバイスに保存しました。</string>
+    <string name="msg_keys_import_failed">prod.keys をインポートできません。</string>
+    <string name="msg_select_rom_folder_first">先に ROM フォルダーを選択してください。</string>
+    <string name="msg_import_keys_first">NSZ パッケージをスキャンする前に prod.keys ファイルをインポートしてください。</string>
+    <plurals name="scan_checking_multidisc">
+        <item quantity="other">%1$d 件の ROM ファイルでマルチディスクゲームを確認中…</item>
+    </plurals>
+    <plurals name="scan_checking_zip">
+        <item quantity="other">%1$d 件の ROM ファイルで ZIP 対応形式を確認中…</item>
+    </plurals>
+    <plurals name="scan_checking_chd">
+        <item quantity="other">%1$d 件の %2$s イメージで CHD 変換を確認中…</item>
+    </plurals>
+    <plurals name="scan_checking_tool">
+        <item quantity="other">%1$d 件のファイルで %2$s 変換を確認中…</item>
+    </plurals>
+    <string name="msg_none_multidisc">マルチディスクゲームは見つかりませんでした。</string>
+    <string name="msg_none_zip">ZIP 対応の ROM は見つかりませんでした。</string>
+    <string name="msg_none_converter">%1$s に対応するファイルは見つかりませんでした。</string>
+    <string name="msg_none_vita">キューにある Vita ショートカットはありません。</string>
+    <string name="msg_none_esde">ES-DE システムが読み込まれていません。</string>
+    <string name="msg_scan_stopped">スキャンを停止しました。</string>
+    <string name="msg_scan_failed">スキャンに失敗しました。</string>
+    <plurals name="msg_stopped_after">
+        <item quantity="other">%2$d 件中 %1$d 件の変換後に停止しました。</item>
+    </plurals>
+    <string name="msg_changes_applied">変更を適用しました。</string>
+    <string name="msg_conversion_stopped">変換を停止しました。</string>
+    <string name="msg_apply_failed">適用に失敗しました。</string>
+    <string name="scan_start_multidisc">ROM ファイルからマルチディスクゲームをスキャン中…</string>
+    <string name="scan_start_zip">ROM ファイルから ZIP 対応形式をスキャン中…</string>
+    <string name="scan_start_tool">ROM ファイルから %1$s 対応ファイルをスキャン中…</string>
+    <string name="scan_start_files">ROM ファイルをスキャン中…</string>
+    <string name="scan_activity_multidisc">マルチディスクゲームをスキャン中</string>
+    <string name="scan_activity_zip">ZIP 対応 ROM をスキャン中</string>
+    <string name="scan_activity_tool">%1$s 対応ファイルをスキャン中</string>
+    <string name="scan_activity_files">ROM ファイルをスキャン中</string>
+    <plurals name="scan_files_checked">
+        <item quantity="other">%1$s: %2$d 件のファイルを確認済み</item>
+    </plurals>
+    <string name="apply_activity_organizing">ROM を整理中</string>
+    <string name="apply_activity_zipping">ROM を ZIP 圧縮中</string>
+    <string name="apply_activity_converting">%1$s で変換中</string>
+    <string name="apply_activity_shortcuts">ショートカットを作成中</string>
+    <string name="apply_activity_esde">ES-DE システムを更新中</string>
+    <string name="apply_progress">%1$s: %3$d 件中 %2$d 件</string>
+
+    <!-- Memory-card shell: home, legend bar and empty states. -->
+    <string name="about_mimir">Mimir について</string>
+    <string name="info_reads">読み込み</string>
+    <string name="info_writes">書き出し</string>
+    <string name="legend_open">開く</string>
+    <string name="legend_theme">テーマ</string>
+    <string name="legend_select">選択</string>
+    <string name="legend_back">戻る</string>
+    <string name="legend_download">ダウンロード</string>
+    <string name="legend_install">インストール</string>
+    <string name="legend_scan">フォルダーをスキャン</string>
+    <plurals name="legend_convert">
+        <item quantity="other">%1$d 件を変換</item>
+    </plurals>
+    <plurals name="legend_apply">
+        <item quantity="other">%1$d 件を適用</item>
+    </plurals>
+    <string name="storage_free_header">空き %1$s</string>
+    <string name="vita_search_hint">ゲームのタイトル、または PCSB01256 のようなタイトル ID を入力してください。</string>
+    <string name="data_no_folder_title">ROM フォルダーを選択</string>
+    <string name="data_no_folder_body">Mimir が読み込むフォルダーを選んでから、スキャンしてください。</string>
+    <string name="data_not_scanned_title">スキャンの準備完了</string>
+    <string name="data_not_scanned_body">X を押すか「フォルダーをスキャン」をタップして %1$s を調べます。</string>
+    <string name="data_nothing_found_title">変更するものはありません</string>
+    <string name="data_nothing_found_body">このフォルダーには、このツールで扱えるファイルが見つかりませんでした。</string>
+
+    <!-- Legend labels with nothing selected. -->
+    <string name="legend_convert_idle">変換</string>
+    <string name="legend_apply_idle">適用</string>
+
+    <!-- Memory-card slot names. -->
+    <string name="slot_utilities">スロット1 · ユーティリティ</string>
+    <string name="slot_space_savers">スロット2 · 容量節約</string>
+
+    <!-- Storage volumes and About. -->
+    <string name="storage_internal">内部ストレージ</string>
+    <string name="storage_sd_card">SD カード</string>
+    <string name="action_close">閉じる</string>
+
+    <!-- Stats. -->
+    <string name="stats">統計</string>
 </resources>

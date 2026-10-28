@@ -9,9 +9,34 @@ still required before releasing it as a replacement.
 
 ## Original Android Companion
 
-Mimir is an open source Android toolkit for retro handheld owners.
+Mimir is an open source Android toolkit for retro handheld owners. It tidies, converts and shrinks
+your game library right on the device. Every tool shows you what it will change before it writes anything.
 
-It is built to help organise ROM libraries safely on-device, with an initial focus on multi-disc cleanup and bulk ROM preparation for Android frontends used on devices like the AYN Odin and Thor.
+## What Mimir does
+
+**Utilities**
+- **Multi-disc Organizer:** finds games that span more than one disc and writes an `.m3u` playlist
+  for each, so your frontend lists the game once and can swap discs.
+- **Vita Shortcuts:** search the built-in PS Vita title list and save a `.psvita` or `.dpt` shortcut,
+  so your frontend can list and launch games installed in Vita3K.
+- **ES-DE Systems:** downloads the latest community custom systems for ES-DE on Android, points each
+  one at its ROM folder, and installs them into ES-DE.
+- **NSZ to NSP:** decompresses Switch `.nsz` files into full `.nsp` packages for emulators that can't
+  read NSZ. Needs your own `prod.keys`.
+- **ROM Patcher:** applies an IPS, UPS or BPS patch (a translation, romhack or bug fix) and saves the
+  patched copy next to the ROM, leaving the original as it is.
+
+**Space savers**
+- **RomZipper:** zips cartridge ROMs (Game Boy, GBA, DS, NES, SNES, N64, Genesis and more) one per
+  `.zip`. Most emulators open the zip directly.
+- **CHDMan:** compresses PS1, PS2, PS3, PSP, Saturn, Dreamcast and Sega CD disc images into one
+  lossless `.chd` per game.
+- **Dolphin RVZ:** compresses GameCube and Wii `.iso` files to `.rvz`, Dolphin's lossless format.
+- **Azahar ZCCI:** compresses decrypted 3DS games to `.zcci`, which Azahar plays directly.
+- **Xbox XISO:** trims the unused video partition and padding from Redump Xbox `.iso` files for xemu
+  and Hakux.
+
+**Stats** shows how much space the space savers have freed and how many games they've compressed.
 
 [![Get it on Obtainium](https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium%3A%2F%2Fadd%2Fhttps%3A%2F%2Fgithub.com%2FItsRetroPup%2FMimir)
 
@@ -64,7 +89,7 @@ Zip naming behaviour:
 
 Mimir's Converter Tools page provides one scan, review, overwrite, progress, and cancellation flow
 for each supported converter. Every conversion retains the source image unless the CHD delete-source
-option is selected.
+option is selected, except Xbox XISO, which replaces each source image with its XISO under the same name.
 
 #### CHDMan
 
@@ -72,14 +97,18 @@ Supported system and source formats:
 - Dreamcast: `.gdi`, `.cue`, `.iso`
 - PlayStation 1: `.cue`, `.iso`
 - PlayStation 2: `.iso`
+- PlayStation 3: `.iso`
 - Sega CD: `.cue`, `.iso`
 - Sega Saturn: `.cue`, `.iso`
 - PlayStation Portable: `.iso`
 
-Choose either CD or DVD conversion before scanning. For PSP, use DVD. For PS2, use CD with NetherSX2 and DVD with ARMSX2.
+PSP and PS3 always convert as DVD, and the other systems as CD. For PS2, choose CD for NetherSX2 or DVD for ARMSX2.
+PS3 CHDs load in ARMSX3 1.0.6 and later; an encrypted image keeps using the `.dkey` beside it, which
+Mimir leaves in place. CHDMan works on a copy in internal storage, so a conversion needs free space
+there of about twice the image's size; Mimir checks this before starting.
 
 Each scan includes compatible files in the selected folder plus matching system subfolders, case-insensitively:
-`dreamcast`/`dc`, `playstation 1`/`ps1`/`psx`, `playstation 2`/`ps2`, `sega cd`/`segacd`/`mega cd`/`megacd`, `sega saturn`/`saturn`, and `playstation portable`/`psp`. `.bin` files are consumed through their `.cue` sheet and are not independent conversion targets.
+`dreamcast`/`dc`, `playstation 1`/`ps1`/`psx`, `playstation 2`/`ps2`, `playstation 3`/`ps3`, `sega cd`/`segacd`/`mega cd`/`megacd`, `sega saturn`/`saturn`, and `playstation portable`/`psp`. `.bin` files are consumed through their `.cue` sheet and are not independent conversion targets.
 
 Conversion progress reports completed images out of the selected total. Users can stop a scan or
 conversion immediately, or finish the current conversion and stop before the next one. An optional
@@ -107,6 +136,19 @@ Mimir bundles the following Android ARM64 command-line backends in
   `2126.0-alpha1` revision `e11f3da49346a45c400001ea424de298649618c8` (GPL-2.0-or-later).
   The reproducible standalone-target patch and build instructions are in
   `docs/azahar-compression-cli.patch` and `docs/azahar-compression-build.md`.
+
+#### Xbox XISO
+
+Mimir can trim original Xbox Redump `.iso` dumps to XISO for Hakux and xemu. Select a folder
+containing `.iso` files directly or in an `xbox` / `microsoft xbox` subfolder. The scan only lists
+images that still contain the Redump video partition (XGD1, XGD2, or XGD3); existing XISOs and
+non-Xbox ISOs are left out.
+
+The conversion rewrites the XDVDFS game partition with directories and files packed contiguously,
+matching `extract-xiso -r`, and keeps the original file name. It is implemented in Kotlin and reads
+the source in place, so no cache copy of the image is needed. Each XISO is written to a temporary
+`.mimir-xiso` file beside its source; the original is deleted and the XISO renamed only after the
+write succeeds. Make sure the storage has room for one extra XISO while converting.
 
 #### NSZ to NSP
 
@@ -137,69 +179,19 @@ Current behaviour:
 The ES-DE Systems tool downloads the latest Android custom-system definitions from
 [GlazedBelmont/es-de-android-custom-systems](https://github.com/GlazedBelmont/es-de-android-custom-systems), scans the selected ROM root for ES-DE system folders, lets users relocate each detected system with a folder picker, and installs the resulting `es_systems.xml` and `es_find_rules.xml` under the selected ES-DE folder's `custom_systems` directory. Default entries retain `%ROMPATH%/<system-folder>`; relocated entries use absolute Android storage paths. Restart ES-DE after installation so it reloads the definitions.
 
-## Design Goals
+### ROM Patcher
+Pick a ROM and an `.ips`, `.ups` or `.bps` patch. Mimir names the result after the patch (for example
+`Game (Hack).sfc`) and saves it in the ROM's own folder, asking once for access to that folder if
+needed. UPS and BPS checksums are verified, so a damaged patch or one made for a different ROM version
+is reported instead of written. The original ROM is never changed.
 
-- local-first
-- no cloud sync
-- no account system
-- safe preview before apply
-- deterministic file operations
-- frontend compatibility first
+### Stats
+The Stats link on the home screen shows lifetime totals for the five space savers (RomZipper,
+CHDMan, Dolphin RVZ, Azahar ZCCI and Xbox XISO): space saved, games compressed, and a breakdown per
+tool. Totals are kept on the device across restarts and updates, and counting starts the first time
+Mimir 1.0 runs.
 
-## Tech Stack
-
-- Kotlin
-- Jetpack Compose
-- Gradle
-- Android SDK
-- Python 3.13 and Chaquopy (NSZ converter)
-
-Building Mimir requires a `python3.13` executable on `PATH` so Chaquopy can resolve and package the
-NSZ dependencies. On Homebrew systems, install it with `brew install python@3.13`.
-
-## Requirements
-
-- Android `minSdk 29`
-- Java 17
-- Android Studio or Gradle CLI
-
-## Build
-
-### Debug APK
-```bash
-./gradlew assembleDebug
-```
-
-### Release APK
-```bash
-./gradlew assembleRelease
-```
-
-Signed release output:
-
-```text
-app/build/outputs/apk/release/app-release.apk
-```
-
-## Project Status
-
-Mimir is currently focused on ROM organisation workflows.
-
-Current scope:
-- multi-disc normalisation
-- frontend preset output generation
-- ROM zip conversion
-- PS Vita shortcut database and on-device shortcut creation
-- Android-native UI for safe local operations
-
-Planned later work may include:
-- more frontend-specific rule validation
-- broader file format support
-- richer Vita shortcut filtering and metadata options
-- UI polish and workflow refinement
-- GitHub release workflow
-- screenshots and user documentation
-
+#
 ## Open Source
 
 Mimir is an open source project, and suggestions are welcome. If there are tools or workflows you think would be useful for retro handheld owners, open an issue or suggest them through the project page.

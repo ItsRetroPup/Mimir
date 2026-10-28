@@ -45,7 +45,7 @@ object ChdPlanner {
             }
 
         return OperationPlan(
-            mode = ToolMode.ChdConverter,
+            mode = ToolMode.Converter,
             changes = changes,
             operations = operations,
             conflicts = conflicts.distinct(),

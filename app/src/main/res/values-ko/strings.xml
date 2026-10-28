@@ -1,14 +1,243 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Mimir</string><string name="home">홈</string><string name="go_home">홈으로 이동</string><string name="toggle_dark_mode">다크 모드 전환</string><string name="status">상태</string><string name="open_tool">%1$s 열기</string>
-    <string name="home_intro">Mimir에 오신 것을 환영합니다!</string><string name="home_prompt">아래 목록에서 도구를 선택하여 시작하세요</string><string name="home_prepare_library">유용한 도구</string><string name="home_make_room">기기의 저장 공간 절약</string>
-    <string name="goal_fix_multidisc">여러 디스크 게임 정리</string><string name="tool_multidisc">여러 디스크 정리</string><string name="tool_multidisc_description">프런트엔드용 폴더와 재생 목록을 만듭니다.</string>
-    <string name="goal_create_vita_shortcuts">Vita 바로가기 만들기</string><string name="tool_vita_shortcuts">Vita 바로가기</string><string name="tool_vita_shortcuts_description">내장 데이터베이스에서 .psvita 또는 .dpt 바로가기를 만듭니다.</string>
-    <string name="goal_setup_esde">ES-DE 설정</string><string name="tool_esde_systems">ES-DE 시스템</string><string name="tool_esde_systems_description">사용자 지정 시스템을 설치하고 ROM 폴더를 연결합니다.</string>
-    <string name="goal_convert_switch_packages">Switch 패키지 변환</string><string name="tool_nsz_to_nsp">NSZ에서 NSP로</string><string name="tool_nsz_to_nsp_description">NSZ 파일을 NSP 패키지로 압축 해제합니다.</string>
-    <string name="goal_compress_cartridge_roms">카트리지 ROM 압축</string><string name="tool_romzipper">RomZipper</string><string name="tool_romzipper_description">지원되는 카트리지 ROM을 .zip 파일로 보관합니다.</string>
-    <string name="goal_compress_disc_images">디스크 이미지 압축</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">PSX, PS2, PSP, Saturn, Dreamcast, Sega CD 이미지를 CHD로 변환합니다.</string>
-    <string name="goal_shrink_gamecube_wii">GameCube 및 Wii 게임 줄이기</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">ISO 이미지를 RVZ로 변환합니다.</string>
-    <string name="goal_shrink_3ds">Nintendo 3DS 게임 줄이기</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">복호화된 3DS 및 CCI 이미지를 ZCCI로 압축합니다.</string><string name="tool_card_description">%1$s \u2022 %2$s</string>
-    <string name="no_rom_folder_selected">ROM 폴더가 선택되지 않았습니다</string><string name="no_vita_output_directory_selected">Vita 출력 폴더가 선택되지 않았습니다</string><string name="no_esde_folder_selected">ES-DE 폴더가 선택되지 않았습니다</string>
+    <string name="app_name">Mimir</string><string name="go_home">홈으로 이동</string><string name="toggle_dark_mode">다크 모드 전환</string><string name="open_tool">%1$s 열기</string>
+<string name="home_prompt">아래 목록에서 도구를 선택하여 시작하세요</string>    <string name="goal_fix_multidisc">여러 디스크 게임 정리</string><string name="tool_multidisc">여러 디스크 정리</string><string name="tool_multidisc_description">여러 장의 디스크로 나뉜 게임을 찾아 게임마다 .m3u 재생 목록을 만듭니다. 프런트엔드에 게임이 한 번만 표시되고 디스크를 바꿀 수 있습니다. ES-DE에서는 디스크를 하나의 게임으로 표시되는 폴더로도 옮깁니다.</string>
+    <string name="goal_create_vita_shortcuts">Vita 바로가기 만들기</string><string name="tool_vita_shortcuts">Vita 바로가기</string><string name="tool_vita_shortcuts_description">내장된 PS Vita 타이틀 목록을 검색하고 Vita3K에 설치된 게임의 .psvita 또는 .dpt 바로 가기를 저장해 프런트엔드에서 표시하고 실행할 수 있게 합니다.</string>
+    <string name="goal_setup_esde">ES-DE 설정</string><string name="tool_esde_systems">ES-DE 시스템</string><string name="tool_esde_systems_description">Android용 ES-DE의 최신 커뮤니티 사용자 지정 시스템을 내려받아 각 시스템을 ROM 폴더에 연결하고 ES-DE의 custom_systems 폴더에 설치합니다. 불러오려면 ES-DE를 다시 시작하세요.</string>
+    <string name="goal_convert_switch_packages">Switch 패키지 변환</string><string name="tool_nsz_to_nsp">NSZ에서 NSP로</string><string name="tool_nsz_to_nsp_description">Switch .nsz 파일을 NSZ를 읽지 못하는 에뮬레이터를 위해 완전한 .nsp 패키지로 압축 해제합니다. 본인의 prod.keys가 필요합니다. .nsz 파일은 그대로 유지됩니다.</string>
+    <string name="goal_compress_cartridge_roms">카트리지 ROM 압축</string><string name="tool_romzipper">RomZipper</string><string name="tool_romzipper_description">카트리지 ROM(Game Boy, GBA, DS, NES, SNES, N64, Mega Drive 등)을 각각 .zip으로 압축해 공간을 절약합니다. 대부분의 에뮬레이터는 zip을 바로 엽니다. 압축하지 않은 ROM은 삭제됩니다.</string>
+    <string name="goal_compress_disc_images">디스크 이미지 압축</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">PS1, PS2, PS3, PSP, Saturn, Dreamcast, Sega CD 디스크 이미지(.cue/.bin, .gdi, .iso)를 게임마다 하나의 .chd 파일로 압축합니다. 무손실이므로 게임은 그대로 실행되고 용량은 줄어듭니다.</string>
+    <string name="goal_shrink_gamecube_wii">GameCube 및 Wii 게임 줄이기</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">GameCube와 Wii .iso 파일을 Dolphin의 무손실 형식인 .rvz로 압축합니다. 게임은 그대로 실행되고 용량은 크게 줄어듭니다. .iso 파일은 그대로 유지됩니다.</string>
+    <string name="goal_shrink_3ds">Nintendo 3DS 게임 줄이기</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">복호화된 3DS 게임(.3ds, .cci)을 Azahar에서 바로 실행되는 .zcci로 압축합니다. 암호화된 덤프는 변환할 수 없습니다. 원본 파일은 그대로 유지됩니다.</string><string name="goal_shrink_xbox">Xbox 게임 줄이기</string><string name="tool_xbox_xiso">Xbox XISO</string><string name="tool_xbox_xiso_description">Redump Xbox .iso 파일에서 사용하지 않는 비디오 파티션과 여백을 제거합니다. 줄인 XISO가 원본을 대체하며 xemu와 Hakux에서 실행됩니다.</string>
+    <string name="goal_patch_rom">ROM 패치하기</string>
+    <string name="tool_rom_patcher">ROM 패처</string>
+    <string name="tool_rom_patcher_description">번역, 롬핵, 버그 수정 같은 IPS, UPS, BPS 패치를 ROM에 적용하고 패치된 사본을 ROM과 같은 폴더에 저장합니다. 원본 ROM은 그대로 유지됩니다.</string>    <string name="no_rom_folder_selected">ROM 폴더가 선택되지 않았습니다</string><string name="no_vita_output_directory_selected">Vita 출력 폴더가 선택되지 않았습니다</string><string name="no_esde_folder_selected">ES-DE 폴더가 선택되지 않았습니다</string>
+
+    <!-- Tool screens, dialogs and status messages. -->
+    <string name="action_cancel">취소</string>
+    <string name="sort_name_ascending">이름 A–Z</string>
+    <string name="sort_name_descending">이름 Z–A</string>
+    <string name="sort_size_largest">크기 큰 순</string>
+    <string name="sort_size_smallest">크기 작은 순</string>
+    <string name="action_select_all">모두 선택</string>
+    <string name="action_deselect_all">모두 선택 해제</string>
+    <string name="storage_body">%2$s 중 %1$s 사용 가능. 이 대기열에는 약 %3$s의 작업 공간이 필요합니다.</string>
+    <string name="storage_low_warning">경고: 선택한 대기열을 변환하기에 여유 공간이 부족할 수 있습니다. 일부 항목을 선택 해제하거나 먼저 공간을 확보하세요.</string>
+    <string name="queue_existing_output">기존 출력 — 교체하려면 개별적으로 선택하세요</string>
+    <string name="replace_output_title">기존 출력을 교체할까요?</string>
+    <string name="replace_output_body_selected">%1$s 파일이 이미 있으며 선택하면 덮어씁니다.</string>
+    <string name="action_replace_output">출력 교체</string>
+    <string name="report_space_saved">순 절약 공간: %1$s.</string>
+    <string name="report_size_increase">순 크기 증가: %1$s.</string>
+    <string name="report_no_size_change">순 크기 변화가 없습니다.</string>
+    <string name="report_title">변환 보고서</string>
+    <plurals name="report_completed">
+        <item quantity="other">변환 %2$d개 중 %1$d개를 완료했습니다.</item>
+    </plurals>
+    <string name="report_stopped">사용자가 중지했습니다.</string>
+    <string name="progress_converting">%1$s 변환 중: %2$d%%</string>
+    <string name="progress_selected_image">선택한 이미지</string>
+    <string name="progress_queue">대기열: 작업 %2$d개 중 %1$d번째</string>
+    <string name="action_stop_after_current">현재 변환 후 중지</string>
+    <string name="action_stop_now">지금 중지</string>
+    <string name="support_body" formatted="false">Mimir는 앞으로도 언제나 100% 무료이며 광고가 없습니다. 응원하고 싶다면 제 YouTube 채널을 방문하거나 후원을 고려해 주세요.</string>
+    <string name="home_footer">RetroPup 제작</string>
+    <string name="app_logo">Mimir 로고</string>
+    <string name="apply_title_convert">선택한 이미지를 변환할까요?</string>
+    <string name="apply_title_changes">변경 사항을 적용할까요?</string>
+    <plurals name="apply_body_changes">
+        <item quantity="other">선택한 ROM 폴더에 예정된 변경 사항 %1$d개를 적용합니다. 원본 파일은 미리보기에 표시된 대로 이동되거나 삭제될 수 있으며, Mimir는 이 작업을 되돌릴 수 없습니다.</item>
+    </plurals>
+    <plurals name="apply_body_replace_xiso">
+        <item quantity="other">선택한 Xbox 이미지 %1$d개를 같은 이름의 트리밍된 XISO로 교체합니다. 원본은 XISO가 기록된 후에만 삭제되며, Mimir는 이 작업을 되돌릴 수 없습니다.</item>
+    </plurals>
+    <plurals name="apply_body_convert">
+        <item quantity="other">선택한 파일 %1$d개를 .%2$s(으)로 변환합니다.</item>
+    </plurals>
+    <plurals name="apply_body_overwrite">
+        <item quantity="other">선택한 출력 중 %1$d개가 이미 있으며 덮어씁니다.</item>
+    </plurals>
+    <string name="apply_body_cannot_undo">Mimir는 이 작업을 되돌릴 수 없습니다.</string>
+    <string name="apply_delete_originals">원본 파일 삭제</string>
+    <string name="apply_delete_originals_detail">변환이 성공하면 .cue 또는 .gdi 파일이 참조하는 같은 폴더의 트랙도 삭제합니다.</string>
+    <string name="action_start_conversions">변환 시작</string>
+    <string name="action_apply_changes">변경 사항 적용</string>
+    <string name="esde_install_title">사용자 지정 시스템을 설치할까요?</string>
+    <plurals name="esde_install_body">
+        <item quantity="other">선택한 ES-DE 폴더의 custom_systems 디렉터리에 구성된 시스템 %1$d개를 설치합니다. 기존 사용자 지정 시스템 파일이 업데이트될 수 있습니다. 설치가 끝나면 ES-DE를 다시 시작하세요.</item>
+    </plurals>
+    <string name="action_install_systems">시스템 설치</string>
+    <string name="vita_add_title">Vita 바로가기를 만들까요?</string>
+    <string name="vita_add_body">선택한 출력 폴더에 %2$s (%3$s)의 .%1$s 바로가기를 만듭니다.</string>
+    <string name="action_create_shortcut">바로가기 만들기</string>
+    <string name="vita_remove_title">Vita 바로가기를 삭제할까요?</string>
+    <string name="vita_remove_body">선택한 출력 폴더에서 %1$s (%2$s)의 바로가기를 삭제합니다.</string>
+    <string name="action_remove_shortcut">바로가기 삭제</string>
+    <plurals name="chip_discs">
+        <item quantity="other">디스크 %1$d장</item>
+    </plurals>
+    <string name="preview_existing_output">일치하는 .%1$s 파일이 이미 있습니다. 교체하려면 이 항목을 선택하세요.</string>
+    <string name="preview_sources">원본</string>
+    <string name="preview_targets">대상</string>
+    <string name="replace_output_body_convert">%1$s 파일이 이미 있으며 이 이미지를 변환하면 덮어씁니다.</string>
+    <plurals name="preview_jobs_selected">
+        <item quantity="other">작업 %1$d개 선택됨 • %2$s</item>
+    </plurals>
+    <plurals name="preview_multidisc_summary">
+        <item quantity="other">멀티 디스크 세트 %1$d개 감지됨, %2$d개 선택됨.</item>
+    </plurals>
+    <plurals name="preview_zip_summary">
+        <item quantity="other">ZIP 대상 목록과 일치하는 ROM %1$d개, %2$d개 선택됨.</item>
+    </plurals>
+    <plurals name="preview_items_summary">
+        <item quantity="other">항목 %1$d개 준비됨, %2$d개 선택됨.</item>
+    </plurals>
+    <plurals name="preview_systems_summary">
+        <item quantity="other">시스템 %1$d개 준비됨, %2$d개 선택됨.</item>
+    </plurals>
+    <string name="control_selected_rom_folder">선택한 ROM 폴더</string>
+    <string name="esde_selected_folder">선택한 ES-DE 폴더</string>
+    <string name="esde_rom_root">ROM 루트 폴더</string>
+    <string name="esde_download_hint">최신 XML을 다운로드해 Android 사용자 지정 시스템을 구성하세요. custom_systems 아래에 설치됩니다.</string>
+    <string name="esde_rom_folders">ROM 폴더</string>
+    <string name="esde_default_folder">기본값</string>
+    <string name="action_choose_folder">폴더 선택</string>
+    <string name="vita_output_directory">바로가기 출력 폴더</string>
+    <string name="vita_file_type">바로가기 파일 형식</string>
+    <string name="vita_cocoon_hint">Cocoon 사용자는 .dpt를 선택하세요</string>
+    <string name="vita_database">바로가기 데이터베이스</string>
+    <plurals name="vita_database_size">
+        <item quantity="other">검색 가능한 타이틀 %1$d개</item>
+    </plurals>
+    <string name="vita_search_label">타이틀 또는 앱 ID 검색</string>
+    <string name="vita_search_results">검색 결과</string>
+    <string name="vita_delete_shortcut">%1$s 바로가기 삭제</string>
+    <string name="action_quick_add">빠른 추가</string>
+    <string name="organizer_frontend_target">프런트엔드 대상</string>
+    <string name="preset_other">기타</string>
+    <string name="organizer_scan_hidden">숨김 폴더 스캔</string>
+    <string name="organizer_scan_hidden_detail">정리하기 전에 이름이 .으로 시작하는 폴더의 ROM을 시스템 폴더로 꺼냅니다.</string>
+    <string name="nsz_keys_title">NSZ 키</string>
+    <string name="nsz_keys_configured">prod.keys를 가져왔으며 Mimir의 비공개 저장소에 보관됩니다.</string>
+    <string name="nsz_keys_missing">NSZ 패키지를 스캔하거나 변환하기 전에 합법적으로 얻은 prod.keys 파일을 가져오세요.</string>
+    <string name="action_replace_keys">prod.keys 교체</string>
+    <string name="action_import_keys">prod.keys 가져오기</string>
+    <string name="chd_system">시스템</string>
+    <string name="chd_conversion_type">변환 유형</string>
+    <string name="chd_compatibility_body">NetherSX2에서는 CD를, ARMSX2에서는 DVD를 사용하세요.</string>
+    <string name="msg_rom_path_unresolved">선택한 ROM 폴더 경로를 확인할 수 없습니다.</string>
+    <string name="msg_select_esde_first">먼저 ES-DE 폴더를 선택하세요.</string>
+    <string name="msg_select_rom_root_find">Mimir가 시스템을 찾을 수 있도록 먼저 ROM 루트 폴더를 선택하세요.</string>
+    <string name="msg_esde_downloading">최신 ES-DE 사용자 지정 시스템을 다운로드하는 중…</string>
+    <plurals name="msg_esde_downloaded">
+        <item quantity="other">ES-DE 시스템 %1$d개를 다운로드했습니다. 폴더를 검토한 후 적용하세요.</item>
+    </plurals>
+    <string name="msg_esde_download_failed">ES-DE 시스템을 다운로드할 수 없습니다.</string>
+    <string name="msg_esde_download_first">먼저 최신 ES-DE 시스템을 다운로드하세요.</string>
+    <string name="msg_select_rom_root_map">Mimir가 시스템을 연결할 수 있도록 먼저 ROM 루트 폴더를 선택하세요.</string>
+    <string name="msg_esde_installing">ES-DE 사용자 지정 시스템을 설치하는 중…</string>
+    <plurals name="msg_esde_installed">
+        <item quantity="other">custom_systems에 시스템 %1$d개를 설치했습니다. 불러오려면 ES-DE를 다시 시작하세요.</item>
+    </plurals>
+    <string name="msg_esde_install_failed">ES-DE 시스템을 설치할 수 없습니다.</string>
+    <string name="msg_stopping">중지하는 중…</string>
+    <string name="msg_stop_after_current">현재 변환 후 중지합니다.</string>
+    <string name="msg_select_vita_output_first">먼저 Vita 바로가기 출력 폴더를 선택하세요.</string>
+    <string name="msg_vita_add_unable">%1$s 바로가기를 추가할 수 없습니다.</string>
+    <string name="msg_vita_added">바로가기 추가됨: %1$s</string>
+    <string name="msg_vita_add_failed">바로가기 추가에 실패했습니다.</string>
+    <string name="msg_vita_removed">바로가기 삭제됨: %1$s</string>
+    <string name="msg_vita_remove_failed">바로가기 삭제에 실패했습니다.</string>
+    <string name="msg_keys_directory_failed">Mimir의 NSZ 키 폴더를 준비할 수 없습니다.</string>
+    <string name="msg_keys_unreadable">선택한 prod.keys 파일을 읽을 수 없습니다.</string>
+    <string name="msg_keys_empty">선택한 prod.keys 파일이 비어 있습니다.</string>
+    <string name="msg_keys_finish_failed">prod.keys 가져오기를 완료할 수 없습니다.</string>
+    <string name="msg_keys_imported">prod.keys를 가져와 이 기기에 저장했습니다.</string>
+    <string name="msg_keys_import_failed">prod.keys를 가져올 수 없습니다.</string>
+    <string name="msg_select_rom_folder_first">먼저 ROM 폴더를 선택하세요.</string>
+    <string name="msg_import_keys_first">NSZ 패키지를 스캔하기 전에 prod.keys 파일을 가져오세요.</string>
+    <plurals name="scan_checking_multidisc">
+        <item quantity="other">ROM 파일 %1$d개에서 멀티 디스크 게임을 확인하는 중…</item>
+    </plurals>
+    <plurals name="scan_checking_zip">
+        <item quantity="other">ROM 파일 %1$d개에서 ZIP 호환 형식을 확인하는 중…</item>
+    </plurals>
+    <plurals name="scan_checking_chd">
+        <item quantity="other">%2$s 이미지 %1$d개의 CHD 변환을 확인하는 중…</item>
+    </plurals>
+    <plurals name="scan_checking_tool">
+        <item quantity="other">파일 %1$d개의 %2$s 변환을 확인하는 중…</item>
+    </plurals>
+    <string name="msg_none_multidisc">멀티 디스크 게임을 찾지 못했습니다.</string>
+    <string name="msg_none_zip">ZIP 호환 ROM을 찾지 못했습니다.</string>
+    <string name="msg_none_converter">%1$s 호환 파일을 찾지 못했습니다.</string>
+    <string name="msg_none_vita">대기 중인 Vita 바로가기가 없습니다.</string>
+    <string name="msg_none_esde">불러온 ES-DE 시스템이 없습니다.</string>
+    <string name="msg_scan_stopped">스캔을 중지했습니다.</string>
+    <string name="msg_scan_failed">스캔에 실패했습니다.</string>
+    <plurals name="msg_stopped_after">
+        <item quantity="other">변환 %2$d개 중 %1$d개 후 중지했습니다.</item>
+    </plurals>
+    <string name="msg_changes_applied">변경 사항을 적용했습니다.</string>
+    <string name="msg_conversion_stopped">변환을 중지했습니다.</string>
+    <string name="msg_apply_failed">적용에 실패했습니다.</string>
+    <string name="scan_start_multidisc">ROM 파일에서 멀티 디스크 게임을 스캔하는 중…</string>
+    <string name="scan_start_zip">ROM 파일에서 ZIP 호환 형식을 스캔하는 중…</string>
+    <string name="scan_start_tool">ROM 파일에서 %1$s 호환 파일을 스캔하는 중…</string>
+    <string name="scan_start_files">ROM 파일을 스캔하는 중…</string>
+    <string name="scan_activity_multidisc">멀티 디스크 게임 스캔 중</string>
+    <string name="scan_activity_zip">ZIP 호환 ROM 스캔 중</string>
+    <string name="scan_activity_tool">%1$s 호환 파일 스캔 중</string>
+    <string name="scan_activity_files">ROM 파일 스캔 중</string>
+    <plurals name="scan_files_checked">
+        <item quantity="other">%1$s: 파일 %2$d개 확인됨</item>
+    </plurals>
+    <string name="apply_activity_organizing">ROM 정리 중</string>
+    <string name="apply_activity_zipping">ROM ZIP 압축 중</string>
+    <string name="apply_activity_converting">%1$s(으)로 변환 중</string>
+    <string name="apply_activity_shortcuts">바로가기 만드는 중</string>
+    <string name="apply_activity_esde">ES-DE 시스템 업데이트 중</string>
+    <string name="apply_progress">%1$s: %3$d개 중 %2$d개</string>
+
+    <!-- Memory-card shell: home, legend bar and empty states. -->
+    <string name="about_mimir">Mimir 정보</string>
+    <string name="info_reads">읽기</string>
+    <string name="info_writes">쓰기</string>
+    <string name="legend_open">열기</string>
+    <string name="legend_theme">테마</string>
+    <string name="legend_select">선택</string>
+    <string name="legend_back">뒤로</string>
+    <string name="legend_download">다운로드</string>
+    <string name="legend_install">설치</string>
+    <string name="legend_scan">폴더 스캔</string>
+    <plurals name="legend_convert">
+        <item quantity="other">%1$d개 변환</item>
+    </plurals>
+    <plurals name="legend_apply">
+        <item quantity="other">%1$d개 적용</item>
+    </plurals>
+    <string name="storage_free_header">%1$s 사용 가능</string>
+    <string name="vita_search_hint">게임 타이틀이나 PCSB01256 같은 타이틀 ID를 입력하세요.</string>
+    <string name="data_no_folder_title">ROM 폴더 선택</string>
+    <string name="data_no_folder_body">Mimir가 읽을 폴더를 고른 다음 스캔하세요.</string>
+    <string name="data_not_scanned_title">스캔 준비 완료</string>
+    <string name="data_not_scanned_body">X를 누르거나 폴더 스캔을 탭해 %1$s을(를) 살펴보세요.</string>
+    <string name="data_nothing_found_title">변경할 항목 없음</string>
+    <string name="data_nothing_found_body">이 폴더에서 이 도구로 처리할 수 있는 파일을 찾지 못했습니다.</string>
+
+    <!-- Legend labels with nothing selected. -->
+    <string name="legend_convert_idle">변환</string>
+    <string name="legend_apply_idle">적용</string>
+
+    <!-- Memory-card slot names. -->
+    <string name="slot_utilities">슬롯 1 · 유틸리티</string>
+    <string name="slot_space_savers">슬롯 2 · 공간 절약</string>
+
+    <!-- Storage volumes and About. -->
+    <string name="storage_internal">내부 저장공간</string>
+    <string name="storage_sd_card">SD 카드</string>
+    <string name="action_close">닫기</string>
+
+    <!-- Stats. -->
+    <string name="stats">통계</string>
 </resources>

@@ -4,36 +4,40 @@ import android.app.Application
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import pup.app.mimir.data.PlanExecutor
-import pup.app.mimir.data.RomTreeRepository
-import pup.app.mimir.data.OperationCancellation
-import pup.app.mimir.data.OperationStoppedException
-import pup.app.mimir.data.StopRequest
-import pup.app.mimir.data.EsDeSystem
-import pup.app.mimir.data.EsDeSystemsRepository
-import pup.app.mimir.domain.FrontendPreset
-import pup.app.mimir.domain.ChdDiscType
-import pup.app.mimir.domain.ChdPlanner
-import pup.app.mimir.domain.ChdSystem
-import pup.app.mimir.domain.ConverterTool
-import pup.app.mimir.domain.FileOperation
-import pup.app.mimir.domain.NativeConverterPlanner
-import pup.app.mimir.domain.OperationPlan
-import pup.app.mimir.domain.RomScanner
-import pup.app.mimir.domain.RomZipperPlanner
-import pup.app.mimir.domain.ToolMode
-import pup.app.mimir.domain.VitaAppIdPlanner
-import pup.app.mimir.domain.VitaShortcutFormat
-import pup.app.mimir.R
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.File
+import pup.app.mimir.R
+import pup.app.mimir.data.EsDeSystem
+import pup.app.mimir.data.EsDeSystemsRepository
+import pup.app.mimir.data.OperationCancellation
+import pup.app.mimir.data.OperationStoppedException
+import pup.app.mimir.data.PlanExecutor
+import pup.app.mimir.data.RomPatchRunner
+import pup.app.mimir.data.RomTreeRepository
+import pup.app.mimir.data.StopRequest
+import pup.app.mimir.data.UsageStatsStore
+import pup.app.mimir.domain.ChdDiscType
+import pup.app.mimir.domain.ChdSystem
+import pup.app.mimir.domain.ConverterTool
+import pup.app.mimir.domain.FileOperation
+import pup.app.mimir.domain.FrontendPreset
+import pup.app.mimir.domain.OperationPlan
+import pup.app.mimir.domain.PatchException
+import pup.app.mimir.domain.PatchFailure
+import pup.app.mimir.domain.PatchFormat
+import pup.app.mimir.domain.RomPatcher
+import pup.app.mimir.domain.ToolMode
+import pup.app.mimir.domain.UsageStats
+import pup.app.mimir.domain.VitaAppIdPlanner
+import pup.app.mimir.domain.VitaShortcutFormat
 
 data class MimirUiState(
     val selectedFolderUri: Uri? = null,
@@ -61,18 +65,40 @@ data class MimirUiState(
     val scanProgressLabel: String? = null,
     val operationProgressLabel: String? = null,
     val operationProgress: Float? = null,
-    val chdConversionReport: ChdConversionReport? = null,
-    val chdCurrentJobProgress: Float? = null,
-    val chdCurrentJobLabel: String? = null,
+    val conversionReport: ConversionReport? = null,
+    val currentJobProgress: Float? = null,
+    val currentJobLabel: String? = null,
     val storageInfo: RomTreeRepository.StorageInfo? = null,
+    /** Free space per device volume, for the header: internal storage and any SD card. */
+    val volumes: List<RomTreeRepository.VolumeSpace> = emptyList(),
     val stopRequest: StopRequest = StopRequest.None,
     val previewCount: Int = 0,
     val previewPlan: OperationPlan? = null,
     val selectedChangePaths: Set<String> = emptySet(),
-    val message: String? = null,
+    val romPatch: RomPatchState = RomPatchState(),
+    val usageStats: UsageStats = UsageStats(sinceMillis = 0L),
+    val message: StatusMessage? = null,
 )
 
-data class ChdConversionReport(
+/** The ROM Patcher's picks and where the patched copy will be written. */
+data class RomPatchState(
+    val rom: RomPatchRunner.PickedFile? = null,
+    val patch: RomPatchRunner.PickedFile? = null,
+    val format: PatchFormat? = null,
+    /** The ROM's own folder, once Mimir holds write access to it. */
+    val outputFolder: RomPatchRunner.OutputFolder? = null,
+    val outputExists: Boolean = false,
+) {
+    val outputName: String?
+        get() = if (rom != null && patch != null) RomPatcher.outputFileName(rom.name, patch.name) else null
+
+    val ready: Boolean get() = outputName != null && outputFolder != null
+}
+
+/** A status line for the current tool; [isError] marks failures. */
+data class StatusMessage(val text: String, val isError: Boolean = false)
+
+data class ConversionReport(
     val completed: Int,
     val total: Int,
     val spaceSavedBytes: Long = 0L,
@@ -81,9 +107,13 @@ data class ChdConversionReport(
 
 class MimirViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = RomTreeRepository(application)
+    private val strings = AppStrings(application)
+    private val planBuilder = ToolPlanBuilder(repository, strings)
     private val executor = PlanExecutor(application)
+    private val patchRunner = RomPatchRunner(application)
     private val esDeRepository = EsDeSystemsRepository(application)
     private val prefs = application.getSharedPreferences("mimir_prefs", 0)
+    private val statsStore = UsageStatsStore(application)
     private var vitaCatalog: List<pup.app.mimir.domain.VitaApp> = emptyList()
     private var activeCancellation: OperationCancellation? = null
     private var esDeLatestRequested = false
@@ -104,6 +134,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             scanHiddenFolders = prefs.getBoolean(KEY_SCAN_HIDDEN_FOLDERS, false),
             deleteOriginalChdFiles = prefs.getBoolean(KEY_DELETE_ORIGINAL_CHD_FILES, false),
             useDarkMode = prefs.getBoolean(KEY_DARK_MODE, true),
+            usageStats = statsStore.load(),
         )
     )
     val uiState: StateFlow<MimirUiState> = _uiState.asStateFlow()
@@ -112,10 +143,14 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             val catalog = runCatching { repository.loadVitaShortcutCatalog() }.getOrElse { emptyList() }
             vitaCatalog = catalog
+            val storage = _uiState.value.selectedFolderUri?.let(repository::storageInfo)
+                ?: repository.primaryStorageInfo()
             _uiState.update {
                 it.copy(
                     vitaDatabaseSize = catalog.size,
                     vitaSearchResults = emptyList(),
+                    storageInfo = storage ?: it.storageInfo,
+                    volumes = repository.deviceVolumes(),
                 )
             }
             val existingOutputUri = _uiState.value.vitaOutputUri
@@ -161,7 +196,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
 
     fun onEsDeSystemFolderSelected(name: String, uri: Uri) {
         val path = EsDeSystemsRepository.absolutePathForTreeUri(uri) ?: run {
-            _uiState.update { it.copy(message = "Unable to resolve the selected ROM folder path.") }
+            _uiState.update { it.copy(message = failure(R.string.msg_rom_path_unresolved)) }
             return
         }
         _uiState.update { state ->
@@ -181,15 +216,15 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
     fun refreshEsDeSystems() {
         val romRootUri = _uiState.value.selectedFolderUri
         if (_uiState.value.esDeRootUri == null) {
-            _uiState.update { it.copy(message = "Select the ES-DE folder first.") }
+            _uiState.update { it.copy(message = info(R.string.msg_select_esde_first)) }
             return
         }
         if (romRootUri == null) {
-            _uiState.update { it.copy(message = "Select the ROM root folder first so Mimir can find its systems.") }
+            _uiState.update { it.copy(message = info(R.string.msg_select_rom_root_find)) }
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { it.copy(isBusy = true, message = "Downloading the latest ES-DE custom systems…") }
+            _uiState.update { it.copy(isBusy = true, message = info(R.string.msg_esde_downloading)) }
             runCatching {
                 val catalog = esDeRepository.fetchLatest()
                 esDeRepository.systemsForRomFolders(catalog, esDeRepository.scanRomFolders(romRootUri))
@@ -199,14 +234,14 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         it.copy(
                             isBusy = false,
                             esDeSystems = mergeEsDeOverrides(systems, it.esDeSystems),
-                            message = "Downloaded ${systems.size} ES-DE systems. Review the folders, then apply them.",
+                            message = StatusMessage(strings.plural(R.plurals.msg_esde_downloaded, systems.size, systems.size)),
                         )
                     }
                     esDeLatestRequested = true
                 }
                 .onFailure { error ->
                     Log.e(TAG, "Unable to download ES-DE systems", error)
-                    _uiState.update { it.copy(isBusy = false, message = error.message ?: "Unable to download ES-DE systems.") }
+                    _uiState.update { it.copy(isBusy = false, message = failure(error, R.string.msg_esde_download_failed)) }
                 }
         }
     }
@@ -216,19 +251,19 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         val systems = _uiState.value.esDeSystems
         val romRootUri = _uiState.value.selectedFolderUri
         if (rootUri == null) {
-            _uiState.update { it.copy(message = "Select the ES-DE folder first.") }
+            _uiState.update { it.copy(message = info(R.string.msg_select_esde_first)) }
             return
         }
         if (systems.isEmpty()) {
-            _uiState.update { it.copy(message = "Download the latest ES-DE systems first.") }
+            _uiState.update { it.copy(message = info(R.string.msg_esde_download_first)) }
             return
         }
         if (romRootUri == null) {
-            _uiState.update { it.copy(message = "Select the ROM root folder first so Mimir can map its systems.") }
+            _uiState.update { it.copy(message = info(R.string.msg_select_rom_root_map)) }
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { it.copy(isBusy = true, message = "Installing ES-DE custom systems…") }
+            _uiState.update { it.copy(isBusy = true, message = info(R.string.msg_esde_installing)) }
             runCatching {
                 if (esDeLatestRequested) {
                     esDeRepository.installLatest(
@@ -244,11 +279,11 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             }
                 .onSuccess { count ->
                     esDeLatestRequested = false
-                    _uiState.update { it.copy(isBusy = false, message = "Installed $count systems in custom_systems. Restart ES-DE to load them.") }
+                    _uiState.update { it.copy(isBusy = false, message = StatusMessage(strings.plural(R.plurals.msg_esde_installed, count, count))) }
                 }
                 .onFailure { error ->
                     Log.e(TAG, "Unable to install ES-DE systems", error)
-                    _uiState.update { it.copy(isBusy = false, message = error.message ?: "Unable to install ES-DE systems.") }
+                    _uiState.update { it.copy(isBusy = false, message = failure(error, R.string.msg_esde_install_failed)) }
                 }
         }
     }
@@ -264,7 +299,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             it.copy(
                 selectedChdSystem = system,
                 selectedChdDiscType = when (system) {
-                    ChdSystem.PlayStationPortable -> ChdDiscType.Dvd
+                    ChdSystem.PlayStationPortable, ChdSystem.PlayStation3 -> ChdDiscType.Dvd
                     ChdSystem.PlayStation2 -> it.selectedChdDiscType
                     else -> ChdDiscType.Cd
                 },
@@ -309,12 +344,12 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
 
     fun stopNow() {
         activeCancellation?.stopNow()
-        _uiState.update { it.copy(stopRequest = StopRequest.Now, message = "Stopping…") }
+        _uiState.update { it.copy(stopRequest = StopRequest.Now, message = info(R.string.msg_stopping)) }
     }
 
     fun stopAfterCurrentConversion() {
         activeCancellation?.stopAfterCurrent()
-        _uiState.update { it.copy(stopRequest = StopRequest.AfterCurrent, message = "Will stop after the current conversion.") }
+        _uiState.update { it.copy(stopRequest = StopRequest.AfterCurrent, message = info(R.string.msg_stop_after_current)) }
     }
 
     fun updateScanHiddenFolders(enabled: Boolean) {
@@ -383,7 +418,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update { state ->
             val plan = state.previewPlan ?: return@update state
             state.copy(selectedChangePaths = plan.changes
-                .filterNot { state.selectedMode == ToolMode.ChdConverter && it.targetAlreadyExists }
+                .filterNot { state.selectedMode == ToolMode.Converter && it.targetAlreadyExists }
                 .mapTo(linkedSetOf()) { it.detailPath })
         }
     }
@@ -394,7 +429,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
 
     fun addVitaShortcut(app: pup.app.mimir.domain.VitaApp) {
         val outputUri = _uiState.value.vitaOutputUri ?: run {
-            _uiState.update { it.copy(message = "Select a Vita shortcut output folder first.") }
+            _uiState.update { it.copy(message = info(R.string.msg_select_vita_output_first)) }
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
@@ -409,7 +444,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                 _uiState.update {
                     it.copy(
                         isBusy = false,
-                        message = plan.conflicts.firstOrNull() ?: "Unable to add shortcut for ${app.title}.",
+                        message = StatusMessage(plan.conflicts.firstOrNull() ?: strings.text(R.string.msg_vita_add_unable, app.title), isError = true),
                     )
                 }
                 return@launch
@@ -421,13 +456,13 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         state.copy(
                             isBusy = false,
                             addedVitaShortcuts = state.addedVitaShortcuts + (app.titleId to targetPath),
-                            message = "Added shortcut: ${app.title}",
+                            message = info(R.string.msg_vita_added, app.title),
                         )
                     }
                 }
                 .onFailure { error ->
                     _uiState.update {
-                        it.copy(isBusy = false, message = error.message ?: "Add shortcut failed.")
+                        it.copy(isBusy = false, message = failure(error, R.string.msg_vita_add_failed))
                     }
                 }
         }
@@ -444,13 +479,13 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         state.copy(
                             isBusy = false,
                             addedVitaShortcuts = state.addedVitaShortcuts - app.titleId,
-                            message = "Removed shortcut: ${app.title}",
+                            message = info(R.string.msg_vita_removed, app.title),
                         )
                     }
                 }
                 .onFailure { error ->
                     _uiState.update {
-                        it.copy(isBusy = false, message = error.message ?: "Remove shortcut failed.")
+                        it.copy(isBusy = false, message = failure(error, R.string.msg_vita_remove_failed))
                     }
                 }
         }
@@ -475,7 +510,8 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                 selectedFolderName = label,
                 previewPlan = null,
                 selectedChangePaths = emptySet(),
-                storageInfo = null,
+                storageInfo = repository.storageInfo(uri),
+                volumes = repository.deviceVolumes(),
                 message = null,
             )
         }
@@ -505,19 +541,17 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             _uiState.update { it.copy(isBusy = true, message = null) }
             runCatching {
                 val parent = nszKeysFile.parentFile
-                    ?: error("Unable to prepare Mimir's NSZ key directory.")
-                require(parent.exists() || parent.mkdirs()) {
-                    "Unable to prepare Mimir's NSZ key directory."
-                }
+                    ?: error(strings.text(R.string.msg_keys_directory_failed))
+                require(parent.exists() || parent.mkdirs()) { strings.text(R.string.msg_keys_directory_failed) }
                 val temporary = File(parent, "prod.keys.importing")
                 getApplication<Application>().contentResolver.openInputStream(uri).use { input ->
-                    requireNotNull(input) { "Unable to read the selected prod.keys file." }
+                    requireNotNull(input) { strings.text(R.string.msg_keys_unreadable) }
                     temporary.outputStream().use { output -> input.copyTo(output) }
                 }
-                require(temporary.length() > 0L) { "The selected prod.keys file is empty." }
+                require(temporary.length() > 0L) { strings.text(R.string.msg_keys_empty) }
                 if (!temporary.renameTo(nszKeysFile)) {
                     temporary.copyTo(nszKeysFile, overwrite = true)
-                    require(temporary.delete()) { "Unable to finish importing prod.keys." }
+                    require(temporary.delete()) { strings.text(R.string.msg_keys_finish_failed) }
                 }
             }
                 .onSuccess {
@@ -525,14 +559,95 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         it.copy(
                             isBusy = false,
                             nszKeysConfigured = true,
-                            message = "prod.keys imported and saved on this device.",
+                            message = info(R.string.msg_keys_imported),
                         )
                     }
                 }
                 .onFailure { error ->
                     _uiState.update {
-                        it.copy(isBusy = false, message = error.message ?: "Unable to import prod.keys.")
+                        it.copy(isBusy = false, message = failure(error, R.string.msg_keys_import_failed))
                     }
+                }
+        }
+    }
+
+    fun onPatchRomSelected(uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val rom = patchRunner.describe(uri)
+                rom to patchRunner.outputFolderFor(rom)
+            }
+                .onSuccess { (rom, folder) ->
+                    _uiState.update {
+                        it.copy(romPatch = it.romPatch.copy(rom = rom, outputFolder = folder, outputExists = false), message = null)
+                    }
+                    refreshPatchOutput()
+                }
+                .onFailure { error -> _uiState.update { it.copy(message = failure(error, R.string.msg_patch_read_failed)) } }
+        }
+    }
+
+    fun onPatchFileSelected(uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching { patchRunner.describe(uri) to patchRunner.detectFormat(uri) }
+                .onSuccess { (patch, format) ->
+                    if (format == null) {
+                        _uiState.update { it.copy(message = failure(R.string.msg_patch_unknown_format, patch.name)) }
+                        return@onSuccess
+                    }
+                    _uiState.update {
+                        it.copy(romPatch = it.romPatch.copy(patch = patch, format = format, outputExists = false), message = null)
+                    }
+                    refreshPatchOutput()
+                }
+                .onFailure { error -> _uiState.update { it.copy(message = failure(error, R.string.msg_patch_read_failed)) } }
+        }
+    }
+
+    /** The user granted a folder because Mimir could not yet write beside the picked ROM. */
+    fun onPatchFolderGranted(uri: Uri) {
+        val rom = _uiState.value.romPatch.rom ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            val folder = runCatching { patchRunner.outputFolderFromGrant(rom, uri) }.getOrNull()
+            if (folder == null) {
+                _uiState.update { it.copy(message = failure(R.string.msg_patch_folder_mismatch, rom.name)) }
+                return@launch
+            }
+            _uiState.update { it.copy(romPatch = it.romPatch.copy(outputFolder = folder), message = null) }
+            refreshPatchOutput()
+        }
+    }
+
+    fun applyPatch() {
+        val patchState = _uiState.value.romPatch
+        val rom = patchState.rom ?: return
+        val patch = patchState.patch ?: return
+        val folder = patchState.outputFolder ?: return
+        val outputName = patchState.outputName ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update {
+                it.copy(isBusy = true, operationProgressLabel = strings.text(R.string.msg_patching, rom.name), operationProgress = null, message = null)
+            }
+            runCatching { patchRunner.patch(rom, patch, folder, outputName) }
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(
+                            isBusy = false,
+                            operationProgressLabel = null,
+                            volumes = repository.deviceVolumes(),
+                            romPatch = it.romPatch.copy(outputExists = true),
+                            message = info(R.string.msg_patched, outputName, folder.label),
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    Log.e(PATCH_TAG, "Unable to patch ${rom.name}", error)
+                    val message = when {
+                        error is PatchException -> failure(patchFailureText(error.failure))
+                        error is OutOfMemoryError -> failure(R.string.msg_patch_too_large)
+                        else -> failure(error, R.string.msg_patch_failed)
+                    }
+                    _uiState.update { it.copy(isBusy = false, operationProgressLabel = null, message = message) }
                 }
         }
     }
@@ -543,20 +658,20 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         val romUri = currentState.selectedFolderUri
 
         when (mode) {
-            ToolMode.MultiDiscOrganizer, ToolMode.RomZipper, ToolMode.ChdConverter -> {
+            ToolMode.MultiDiscOrganizer, ToolMode.RomZipper, ToolMode.Converter -> {
                 if (romUri == null) {
-                    _uiState.update { it.copy(message = "Select a ROM folder first.") }
+                    _uiState.update { it.copy(message = info(R.string.msg_select_rom_folder_first)) }
                     return
                 }
-                if (mode == ToolMode.ChdConverter &&
+                if (mode == ToolMode.Converter &&
                     currentState.selectedConverterTool == ConverterTool.NszNsp &&
                     !currentState.nszKeysConfigured
                 ) {
-                    _uiState.update { it.copy(message = "Import a prod.keys file before scanning NSZ packages.") }
+                    _uiState.update { it.copy(message = info(R.string.msg_import_keys_first)) }
                     return
                 }
             }
-            ToolMode.VitaAppIds, ToolMode.EsDeSystems -> return
+            ToolMode.VitaAppIds, ToolMode.EsDeSystems, ToolMode.RomPatcher -> return
         }
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -565,82 +680,18 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             _uiState.update {
                 it.copy(
                     isBusy = true,
-                    scanProgressLabel = initialScanLabel(mode),
+                    scanProgressLabel = planBuilder.initialLabel(currentState),
                     message = null,
                     stopRequest = StopRequest.None,
                 )
             }
             runCatching {
-                val plan = when (mode) {
-                    ToolMode.MultiDiscOrganizer -> {
-                        val entries = repository.scanTree(
-                            rootUri = requireNotNull(romUri),
-                            scanHiddenFolders = _uiState.value.scanHiddenFolders,
-                            onFileScanned = { scannedFiles -> updateScanProgress(mode, scannedFiles) },
-                            shouldStop = cancellation::shouldInterruptCurrentOperation,
-                        )
-                        _uiState.update {
-                            it.copy(scanProgressLabel = "Checking ${entries.size} ROM files for multi-disc games…")
-                        }
-                        val scanResult = RomScanner.scan(entries)
-                        pup.app.mimir.domain.ChangePlanner.buildPlan(
-                            scanResult = scanResult,
-                            preset = _uiState.value.selectedPreset,
-                        )
-                    }
-
-                    ToolMode.RomZipper -> {
-                        val entries = repository.scanTree(
-                            rootUri = requireNotNull(romUri),
-                            onFileScanned = { scannedFiles -> updateScanProgress(mode, scannedFiles) },
-                            shouldStop = cancellation::shouldInterruptCurrentOperation,
-                        )
-                        _uiState.update {
-                            it.copy(scanProgressLabel = "Checking ${entries.size} ROM files for zip-compatible formats…")
-                        }
-                        RomZipperPlanner.buildPlan(entries)
-                    }
-
-                    ToolMode.ChdConverter -> {
-                        when (currentState.selectedConverterTool) {
-                            ConverterTool.Chd -> {
-                                val entries = repository.scanChdTree(
-                                    rootUri = requireNotNull(romUri),
-                                    folderAliases = currentState.selectedChdSystem.folderAliases,
-                                    supportedExtensions = currentState.selectedChdSystem.supportedExtensions,
-                                    onFileScanned = { scannedFiles -> updateScanProgress(mode, scannedFiles) },
-                                    shouldStop = cancellation::shouldInterruptCurrentOperation,
-                                )
-                                _uiState.update {
-                                    it.copy(scanProgressLabel = "Checking ${entries.size} ${currentState.selectedChdSystem.displayName} images for CHD conversion…")
-                                }
-                                ChdPlanner.buildPlan(
-                                    entries = entries,
-                                    system = currentState.selectedChdSystem,
-                                    discType = currentState.selectedChdDiscType,
-                                    deleteOriginalFiles = currentState.deleteOriginalChdFiles,
-                                )
-                            }
-                            else -> {
-                                val tool = currentState.selectedConverterTool
-                                val entries = repository.scanChdTree(
-                                    rootUri = requireNotNull(romUri),
-                                    folderAliases = tool.folderAliases,
-                                    supportedExtensions = tool.sourceExtensions,
-                                    outputExtension = tool.outputExtension,
-                                    onFileScanned = { scannedFiles -> updateScanProgress(mode, scannedFiles) },
-                                    shouldStop = cancellation::shouldInterruptCurrentOperation,
-                                )
-                                _uiState.update {
-                                    it.copy(scanProgressLabel = "Checking ${entries.size} files for ${tool.displayName} conversion…")
-                                }
-                                NativeConverterPlanner.buildPlan(entries, tool)
-                            }
-                        }
-                    }
-
-                    ToolMode.VitaAppIds, ToolMode.EsDeSystems -> error("This tool does not use ROM scanning.")
-                }
+                val plan = planBuilder.build(
+                    state = currentState,
+                    romUri = requireNotNull(romUri),
+                    cancellation = cancellation,
+                    onProgressLabel = { label -> _uiState.update { it.copy(scanProgressLabel = label) } },
+                )
                 val previewCount = plan.changes.size
                 _uiState.update {
                     it.copy(
@@ -648,23 +699,13 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         scanProgressLabel = null,
                         previewCount = previewCount,
                         previewPlan = plan,
-                        storageInfo = if (mode == ToolMode.ChdConverter) {
+                        storageInfo = if (mode == ToolMode.Converter) {
                             repository.storageInfo(requireNotNull(romUri))
                         } else it.storageInfo,
                         selectedChangePaths = plan.changes
-                            .filterNot { mode == ToolMode.ChdConverter && it.targetAlreadyExists }
+                            .filterNot { mode == ToolMode.Converter && it.targetAlreadyExists }
                             .mapTo(linkedSetOf()) { it.detailPath },
-                        message = if (plan.changes.isEmpty()) {
-                            when (mode) {
-                                ToolMode.MultiDiscOrganizer -> "No multi-disc games found."
-                                ToolMode.RomZipper -> "No zip-compatible ROMs found."
-                                ToolMode.ChdConverter -> "No compatible ${currentState.selectedConverterTool.displayName} files found."
-                                ToolMode.VitaAppIds -> "No Vita shortcuts queued."
-                                ToolMode.EsDeSystems -> "No ES-DE systems loaded."
-                            }
-                        } else {
-                            null
-                        },
+                        message = if (plan.changes.isEmpty()) StatusMessage(planBuilder.emptyResultText(currentState)) else null,
                         stopRequest = StopRequest.None,
                     )
                 }
@@ -674,7 +715,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         isBusy = false,
                         scanProgressLabel = null,
                         stopRequest = StopRequest.None,
-                        message = if (error is OperationStoppedException) "Scan stopped." else error.message ?: "Scan failed.",
+                        message = if (error is OperationStoppedException) info(R.string.msg_scan_stopped) else failure(error, R.string.msg_scan_failed),
                     )
                 }
             }
@@ -691,52 +732,58 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             ?: return
         val uri = when (plan.mode) {
             ToolMode.VitaAppIds -> current.vitaOutputUri
-            ToolMode.EsDeSystems -> null
+            ToolMode.EsDeSystems, ToolMode.RomPatcher -> null
             else -> current.selectedFolderUri
         } ?: return
+        val converter = current.selectedConverterTool.takeIf { plan.mode == ToolMode.Converter }
         viewModelScope.launch(Dispatchers.IO) {
             val cancellation = OperationCancellation()
             activeCancellation = cancellation
+            // What finished before a stop or failure still counts toward the stats.
+            var finishedOperations = 0
+            var savedBytes = 0L
             _uiState.update {
                 it.copy(
                     isBusy = true,
                     operationProgressLabel = applyProgressLabel(plan.mode, 0, plan.operations.size),
                     operationProgress = 0f,
                     message = null,
-                    chdConversionReport = if (plan.mode == ToolMode.ChdConverter) {
-                        ChdConversionReport(completed = 0, total = plan.operations.size)
+                    conversionReport = if (plan.mode == ToolMode.Converter) {
+                        ConversionReport(completed = 0, total = plan.operations.size)
                     } else {
-                        it.chdConversionReport
+                        it.conversionReport
                     },
-                    chdCurrentJobProgress = if (plan.mode == ToolMode.ChdConverter) 0f else null,
-                    chdCurrentJobLabel = if (plan.mode == ToolMode.ChdConverter) null else it.chdCurrentJobLabel,
+                    currentJobProgress = if (plan.mode == ToolMode.Converter) 0f else null,
+                    currentJobLabel = if (plan.mode == ToolMode.Converter) null else it.currentJobLabel,
                     stopRequest = StopRequest.None,
                 )
             }
             executor.apply(
                 rootUri = uri,
                 plan = plan,
-                onProgress = { completed, total ->
+                onProgress = { completed, total, saved ->
+                    finishedOperations = completed
+                    savedBytes = saved
                     _uiState.update {
                         it.copy(
                             operationProgressLabel = applyProgressLabel(plan.mode, completed, total),
                             operationProgress = completed.toFloat() / total,
-                            chdConversionReport = if (plan.mode == ToolMode.ChdConverter) {
-                                ChdConversionReport(
+                            conversionReport = if (plan.mode == ToolMode.Converter) {
+                                ConversionReport(
                                     completed = completed,
                                     total = total,
-                                    spaceSavedBytes = it.chdConversionReport?.spaceSavedBytes ?: 0L,
+                                    spaceSavedBytes = saved,
                                 )
                             } else {
-                                it.chdConversionReport
+                                it.conversionReport
                             },
-                            chdCurrentJobProgress = if (plan.mode == ToolMode.ChdConverter) 0f else null,
+                            currentJobProgress = if (plan.mode == ToolMode.Converter) 0f else null,
                         )
                     }
                 },
                 onCurrentOperationProgress = { progress ->
-                    if (plan.mode == ToolMode.ChdConverter) {
-                        _uiState.update { it.copy(chdCurrentJobProgress = progress) }
+                    if (plan.mode == ToolMode.Converter) {
+                        _uiState.update { it.copy(currentJobProgress = progress) }
                     }
                 },
                 onOperationStarted = { operation ->
@@ -748,7 +795,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         }
                         _uiState.update {
                             it.copy(
-                                chdCurrentJobLabel = sourcePath
+                                currentJobLabel = sourcePath
                                     .substringAfterLast('/')
                                     .substringBeforeLast('.'),
                             )
@@ -757,29 +804,37 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                 },
                 cancellation = cancellation,
             )
+                .also {
+                    if (UsageStats.savesSpace(plan.mode, converter)) {
+                        recordUsage(UsageStats.keyFor(plan.mode, converter), plan.completedChanges(finishedOperations), savedBytes)
+                    }
+                }
                 .onSuccess { result ->
                     _uiState.update {
                         it.copy(
                             isBusy = false,
+                            volumes = repository.deviceVolumes(),
                             operationProgressLabel = null,
                             operationProgress = null,
-                            chdCurrentJobProgress = null,
-                            chdCurrentJobLabel = null,
-                            chdConversionReport = if (plan.mode == ToolMode.ChdConverter) {
-                                ChdConversionReport(
+                            currentJobProgress = null,
+                            currentJobLabel = null,
+                            conversionReport = if (plan.mode == ToolMode.Converter) {
+                                ConversionReport(
                                     completed = result.completedOperations,
                                     total = plan.operations.size,
                                     spaceSavedBytes = result.spaceSavedBytes,
                                     stopped = result.stopped,
                                 )
                             } else {
-                                it.chdConversionReport
+                                it.conversionReport
                             },
                             stopRequest = StopRequest.None,
                             message = if (result.stopped) {
-                                "Stopped after ${result.completedOperations} of ${plan.operations.size} conversions."
+                                StatusMessage(
+                                    strings.plural(R.plurals.msg_stopped_after, plan.operations.size, result.completedOperations, plan.operations.size),
+                                )
                             } else {
-                                "Changes applied."
+                                info(R.string.msg_changes_applied)
                             },
                         )
                     }
@@ -788,24 +843,25 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                     _uiState.update {
                         it.copy(
                             isBusy = false,
+                            volumes = repository.deviceVolumes(),
                             operationProgressLabel = null,
                             operationProgress = null,
-                            chdCurrentJobProgress = null,
-                            chdCurrentJobLabel = null,
-                            chdConversionReport = if (plan.mode == ToolMode.ChdConverter) {
-                                ChdConversionReport(
-                                    completed = it.chdConversionReport?.completed ?: 0,
+                            currentJobProgress = null,
+                            currentJobLabel = null,
+                            conversionReport = if (plan.mode == ToolMode.Converter) {
+                                ConversionReport(
+                                    completed = it.conversionReport?.completed ?: 0,
                                     total = plan.operations.size,
                                     stopped = error is OperationStoppedException,
                                 )
                             } else {
-                                it.chdConversionReport
+                                it.conversionReport
                             },
                             stopRequest = StopRequest.None,
                             message = if (error is OperationStoppedException) {
-                                "Conversion stopped."
+                                info(R.string.msg_conversion_stopped)
                             } else {
-                                error.message ?: "Apply failed."
+                                failure(error, R.string.msg_apply_failed)
                             },
                         )
                     }
@@ -816,6 +872,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
         private const val TAG = "Mimir.ESDE"
+        private const val PATCH_TAG = "Mimir.Patcher"
         private const val KEY_URI = "rom_tree_uri"
         private const val KEY_LABEL = "rom_tree_label"
         private const val KEY_VITA_OUTPUT_URI = "vita_output_uri"
@@ -828,14 +885,48 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         private const val KEY_DELETE_ORIGINAL_CHD_FILES = "delete_original_chd_files"
         private const val NSZ_KEYS_RELATIVE_PATH = "nsz/prod.keys"
         private const val MAX_VITA_RESULTS = 40
-        private const val SCAN_PROGRESS_UPDATE_INTERVAL = 25
     }
+
+    private fun info(@StringRes id: Int, vararg args: Any) = StatusMessage(strings.text(id, *args))
+
+    private fun recordUsage(key: String, games: Int, spaceSavedBytes: Long) {
+        if (games <= 0 && spaceSavedBytes == 0L) return
+        val stats = statsStore.record(key, games, spaceSavedBytes)
+        _uiState.update { it.copy(usageStats = stats) }
+    }
+
+    /** Checks whether the patched copy's name is already taken in the ROM's folder. */
+    private fun refreshPatchOutput() {
+        val patchState = _uiState.value.romPatch
+        val folder = patchState.outputFolder ?: return
+        val name = patchState.outputName ?: return
+        val exists = runCatching { patchRunner.outputExists(folder, name) }.getOrDefault(false)
+        _uiState.update {
+            if (it.romPatch.outputFolder != folder || it.romPatch.outputName != name) it
+            else it.copy(romPatch = it.romPatch.copy(outputExists = exists))
+        }
+    }
+
+    @StringRes
+    private fun patchFailureText(failure: PatchFailure): Int = when (failure) {
+        PatchFailure.UnknownFormat -> R.string.msg_patch_not_supported
+        PatchFailure.Malformed -> R.string.msg_patch_malformed
+        PatchFailure.PatchDamaged -> R.string.msg_patch_damaged
+        PatchFailure.WrongRom -> R.string.msg_patch_wrong_rom
+        PatchFailure.ResultMismatch -> R.string.msg_patch_result_mismatch
+        PatchFailure.TooLarge -> R.string.msg_patch_too_large
+    }
+
+    private fun failure(@StringRes id: Int, vararg args: Any) = StatusMessage(strings.text(id, *args), isError = true)
+
+    private fun failure(error: Throwable, @StringRes fallback: Int) =
+        StatusMessage(error.message ?: strings.text(fallback), isError = true)
 
     private fun treeLabel(uri: Uri): String =
         DocumentsContract.getTreeDocumentId(uri).substringAfterLast(':')
 
     private fun OperationPlan.withChdDeleteOriginalFiles(deleteOriginalFiles: Boolean): OperationPlan {
-        if (mode != ToolMode.ChdConverter) return this
+        if (mode != ToolMode.Converter) return this
         fun update(operation: FileOperation): FileOperation = when (operation) {
             is FileOperation.ConvertToChd -> operation.copy(deleteOriginalFiles = deleteOriginalFiles)
             else -> operation
@@ -874,36 +965,16 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun initialScanLabel(mode: ToolMode): String =
-        when (mode) {
-            ToolMode.MultiDiscOrganizer -> "Scanning ROM files for multi-disc games…"
-            ToolMode.RomZipper -> "Scanning ROM files for zip-compatible formats…"
-            ToolMode.ChdConverter -> "Scanning ROM files for ${_uiState.value.selectedConverterTool.displayName}-compatible files…"
-            ToolMode.VitaAppIds -> "Scanning ROM files…"
-            ToolMode.EsDeSystems -> ""
-        }
-
-    private fun updateScanProgress(mode: ToolMode, scannedFiles: Int) {
-        if (scannedFiles % SCAN_PROGRESS_UPDATE_INTERVAL != 0) return
-        val activity = when (mode) {
-            ToolMode.MultiDiscOrganizer -> "Scanning for multi-disc games"
-            ToolMode.RomZipper -> "Scanning for zip-compatible ROMs"
-            ToolMode.ChdConverter -> "Scanning for ${_uiState.value.selectedConverterTool.displayName}-compatible files"
-            ToolMode.VitaAppIds -> "Scanning ROM files"
-            ToolMode.EsDeSystems -> ""
-        }
-        _uiState.update { it.copy(scanProgressLabel = "$activity: $scannedFiles files checked") }
-    }
-
     private fun applyProgressLabel(mode: ToolMode, completed: Int, total: Int): String {
         val activity = when (mode) {
-            ToolMode.MultiDiscOrganizer -> "Organizing ROMs"
-            ToolMode.RomZipper -> "Zipping ROMs"
-            ToolMode.ChdConverter -> "Converting with ${_uiState.value.selectedConverterTool.displayName}"
-            ToolMode.VitaAppIds -> "Creating shortcuts"
-            ToolMode.EsDeSystems -> "Updating ES-DE systems"
+            ToolMode.MultiDiscOrganizer -> strings.text(R.string.apply_activity_organizing)
+            ToolMode.RomZipper -> strings.text(R.string.apply_activity_zipping)
+            ToolMode.Converter -> strings.text(R.string.apply_activity_converting, _uiState.value.selectedConverterTool.displayName)
+            ToolMode.VitaAppIds -> strings.text(R.string.apply_activity_shortcuts)
+            ToolMode.EsDeSystems -> strings.text(R.string.apply_activity_esde)
+            ToolMode.RomPatcher -> strings.text(R.string.apply_activity_patching)
         }
-        return "$activity: $completed of $total"
+        return strings.text(R.string.apply_progress, activity, completed, total)
     }
 
     private suspend fun refreshExistingVitaShortcuts(

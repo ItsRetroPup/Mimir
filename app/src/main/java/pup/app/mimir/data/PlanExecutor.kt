@@ -13,10 +13,12 @@ import java.util.zip.ZipOutputStream
 class PlanExecutor(private val context: Context) {
     private val chdmanRunner = ChdmanRunner(context)
     private val nativeConverterRunner = NativeConverterRunner(context)
+    private val xisoRunner = XisoRunner(context)
     fun apply(
         rootUri: Uri,
         plan: OperationPlan,
-        onProgress: ((completedOperations: Int, totalOperations: Int) -> Unit)? = null,
+        /** Called after each operation, with the space saved so far. */
+        onProgress: ((completedOperations: Int, totalOperations: Int, spaceSavedBytes: Long) -> Unit)? = null,
         onCurrentOperationProgress: ((Float) -> Unit)? = null,
         onOperationStarted: ((FileOperation) -> Unit)? = null,
         cancellation: OperationCancellation? = null,
@@ -39,7 +41,7 @@ class PlanExecutor(private val context: Context) {
                 }
 
                 is FileOperation.MoveFile -> {
-                    val sourceFile = findFile(root, operation.sourcePath)
+                    val sourceFile = root.findRelative(operation.sourcePath)
                         ?: error("Missing source file: ${operation.sourcePath}")
                     val target = createFile(root, operation.targetPath)
                     context.contentResolver.openInputStream(sourceFile.uri).use { input ->
@@ -63,7 +65,7 @@ class PlanExecutor(private val context: Context) {
                 }
 
                 is FileOperation.ZipFile -> {
-                    val sourceFile = findFile(root, operation.sourcePath)
+                    val sourceFile = root.findRelative(operation.sourcePath)
                         ?: error("Missing source file: ${operation.sourcePath}")
                     val target = createFile(root, operation.targetPath)
                     context.contentResolver.openInputStream(sourceFile.uri).use { input ->
@@ -77,6 +79,7 @@ class PlanExecutor(private val context: Context) {
                             }
                         }
                     }
+                    spaceSavedBytes += sourceFile.length().coerceAtLeast(0L) - target.length()
                     if (!sourceFile.delete()) {
                         error("Failed to remove original file: ${operation.sourcePath}")
                     }
@@ -104,7 +107,7 @@ class PlanExecutor(private val context: Context) {
                         spaceSavedBytes += sourceBytesBefore - target.length()
                         if (operation.deleteOriginalFiles) {
                             conversion.originalSourcePaths.forEach { sourcePath ->
-                                val source = findFile(root, sourcePath)
+                                val source = root.findRelative(sourcePath)
                                     ?: error("Missing original source file: $sourcePath")
                                 require(source.delete()) { "Failed to delete original source file: $sourcePath" }
                             }
@@ -114,7 +117,16 @@ class PlanExecutor(private val context: Context) {
                     }
                 }
 
-                is FileOperation.ConvertWithTool -> {
+                is FileOperation.ConvertWithTool -> if (operation.tool.replacesSource) {
+                    val sourceBytesBefore = sourceSize(root, operation.sourcePath)
+                    val outputBytes = xisoRunner.convertInPlace(
+                        root = root,
+                        operation = operation,
+                        cancellation = cancellation,
+                        onProgress = onCurrentOperationProgress,
+                    )
+                    spaceSavedBytes += sourceBytesBefore - outputBytes
+                } else {
                     val conversion = nativeConverterRunner.convert(
                         root = root,
                         operation = operation,
@@ -133,7 +145,7 @@ class PlanExecutor(private val context: Context) {
                     }
                 }
             }
-            onProgress?.invoke(index + 1, plan.operations.size)
+            onProgress?.invoke(index + 1, plan.operations.size, spaceSavedBytes)
         }
         ExecutionResult(completedOperations = plan.operations.size, stopped = false, spaceSavedBytes = spaceSavedBytes)
     }
@@ -141,7 +153,7 @@ class PlanExecutor(private val context: Context) {
     fun deleteOutputFile(rootUri: Uri, relativePath: String): Result<Unit> = runCatching {
         val root = DocumentFile.fromTreeUri(context, rootUri)
             ?: error("Unable to access selected output folder.")
-        val file = findFile(root, relativePath) ?: error("Missing shortcut: $relativePath")
+        val file = root.findRelative(relativePath) ?: error("Missing shortcut: $relativePath")
         require(file.delete()) { "Failed to delete shortcut: $relativePath" }
     }
 
@@ -164,21 +176,8 @@ class PlanExecutor(private val context: Context) {
         return current.takeIf { it.isDirectory }
     }
 
-    private fun findFile(root: DocumentFile, relativePath: String): DocumentFile? {
-        val parts = relativePath.split('/').filter { it.isNotBlank() }
-        var current = root
-        parts.forEachIndexed { index, part ->
-            val child = current.findFile(part) ?: return null
-            if (index == parts.lastIndex) {
-                return child
-            }
-            current = child
-        }
-        return null
-    }
-
     private fun sourceSize(root: DocumentFile, relativePath: String): Long =
-        findFile(root, relativePath)?.length()?.coerceAtLeast(0L) ?: 0L
+        root.findRelative(relativePath)?.length()?.coerceAtLeast(0L) ?: 0L
 
     private fun createFile(root: DocumentFile, relativePath: String): DocumentFile {
         val parentPath = RelativePaths.parentOf(relativePath)

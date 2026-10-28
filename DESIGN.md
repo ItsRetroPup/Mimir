@@ -1,195 +1,397 @@
 ---
 name: Mimir
-description: A warm violet Material 3 workshop for safely maintaining retro ROM libraries.
+description: A console memory-card manager for retro ROM libraries; tools are save blocks, planned changes are file entries, every write is confirmed.
 colors:
-  primary: "#7B1FA2"
-  primary-dark: "#E0B0FF"
-  secondary: "#6A1B9A"
-  secondary-dark: "#F5B7FF"
-  tertiary: "#5F5663"
-  background: "#FAF7FC"
-  background-dark: "#100B14"
-  surface: "#FFFFFF"
-  surface-dark: "#19121F"
-  surface-variant: "#EEE5F2"
-  surface-variant-dark: "#30243A"
-  outline: "#76677A"
-  outline-dark: "#A99AAF"
-  text: "#1A111F"
-  text-dark: "#F5EDF8"
+  night-field-top: "#0B1024"
+  night-field-bottom: "#05070D"
+  night-grid: "#1B2650"
+  night-panel: "#111934"
+  night-panel-raised: "#18224A"
+  night-edge-light: "#7FA7FF"
+  night-text: "#E8EEFF"
+  night-text-muted: "#9AA7CB"
+  night-caution: "#FFB347"
+  night-on-caution: "#2A1600"
+  night-error: "#FF7A7A"
+  day-field-top: "#E6ECF8"
+  day-field-bottom: "#D3DBEC"
+  day-grid: "#BCC8E2"
+  day-panel: "#F7F9FD"
+  day-panel-raised: "#FFFFFF"
+  day-edge-light: "#3550C8"
+  day-text: "#0C1430"
+  day-text-muted: "#475478"
+  day-caution: "#A85200"
+  day-on-caution: "#FFFFFF"
+  day-error: "#C62828"
+  ink-multidisc-night: "#FF8A3D"
+  ink-multidisc-day: "#C2520F"
+  ink-vita-night: "#5B95FF"
+  ink-vita-day: "#2558D0"
+  ink-esde-night: "#34D399"
+  ink-esde-day: "#087A53"
+  ink-nsz-night: "#FF5C93"
+  ink-nsz-day: "#C81E5E"
+  ink-romzipper-night: "#FFC93C"
+  ink-romzipper-day: "#9A6B00"
+  ink-chdman-night: "#2DD4E6"
+  ink-chdman-day: "#0B7F8E"
+  ink-rvz-night: "#B197FC"
+  ink-rvz-day: "#6A47D6"
+  ink-zcci-night: "#B5E853"
+  ink-zcci-day: "#55800B"
+  ink-xiso-night: "#4ADE80"
+  ink-xiso-day: "#13803B"
 typography:
   display:
-    fontFamily: "sans-serif"
-    fontSize: "28sp"
-    fontWeight: 600
+    fontFamily: "Rubik"
+    fontSize: "32sp"
+    fontWeight: 800
     lineHeight: "36sp"
-  headline:
-    fontFamily: "sans-serif"
-    fontSize: "24sp"
-    fontWeight: 600
+    letterSpacing: "-0.015em"
+  headline-large:
+    fontFamily: "Rubik"
+    fontSize: "28sp"
+    fontWeight: 700
     lineHeight: "32sp"
-  title:
-    fontFamily: "sans-serif"
-    fontSize: "20sp"
+    letterSpacing: "-0.01em"
+  headline:
+    fontFamily: "Rubik"
+    fontSize: "21sp"
+    fontWeight: 700
+    lineHeight: "26sp"
+  title-large:
+    fontFamily: "Rubik"
+    fontSize: "19sp"
     fontWeight: 600
-    lineHeight: "28sp"
-  body:
-    fontFamily: "sans-serif"
+    lineHeight: "24sp"
+  title:
+    fontFamily: "Rubik"
+    fontSize: "16sp"
+    fontWeight: 600
+    lineHeight: "21sp"
+  title-small:
+    fontFamily: "Rubik"
+    fontSize: "14sp"
+    fontWeight: 600
+    lineHeight: "18sp"
+  body-large:
+    fontFamily: "Rubik"
     fontSize: "16sp"
     fontWeight: 400
-    lineHeight: "24sp"
-  label:
-    fontFamily: "monospace"
+    lineHeight: "23sp"
+  body:
+    fontFamily: "Rubik"
     fontSize: "14sp"
-    fontWeight: 500
+    fontWeight: 400
     lineHeight: "20sp"
-    letterSpacing: "0.8sp"
+  body-small:
+    fontFamily: "Rubik"
+    fontSize: "12sp"
+    fontWeight: 400
+    lineHeight: "17sp"
+  label:
+    fontFamily: "Rubik"
+    fontSize: "14sp"
+    fontWeight: 600
+    lineHeight: "18sp"
+    letterSpacing: "0.01em"
+  label-small:
+    fontFamily: "Rubik"
+    fontSize: "12sp"
+    fontWeight: 600
+    lineHeight: "16sp"
+    letterSpacing: "0.02em"
+  figures:
+    fontFamily: "Rubik"
+    fontSize: "14sp"
+    fontWeight: 600
+    lineHeight: "18sp"
+    letterSpacing: "0.01em"
+    fontFeature: "tnum"
 rounded:
-  icon: "10dp"
-  card: "12dp"
-  action-surface: "16dp"
-  chip: "999dp"
+  segment: "2dp"
+  xs: "8dp"
+  sm: "12dp"
+  md: "16dp"
+  dialog: "24dp"
+  pill: "9999dp"
 spacing:
-  compact: "8dp"
-  card: "12dp"
-  comfortable: "16dp"
-  page: "20dp"
+  hair: "2dp"
+  xxs: "4dp"
+  xs: "6dp"
+  sm: "8dp"
+  sm-plus: "10dp"
+  md: "12dp"
+  slot-gap: "14dp"
+  lg: "16dp"
+  info: "18dp"
+  gutter: "20dp"
+  xl: "24dp"
+  field-grid: "48dp"
 components:
-  tool-card:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.card}"
-    padding: "14dp 16dp"
-  tool-card-selected:
-    backgroundColor: "#7B1FA21F"
-    textColor: "{colors.text}"
-    rounded: "{rounded.card}"
-    padding: "14dp 16dp"
-  floating-action-surface:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.action-surface}"
-    padding: "8dp"
+  console-panel:
+    backgroundColor: "{colors.night-panel}"
+    textColor: "{colors.night-text}"
+    rounded: "{rounded.md}"
+    padding: "16dp"
+  console-panel-day:
+    backgroundColor: "{colors.day-panel}"
+    textColor: "{colors.day-text}"
+    rounded: "{rounded.md}"
+    padding: "16dp"
+  save-block:
+    backgroundColor: "{colors.night-panel}"
+    textColor: "{colors.night-text-muted}"
+    typography: "{typography.label-small}"
+    rounded: "{rounded.md}"
+    padding: "6dp"
+  save-block-focused:
+    backgroundColor: "{colors.ink-xiso-night}"
+    textColor: "{colors.night-text}"
+    rounded: "{rounded.md}"
+  button-ink:
+    backgroundColor: "{colors.night-edge-light}"
+    textColor: "{colors.night-field-bottom}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    padding: "10dp 24dp"
+  button-ink-day:
+    backgroundColor: "{colors.day-edge-light}"
+    textColor: "{colors.day-panel-raised}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    padding: "10dp 24dp"
+  button-caution:
+    backgroundColor: "{colors.night-caution}"
+    textColor: "{colors.night-on-caution}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    padding: "10dp 24dp"
+  button-caution-day:
+    backgroundColor: "{colors.day-caution}"
+    textColor: "{colors.day-on-caution}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    padding: "10dp 24dp"
+  button-outlined:
+    textColor: "{colors.night-edge-light}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    padding: "10dp 24dp"
+  legend-bar:
+    backgroundColor: "{colors.night-panel}"
+    textColor: "{colors.night-text}"
+    typography: "{typography.label}"
+    height: "48dp"
+    padding: "2dp 16dp"
+  legend-action:
+    textColor: "{colors.night-text}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+    height: "48dp"
+    padding: "0 12dp"
+  button-glyph:
+    backgroundColor: "{colors.night-text}"
+    textColor: "{colors.night-field-bottom}"
+    rounded: "{rounded.pill}"
+    size: "22dp"
+  data-row:
+    backgroundColor: "{colors.night-panel}"
+    textColor: "{colors.night-text}"
+    typography: "{typography.title}"
+    rounded: "{rounded.sm}"
+    padding: "8dp 12dp"
+    height: "56dp"
+  choice-chip:
+    backgroundColor: "{colors.night-panel-raised}"
+    textColor: "{colors.night-text}"
+    typography: "{typography.label}"
+    rounded: "{rounded.pill}"
+  choice-chip-selected:
+    backgroundColor: "{colors.night-edge-light}"
+    textColor: "{colors.night-field-bottom}"
+    rounded: "{rounded.pill}"
+  format-badge:
+    textColor: "{colors.night-edge-light}"
+    typography: "{typography.label-small}"
+    rounded: "{rounded.xs}"
+    padding: "3dp 8dp"
+  status-line:
+    textColor: "{colors.night-text}"
+    typography: "{typography.body}"
+    rounded: "{rounded.sm}"
+    padding: "10dp 12dp"
+  block-progress:
+    backgroundColor: "{colors.night-grid}"
+    rounded: "{rounded.segment}"
+    height: "12dp"
+  size-bar:
+    backgroundColor: "{colors.night-grid}"
+    rounded: "{rounded.segment}"
+    height: "5dp"
+    width: "160dp"
 ---
 
 # Design System: Mimir
 
 ## Overview
 
-**Creative North Star: "The Violet Workshop"**
+**Creative North Star: "The Memory Card Manager"**
 
-Mimir is a warm, approachable Android workshop for careful library maintenance. Violet connects the app's tools and decisions; generous, gently lifted surfaces make the operational work feel manageable rather than clinical.
+Mimir is drawn as a console's own system data browser. The tools are save blocks sitting in two memory-card slots on a night-blue field ruled with faint slot gridlines; a tool page is the card's data view, with what to read on the left and the files Mimir found, as file entries with block-meter size bars, on the right. Writing anything is a ceremony the console would recognise: a plain dialog, a named count, an amber button only when the write cannot be taken back.
 
-The interface is Material 3 first. It uses clear task labels, native Android controls, and deliberate confirmation points to make local file work feel trustworthy. Dark mode is a first-class violet-night scheme, never an inverted light screen.
+The world is controller-first on a 1920×1080 handheld (AYN Thor) and touch-second. Every screen carries a header strip on top and a face-button legend bar at the foot; the legend is not decoration but the literal map of what A, B, X and Y do here, and its entries are touch targets too. Density is moderate and landscape: two panes, no scrolling column of stacked cards. Each of the nine tools owns one ink and speaks in it everywhere on its page (block, header crumb, buttons, chips, checkboxes, focus ring), so the page tells you where you are without a label.
+
+There are two lighting states of the same world, night (default, deep navy) and daylight (cool paper-blue), swapped by the Y button on home or the header toggle. Every token below comes in both.
 
 **Key Characteristics:**
-
-- Warm violet accents on pale lilac or near-black plum surfaces.
-- Landscape-first operation with a persistent navigation rail and a readable vertical task list.
-- Gently lifted cards, plain-language task copy, and technical mono labels for statuses and small metadata.
+- Night-blue field with a 48dp slot grid drawn over a vertical fade; solid panels with a 1dp cold edge light.
+- One ink per tool, with a night value and a darker daylight value.
+- Tools are drawn objects (discs, cartridges, game cards, folders) rendered in their ink, never icon-font tiles.
+- Drawn A/B/X/Y face-button glyphs: a filled disc with its letter knocked out.
+- One turning object at a time: the focused save block rocks about its vertical axis.
+- Rubik throughout; rank by weight and reversal more than by size jumps; tabular figures for every number.
 
 ## Colors
 
-The palette pairs a welcoming workshop violet with quiet lilac neutrals; the accent identifies action and selection rather than filling the screen.
+A cold, two-state console palette: navy and steel at rest, nine saturated inks for identity, amber held back for the one moment that matters.
 
 ### Primary
-
-- **Workshop Violet:** primary actions, selected tools, section labels, and icon emphasis. Use its dark-mode counterpart on the violet-night scheme.
-
-### Secondary
-
-- **Orchid Signal:** supporting status, output, and positive-progress emphasis; reserve it for secondary emphasis.
+- **Cold Edge Light** (night-edge-light / day-edge-light): the system's own accent when no tool is open. It is Material's primary on home, the edge of every panel (28% alpha at rest, 55% for outlines), the About link's focus ring, and the selected-chip fill outside a tool.
+- **Tool Inks** (ink-*-night / ink-*-day): one per tool. Multi-disc Organizer orange, Vita Shortcuts cobalt, ES-DE Systems mint, NSZ to NSP magenta, RomZipper gold, CHDMan cyan, Dolphin RVZ violet, Azahar ZCCI lime, Xbox XISO green. Opening a tool wraps its page in an ink theme that replaces Material's primary and secondary with the ink, so filled buttons, chips, checkboxes, switches, focus rings, the header crumb, the "Writes" value and the panel accent all take it. Night inks are bright on navy (5.9:1 or better on the panel); daylight inks are darkened so a white label on an ink fill stays at 4.6:1 or better.
 
 ### Tertiary
-
-- **Muted Plum:** restrained supporting hierarchy where neither action nor status should dominate.
+- **Caution Amber** (night-caution / day-caution, with its on-colour): reserved for writes that cannot be taken back: the confirm button of the apply/convert dialog, "Replace output", "Remove shortcut", "Stop now", the delete icon on a Vita shortcut, and the "existing output will be replaced" lines in queue rows. It is never an error colour and never a highlight.
+- **Error** (night-error / day-error): failures and low-storage warnings, shown in the status line at 12% tint with an outlined error icon.
 
 ### Neutral
+- **Night Field** (night-field-top to night-field-bottom): the vertical fade every screen sits on. The bottom value is also the dark label colour on night inks and the knocked-out letter in face-button glyphs.
+- **Slot Grid** (night-grid / day-grid): the 48dp field gridlines (55% alpha night, 70% daylight), panel rules, empty-cell dashes, and the unlit segments of block meters.
+- **Panel** (night-panel / day-panel): every solid surface: console panels, save-block cells, data rows, the legend bar (at 94%).
+- **Raised Panel** (night-panel-raised / day-panel-raised): unselected choice chips and Material's high containers.
+- **Ice Text / Steel Muted** (night-text, night-text-muted and their day pair): primary text, and secondary text such as labels, descriptions, sizes and the free-space readout (both 7:1 or better on panel).
 
-- **Lilac Paper:** the light background and soft gradient base.
-- **Clean Surface:** cards and temporary elevated surfaces.
-- **Violet Night:** the dark background, with deep-plum surfaces layered above it.
-- **Soft Outline:** card boundaries and inactive selection affordances.
+### Named Rules
+**The Amber Is A Warning Rule.** Amber appears only on a control that destroys or replaces data, or on the line warning that it will. Errors use the error role. If a screen shows amber and nothing on it can be lost, it is wrong.
 
-**The Accent-Has-A-Job Rule.** Violet is for action, selection, and navigation context. Let the neutral surface do most of the visual work.
+**The One Ink Per Page Rule.** A tool page speaks only in its own ink, plus the cold edge light for the system chrome. Never mix two tools' inks on one page; home shows all nine only because it shows all nine blocks, and Stats shows each space saver's ink only on that tool's own row.
+
+**The Paired Lighting Rule.** Every colour exists as a night and a daylight value. Never introduce a colour that only works in one.
 
 ## Typography
 
-**Display Font:** Android sans-serif.
-**Body Font:** Android sans-serif.
-**Label/Mono Font:** Android monospace.
+**Display Font:** Rubik (bundled variable font `res/font/rubik.ttf`, OFL; weights 400 to 800 via variation axis)
+**Body Font:** Rubik
+**Label/Mono Font:** Rubik with tabular figures (`tnum`) for numbers
 
-**Character:** Semibold sans-serif headings make tools easy to scan; mono labels give filenames, status, and operation language a useful workshop character without compromising body readability.
+**Character:** One soft-cornered geometric sans for everything, so hierarchy has to come from weight (400 body, 600 titles and labels, 700 headlines, 800 display) and from reversal (ink text, knocked-out glyph letters), not from a second family.
 
 ### Hierarchy
+- **Display** (800, 32sp/36sp, -0.015em): the "Mimir" name in the home welcome panel, and the two lifetime totals on Stats (with `tnum`).
+- **Headline Large** (700, 28sp/32sp, -0.01em): the focused tool's name in the home info panel, the scale-contrast moment beside the small blocks.
+- **Headline** (700, 21sp/26sp): data-pane headings (plan header, Vita database, ROM folders) and empty-pane titles.
+- **Title Large** (600, 19sp/24sp): header strip name and tool crumb, slot titles ("Slot 1 • Utilities"), report title.
+- **Title** (600, 16sp/21sp): row titles in data rows, the Reads/Writes values, the A enter prompt, progress labels.
+- **Title Small** (600, 14sp/18sp): option labels and the selected folder name in the setup pane.
+- **Body Large / Body / Body Small** (400; 16/23, 14/20, 12/17sp): home prompt; descriptions and status text; file paths, option details, target names and the amber/error inline lines.
+- **Label** (600, 14sp/18sp, 0.01em): buttons, chips, legend labels, the "Reads/Writes" captions.
+- **Label Small** (600, 12sp/16sp, 0.02em): save-block names under each cell, format badges, slot field captions.
+- **Figures** (Label or Body Small with `tnum`): free storage, file sizes, counts, title IDs, queue positions.
 
-- **Display:** used for key page-level states and large summaries.
-- **Headline:** section titles and operational summaries.
-- **Title:** cards and secondary headings.
-- **Body:** descriptions, folder names, and explanatory copy.
-- **Label:** compact all-caps-like technical labels, metadata, and status markers.
+### Named Rules
+**The Sentence Case Rule.** Buttons, legend labels, chips and titles are sentence case ("Choose folder", "Scan folder", "Shrink Xbox games"). The only uppercase text is a file-extension badge (".ISO" shown as "ISO"), which is data, not styling.
 
-**The Plain-Task Rule.** Use normal language for decisions and consequences; reserve mono treatment for concise labels and technical detail.
+**The Tabular Figures Rule.** Any number that can change or be compared (sizes, counts, free space, IDs, progress) is set with `tnum`.
+
+**The No Kicker Rule.** No eyebrow or kicker text above headings. A section is introduced by its title alone; context comes from the slot, the ink and the header crumb.
 
 ## Layout
 
-Landscape is the primary operating context. At expanded sizes, Mimir keeps a navigation rail on the left and increases the content inset beside it; the main content remains a single readable vertical list rather than a dense dashboard grid. This preserves predictable scanning for sequential ROM-library work.
+The screen is a fixed console frame: header strip (minimum 52dp, 12dp horizontal padding) on top, legend bar (minimum 48dp, 16dp horizontal padding) at the foot, content between on the gridded field.
 
-Compact portrait screens retain the same vertical task order with page padding and a bottom navigation treatment. Use 12dp between stacked content blocks, 16dp for card interiors, and 20dp for top-bar horizontal padding. The navigation rail appears from 840dp width and 480dp height, covering landscape handhelds as well as larger devices. Support system font scaling, insets, and 48dp minimum touch targets.
+- **Home, wide (600dp and up):** two columns with a 20dp gutter and 20dp/16dp outer padding. Left 60%: two memory-card slots, each a title plus a row of five square cells with 10dp gaps; slots sit 14dp apart and size their cells from the available height so both fit without scrolling. Unused cells are drawn as dashed empty frames (1.5dp, 10/8 dash, grid colour). Right 40%: the info panel for the focused block, filling the height, with the A prompt pinned to its foot.
+- **Tool page, wide (700dp and up):** setup pane 42% and data pane 58%, 20dp gutter, each independently scrollable with 12dp vertical padding; setup stacks at 12dp, data at 10dp, data rows at 6dp.
+- **Narrow:** both stack into one scrolling column with 16dp padding.
+- **Rhythm:** a near-linear 2/4/6/8/10/12/16/18/20/24dp scale; panels pad 16dp (info 18dp, welcome 20dp). The 48dp field grid is decorative and does not snap content.
+- **Locale and scale headroom:** labels allow two lines (block names reserve two), legend labels ellipsize to one, and panes scroll rather than clip, so German/French strings and system font scale hold.
+
+**The Two Pane Rule.** A tool page is always setup on the left, data on the right. Never collapse it into a single column of cards on a wide screen.
 
 ## Elevation & Depth
 
-Mimir uses soft lift, not heavy shadows: translucent white or deep-plum cards sit above a subtle vertical background gradient, with Material tonal elevation providing the main separation. The persistent bottom action surface is the clearest elevated element because it carries the next irreversible step.
+Flat and tonal. No surface casts a shadow. Depth comes from three things only: the field fading from top to bottom behind a grid; solid panels lifted off it by colour and a 1dp edge light (cold edge at 28% alpha, or the page ink at 55% when the panel belongs to a tool); and motion, where the focused element rises.
 
-**The Gentle-Lift Rule.** Elevation should clarify a control's readiness or action priority; it must not make every surface look floating.
+The drawn save-block objects carry their own internal depth (a darker side offset beneath the face, a light-to-shade gradient, a specular arc on discs). That is illustration, not UI elevation.
+
+### Named Rules
+**The Lift Not Shadow Rule.** Focus raises an element: scale to 1.06 with a small upward shift (3.6px), settling on a bouncy spring (damping 0.45, medium-low stiffness). Nothing ever gets a drop shadow to show state.
 
 ## Shapes
 
-The form language is softly rectangular: 12dp for task cards, 16dp for action surfaces, 10dp for icon tiles, and pill shapes only for compact chips. Outlines are thin and low-contrast at rest, becoming more present for selection.
+Soft, consistent rounding on a geometric world. Panels and save-block cells use the 16dp corner; data rows, status lines and change rows 12dp; format badges 8dp; dialogs 24dp. Every interactive pill (buttons, chips, legend actions, the default focus ring) is fully rounded, and face-button glyphs are circles. Block-meter segments are tiny 2dp-rounded bars with 3dp gaps. The logo tile rounds at 22% of its size and sits on a night tile in daylight, since the artwork is white.
+
+Game-card objects share one silhouette: a rounded rectangle with the top-right corner cut.
 
 ## Components
 
 ### Buttons
-
-- **Character:** warm, direct Material 3 actions.
-- **Primary:** standard filled Material 3 button for scanning, applying, installing, and confirming.
-- **Secondary:** outlined Material 3 button for cancellation, alternative folder selection, and reversible actions.
-- **Placement:** a bottom action surface may hold the primary operation when a tool page needs a persistent next step.
+- **Shape:** fully rounded pill.
+- **Ink (filled):** the page ink with the dark field colour as label on night, white label in daylight. Used for the primary forward action on a pane (Choose folder, Install systems, Create shortcut).
+- **Caution (filled):** caution amber with its on-colour; only for the irreversible confirmations listed under Colors.
+- **Outlined:** ink text and a 60% ink outline; Cancel, Select all, Stop after current, per-row Add/Pick.
+- **Focus:** a 3dp ink ring plus the focus lift. On night only, a filled button's fill also brightens 22% toward white; in daylight it does not, because the white label would lose contrast. Material's focus overlay is switched off on filled buttons because it darkens them and reads as disabled. Pressing still ripples.
 
 ### Chips
-
-- **Style:** standard Material 3 filter chips in a wrapping row with compact gaps.
-- **State:** selection is explicit through the Material selected treatment; chips choose options rather than trigger destructive actions.
+- **Style:** choice chips in a wrapping row, 8dp gaps, pill shape. Unselected: raised panel and text colour. Selected: ink fill with the on-ink label.
+- **State:** a controller moving into the row lands on the current choice, not the nearest chip.
 
 ### Cards / Containers
+- **Console panel:** panel colour, 16dp corners, 1dp edge light (cold edge at 28%, or ink at 55% when it belongs to a tool), 16dp padding, 12dp stack. Hosts the setup pane, info and welcome panels, and progress and report panels.
+- **Panel rule:** a 1dp line in the grid colour separating groups inside a panel.
+- **Shadow Strategy:** none (see Elevation & Depth).
 
-- **Character:** gently lifted, full-width workbench cards.
-- **Tool cards:** a thin outline, 12dp corners, and a 44dp icon tile; selected cards receive a low-opacity primary wash.
-- **Internal spacing:** 16dp horizontally and 14dp vertically for tool rows.
+### Inputs / Fields
+- **Search field:** Material outlined text field in the page ink. Read-only until activated with A, Enter or a tap, so a controller can pass over it without summoning the keyboard; it returns to read-only when focus leaves, and Up/Down always move focus out of it.
 
 ### Navigation
+- **Header strip:** Home button (tool pages only), Mimir mark (34dp), "Mimir", then a chevron and the tool name in its ink. The breadcrumb takes the remaining width and truncates. At the right, one readout per volume (internal storage, then the SD card when one is mounted): its icon, an 8-segment block meter of used space in steel, and the free space in tabular figures; then the theme toggle. Home's legend bar carries two links at its left: About Mimir, which opens the About dialog (support links and credit), and Stats, which opens the Stats page; on a narrow screen they share the space the legend leaves and ellipsize. On Stats the crumb reads "Stats" in the cold edge light and the legend holds only B Back. Icon buttons carry a circular focus ring.
+- **Legend bar:** panel at 94% along the foot. Each action is a glyph plus a sentence-case label at least 48dp tall. Disabled actions drop to 38% alpha; the screen's primary action is emphasised with an ink tint at 18%, a 60% ink outline and ink-coloured glyph and label.
+- **Controller model:** A selects or opens; B goes back (home); X scans (or downloads on ES-DE); Y applies or converts with the selected count, installs on ES-DE, and toggles the theme on home. The first directional press on a screen lands in content, not the header. Returning home refocuses the block you opened. Touch input never shows focus.
 
-- **Expanded:** Material navigation rail at the left for home and each tool.
-- **Compact:** use the existing compact navigation treatment, while keeping system Back behavior intact.
-- **Active state:** primary violet indicates the current context.
+### Save Block (signature)
+A square cell on the slot grid holding the tool's drawn object, with its name beneath in two reserved lines. At rest: panel fill, 1dp edge at 22%, steel name. Focused: ink fill at 16%, a 3dp ink border, the name brightens to full text, the cell lifts, and the object turns: it rocks between -18° and 18° about its vertical axis on an 1800ms ease-in-out reversing loop. The last block opened keeps a 60% ink border as "selected". The info panel beside it mirrors the focused block: the object at 52dp, the name in Headline Large, a description, Reads and Writes rows (Writes in ink), and the A prompt in ink.
 
-### Dialogs
+### Block Meter (signature)
+Progress is drawn as a row of segments, never a smooth Material bar: 24 segments at 12dp for progress, 16 segments at 5dp and 160dp wide as a per-row size bar (relative to the largest item), 8 segments at 8dp and 56dp wide per volume in the header. Unlit segments use the grid colour; lit segments use the ink, partially lit at the leading edge. When the amount of work is unknown, a group of lit segments sweeps back and forth (1400ms linear).
 
-- **Style:** standard Material 3 alert dialogs for confirmation only.
-- **Content:** state the file-operation consequence plainly, including when a change cannot be undone.
+### Data Row
+A file-list entry: panel fill (ink at 10% when selected), 12dp corners, minimum 56dp tall, 12dp/8dp padding. A checkbox, the title, a size bar, the target name in steel, and an amber line if an output will be replaced; sizes sit at the right in tabular figures. Change rows add an ink format badge (ink text on 14% ink, 8dp corners) and a sources → targets file list with an ink arrow.
+
+### Stats
+The memory card's lifetime totals, in the cold edge light rather than any tool ink. Left (42%): one console panel with Space saved and Games compressed as Display figures, separated by panel rules, then the date counting began in Body Small steel (plus one line of guidance while nothing has been counted). Right (58%): "By tool" as a headline, then one data row per Slot 2 space saver, in home order; the Slot 1 utilities are not tracked. Each row holds the tool's object at 36dp in its ink (55% when unused), its name, and its game count or "Not used yet"; once used, it adds "N saved" in its ink above a 16-segment size meter scaled to the tool that saved the most. Rows take focus (edge-light ring) so a controller can scroll the list.
+
+### Empty Pane
+Centred in the data pane: the tool's object drawn at 96dp in its ink at 55%, a headline and one line of plain guidance. No illustration beyond the tool's own object.
+
+### Status Line
+Full-width, 12dp corners, 12% tint of the ink (info) or error role (failure) behind an outlined icon and body text.
 
 ## Do's and Don'ts
 
 ### Do:
-
-- **Do** make landscape the reference layout: rail plus one vertical task sequence.
-- **Do** treat dark mode as a complete violet-night palette with readable surface contrast.
-- **Do** use primary violet to show action, navigation context, and selected work.
-- **Do** keep destructive file operations behind clear Material confirmation dialogs.
+- **Do** give every new tool exactly one ink with a night value and a darker daylight value, and its own drawn object.
+- **Do** show focus with an ink ring (3dp) and the focus lift; on night, filled buttons may also brighten.
+- **Do** route every face-button action through the legend so the bar always shows exactly what A, B, X and Y do.
+- **Do** confirm every write in a dialog that names the count, with the destructive confirm in caution amber and Cancel outlined.
+- **Do** park all looping motion (block turning, meter sweep) when the system animation scale is 0.
+- **Do** keep exactly one object turning at a time: the focused save block.
 
 ### Don't:
-
-- **Don't** turn the landscape workspace into a multi-column tool grid.
-- **Don't** use violet as a full-screen fill or add decorative neon effects.
-- **Don't** replace native Material 3 controls with iOS-like controls or custom equivalents.
-- **Don't** use mono for paragraphs or instructional copy.
+- **Don't** show focus by dimming or darkening an element; on a handheld that reads as disabled.
+- **Don't** use amber for errors, highlights or anything that can be undone; errors use the error role.
+- **Don't** represent a tool with an icon-font glyph or a Material icon tile; tools are drawn objects.
+- **Don't** add eyebrow or kicker text above headings, or uppercase labels.
+- **Don't** stack Material cards in one scrolling column on a wide screen.
+- **Don't** draw progress as a continuous bar; use the block meter.
+- **Don't** let a text field open the keyboard just because a controller passed over it.

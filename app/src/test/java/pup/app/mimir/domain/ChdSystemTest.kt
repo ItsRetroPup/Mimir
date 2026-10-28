@@ -14,6 +14,12 @@ class ChdSystemTest {
     }
 
     @Test
+    fun ps3ReadsIsoImagesFromItsFolders() {
+        assertEquals(setOf("playstation 3", "ps3"), ChdSystem.PlayStation3.folderAliases)
+        assertEquals(setOf("iso"), ChdSystem.PlayStation3.supportedExtensions)
+    }
+
+    @Test
     fun segaCdIncludesMegaCdAliases() {
         assertEquals(
             setOf("sega cd", "segacd", "mega cd", "megacd"),

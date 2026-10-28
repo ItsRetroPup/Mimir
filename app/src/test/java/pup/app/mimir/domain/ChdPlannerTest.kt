@@ -17,7 +17,7 @@ class ChdPlannerTest {
             deleteOriginalFiles = false,
         )
 
-        assertEquals(ToolMode.ChdConverter, plan.mode)
+        assertEquals(ToolMode.Converter, plan.mode)
         assertEquals(listOf("dreamcast/Jet Set Radio.chd"), plan.changes.map { it.detailPath })
         val operation = plan.operations.single() as FileOperation.ConvertToChd
         assertEquals("dreamcast/Jet Set Radio.gdi", operation.sourcePath)
@@ -40,6 +40,24 @@ class ChdPlannerTest {
         assertEquals(1, plan.changes.size)
         assertEquals("ps2/Shadow of the Colossus.chd", plan.changes.single().detailPath)
         assertEquals(ChdDiscType.Dvd, (plan.operations.single() as FileOperation.ConvertToChd).discType)
+    }
+
+    @Test
+    fun plansPs3IsoAsDvdChdAndLeavesItsDkeyAlone() {
+        val plan = ChdPlanner.buildPlan(
+            entries = listOf(
+                RomEntry("ps3/Demon's Souls.iso", "Demon's Souls.iso"),
+                RomEntry("ps3/Demon's Souls.dkey", "Demon's Souls.dkey"),
+            ),
+            system = ChdSystem.PlayStation3,
+            discType = ChdDiscType.Dvd,
+            deleteOriginalFiles = true,
+        )
+
+        val operation = plan.operations.single() as FileOperation.ConvertToChd
+        assertEquals("ps3/Demon's Souls.iso", operation.sourcePath)
+        assertEquals("ps3/Demon's Souls.chd", operation.targetPath)
+        assertEquals(ChdDiscType.Dvd, operation.discType)
     }
 
     @Test

@@ -1,7 +1,9 @@
 package pup.app.mimir.data
 
 import android.content.Context
+import android.text.format.Formatter
 import androidx.documentfile.provider.DocumentFile
+import pup.app.mimir.R
 import pup.app.mimir.domain.FileOperation
 import pup.app.mimir.domain.RelativePaths
 import java.io.File
@@ -13,7 +15,8 @@ import kotlin.concurrent.thread
  *
  * Android application storage is not executable, so the tool must remain in the APK native-library
  * directory. Input files are copied into an app-cache workspace because CHDMan accepts filesystem
- * paths while Mimir operates on Storage Access Framework document URIs.
+ * paths while Mimir operates on Storage Access Framework document URIs. That copy plus the output
+ * can be tens of gigabytes for a PS3 disc, so the cache's free space is checked before starting.
  */
 class ChdmanRunner(private val context: Context) {
     data class ConversionResult(
@@ -33,12 +36,15 @@ class ChdmanRunner(private val context: Context) {
                 "CHDMan is not bundled for this device's CPU architecture."
             }
 
-            val source = findFile(root, operation.sourcePath)
+            val source = root.findRelative(operation.sourcePath)
                 ?: error("Missing source image: ${operation.sourcePath}")
+            val inputs = sourceFiles(source)
+            requireCacheSpace(source.name.orEmpty(), inputs.values.sumOf { it.length().coerceAtLeast(0L) })
             val workspace = File(context.cacheDir, "chdman/${UUID.randomUUID()}")
             require(workspace.mkdirs()) { "Unable to prepare CHDMan workspace." }
             try {
-                val stagedFiles = stageSource(source, workspace)
+                inputs.forEach { (fileName, file) -> copyToWorkspace(file, workspace, fileName) }
+                val stagedFiles = inputs.keys
                 val stagedSource = File(workspace, source.name ?: error("Source image has no name."))
                 val output = File(workspace, File(operation.targetPath).name)
                 val process = ProcessBuilder(
@@ -53,7 +59,7 @@ class ChdmanRunner(private val context: Context) {
                 onProgress?.invoke(0f)
                 var log = ""
                 val logReader = thread(start = true, isDaemon = true) {
-                    log = readProcessOutput(process.inputStream, onProgress)
+                    log = readConverterOutput(process.inputStream, onProgress, MAX_LOG_LENGTH)
                 }
                 while (process.isAlive) {
                     if (cancellation?.shouldInterruptCurrentOperation() == true) {
@@ -70,8 +76,9 @@ class ChdmanRunner(private val context: Context) {
                 }
                 onProgress?.invoke(1f)
 
+                // Both live in the cache, so a rename moves the output without a second full copy.
                 val retainedOutput = File(context.cacheDir, "chdman-output-${UUID.randomUUID()}.chd")
-                output.copyTo(retainedOutput, overwrite = true)
+                if (!output.renameTo(retainedOutput)) output.copyTo(retainedOutput, overwrite = true)
                 ConversionResult(
                     output = retainedOutput,
                     originalSourcePaths = stagedFiles.map { fileName ->
@@ -84,43 +91,12 @@ class ChdmanRunner(private val context: Context) {
             }
         }.getOrElse { throw it }
 
-    private fun readProcessOutput(
-        input: java.io.InputStream,
-        onProgress: ((Float) -> Unit)?,
-    ): String {
-        val log = StringBuilder()
-        val update = StringBuilder()
-        input.bufferedReader().use { reader ->
-            while (true) {
-                val value = reader.read()
-                if (value == -1) break
-                val character = value.toChar()
-                if (character == '\r' || character == '\n') {
-                    reportProgress(update.toString(), onProgress)
-                    update.clear()
-                } else {
-                    update.append(character)
-                }
-                log.append(character)
-                if (log.length > MAX_LOG_LENGTH) log.delete(0, log.length - MAX_LOG_LENGTH)
-            }
-        }
-        reportProgress(update.toString(), onProgress)
-        return log.toString()
-    }
-
-    private fun reportProgress(line: String, onProgress: ((Float) -> Unit)?) {
-        PERCENT_PATTERN.findAll(line).lastOrNull()?.groupValues?.get(1)?.toFloatOrNull()?.let { percent ->
-            onProgress?.invoke((percent / 100f).coerceIn(0f, 1f))
-        }
-    }
-
-    private fun stageSource(source: DocumentFile, workspace: File): Set<String> {
+    /** The image and, for a .cue or .gdi, every track it references, keyed by file name. */
+    private fun sourceFiles(source: DocumentFile): Map<String, DocumentFile> {
         val sourceName = source.name ?: error("Source image has no name.")
-        val stagedFiles = linkedSetOf(sourceName)
-        copyToWorkspace(source, workspace, sourceName)
-        val extension = source.name.orEmpty().substringAfterLast('.', "").lowercase()
-        if (extension !in DESCRIPTOR_EXTENSIONS) return stagedFiles
+        val files = linkedMapOf(sourceName to source)
+        val extension = sourceName.substringAfterLast('.', "").lowercase()
+        if (extension !in DESCRIPTOR_EXTENSIONS) return files
 
         val descriptor = context.contentResolver.openInputStream(source.uri)
             ?.bufferedReader()
@@ -128,12 +104,24 @@ class ChdmanRunner(private val context: Context) {
             ?: error("Unable to read ${source.name}")
         val parent = source.parentFile ?: error("Unable to access ${source.name}'s folder.")
         referencedFileNames(extension, descriptor).forEach { fileName ->
-            val referenced = parent.findFile(fileName)
+            files[fileName] = parent.findFile(fileName)
                 ?: error("Missing track referenced by ${source.name}: $fileName")
-            copyToWorkspace(referenced, workspace, fileName)
-            stagedFiles += fileName
         }
-        return stagedFiles
+        return files
+    }
+
+    /** The staged copy plus an output that, at worst, is as large as the input. */
+    private fun requireCacheSpace(sourceName: String, inputBytes: Long) {
+        val needed = inputBytes * 2
+        val free = context.cacheDir.usableSpace
+        require(free >= needed) {
+            context.getString(
+                R.string.msg_chd_cache_space,
+                sourceName,
+                Formatter.formatShortFileSize(context, needed),
+                Formatter.formatShortFileSize(context, free),
+            )
+        }
     }
 
     private fun copyToWorkspace(source: DocumentFile, workspace: File, fileName: String) {
@@ -162,19 +150,6 @@ class ChdmanRunner(private val context: Context) {
             else -> emptySet()
         }
 
-    private fun findFile(root: DocumentFile, relativePath: String): DocumentFile? {
-        var current = root
-        val parts = relativePath.split('/').filter { it.isNotBlank() }
-        parts.forEachIndexed { index, part ->
-            val child = current.findFile(part) ?: return null
-            if (index == parts.lastIndex) {
-                return child
-            }
-            current = child
-        }
-        return null
-    }
-
     private companion object {
         const val EXECUTABLE_NAME = "libchdman.so"
         const val MAX_LOG_LENGTH = 4_000
@@ -182,6 +157,5 @@ class ChdmanRunner(private val context: Context) {
         val DESCRIPTOR_EXTENSIONS = setOf("cue", "gdi")
         val CUE_FILE_PATTERN = Regex("""(?im)^\s*FILE\s+"([^"]+)"""")
         val GDI_TRACK_PATTERN = Regex("""^\s*\d+\s+\d+\s+\d+\s+\d+\s+(?:"([^"]+)"|(\S+))""")
-        val PERCENT_PATTERN = Regex("""(\d{1,3}(?:\.\d+)?)\s*%""")
     }
 }
