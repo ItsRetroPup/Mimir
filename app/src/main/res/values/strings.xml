@@ -25,7 +25,7 @@
     <string name="tool_romzipper_description">Zips each cartridge ROM (Game Boy, GBA, DS, NES, SNES, N64, Genesis and more) into its own .zip to save space. Most emulators open the zip directly. The unzipped ROM is removed.</string>
     <string name="goal_compress_disc_images">Compress disc images</string>
     <string name="tool_chdman">CHDMan</string>
-    <string name="tool_chdman_description">Compresses PS1, PS2, PSP, Saturn, Dreamcast and Sega CD disc images (.cue/.bin, .gdi, .iso) into one .chd file per game. Lossless, so games play the same in less space.</string>
+    <string name="tool_chdman_description">Compresses PS1, PS2, PS3, PSP, Saturn, Dreamcast and Sega CD disc images (.cue/.bin, .gdi, .iso) into one .chd file per game. Lossless, so games play the same in less space.</string>
     <string name="goal_shrink_gamecube_wii">Shrink GameCube and Wii games</string>
     <string name="tool_dolphin_rvz">Dolphin RVZ</string>
     <string name="tool_dolphin_rvz_description">Compresses GameCube and Wii .iso files to .rvz, Dolphin\'s lossless format. Games play the same and take far less space. Your .iso files are kept.</string>
@@ -325,4 +325,19 @@
     <string name="msg_patch_result_mismatch">The patched ROM doesn\'t match what the patch expects. The ROM is probably a different version from the one the patch was made for.</string>
     <string name="msg_patch_too_large">This ROM is too large to patch on this device.</string>
     <string name="msg_patch_folder_mismatch">That folder doesn\'t contain %1$s. Choose the folder the ROM is in.</string>
+
+    <!-- Stats. -->
+    <string name="stats">Stats</string>
+    <string name="stats_space_saved">Space saved</string>
+    <string name="stats_games_compressed">Games compressed</string>
+    <string name="stats_since">Counting since %1$s</string>
+    <string name="stats_empty">Your totals add up here as you use the tools.</string>
+    <string name="stats_by_tool">By tool</string>
+    <string name="stats_not_used">Not used yet</string>
+    <string name="stats_saved_value">%1$s saved</string>
+    <plurals name="stats_games">
+        <item quantity="one">%1$d game</item>
+        <item quantity="other">%1$d games</item>
+    </plurals>
+    <string name="msg_chd_cache_space">Not enough space to convert %1$s. CHDMan works on a copy in internal storage and needs about %2$s free, but only %3$s is free.</string>
 </resources>

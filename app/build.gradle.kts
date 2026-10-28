@@ -22,8 +22,8 @@ android {
         applicationId = "pup.app.mimir"
         minSdk = 29
         targetSdk = 35
-        versionCode = 9
-        versionName = "0.3.1"
+        versionCode = 10
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

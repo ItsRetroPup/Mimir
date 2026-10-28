@@ -23,6 +23,7 @@ import pup.app.mimir.data.PlanExecutor
 import pup.app.mimir.data.RomPatchRunner
 import pup.app.mimir.data.RomTreeRepository
 import pup.app.mimir.data.StopRequest
+import pup.app.mimir.data.UsageStatsStore
 import pup.app.mimir.domain.ChdDiscType
 import pup.app.mimir.domain.ChdSystem
 import pup.app.mimir.domain.ConverterTool
@@ -34,6 +35,7 @@ import pup.app.mimir.domain.PatchFailure
 import pup.app.mimir.domain.PatchFormat
 import pup.app.mimir.domain.RomPatcher
 import pup.app.mimir.domain.ToolMode
+import pup.app.mimir.domain.UsageStats
 import pup.app.mimir.domain.VitaAppIdPlanner
 import pup.app.mimir.domain.VitaShortcutFormat
 
@@ -74,6 +76,7 @@ data class MimirUiState(
     val previewPlan: OperationPlan? = null,
     val selectedChangePaths: Set<String> = emptySet(),
     val romPatch: RomPatchState = RomPatchState(),
+    val usageStats: UsageStats = UsageStats(sinceMillis = 0L),
     val message: StatusMessage? = null,
 )
 
@@ -110,6 +113,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
     private val patchRunner = RomPatchRunner(application)
     private val esDeRepository = EsDeSystemsRepository(application)
     private val prefs = application.getSharedPreferences("mimir_prefs", 0)
+    private val statsStore = UsageStatsStore(application)
     private var vitaCatalog: List<pup.app.mimir.domain.VitaApp> = emptyList()
     private var activeCancellation: OperationCancellation? = null
     private var esDeLatestRequested = false
@@ -130,6 +134,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             scanHiddenFolders = prefs.getBoolean(KEY_SCAN_HIDDEN_FOLDERS, false),
             deleteOriginalChdFiles = prefs.getBoolean(KEY_DELETE_ORIGINAL_CHD_FILES, false),
             useDarkMode = prefs.getBoolean(KEY_DARK_MODE, true),
+            usageStats = statsStore.load(),
         )
     )
     val uiState: StateFlow<MimirUiState> = _uiState.asStateFlow()
@@ -294,7 +299,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             it.copy(
                 selectedChdSystem = system,
                 selectedChdDiscType = when (system) {
-                    ChdSystem.PlayStationPortable -> ChdDiscType.Dvd
+                    ChdSystem.PlayStationPortable, ChdSystem.PlayStation3 -> ChdDiscType.Dvd
                     ChdSystem.PlayStation2 -> it.selectedChdDiscType
                     else -> ChdDiscType.Cd
                 },
@@ -730,9 +735,13 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             ToolMode.EsDeSystems, ToolMode.RomPatcher -> null
             else -> current.selectedFolderUri
         } ?: return
+        val converter = current.selectedConverterTool.takeIf { plan.mode == ToolMode.Converter }
         viewModelScope.launch(Dispatchers.IO) {
             val cancellation = OperationCancellation()
             activeCancellation = cancellation
+            // What finished before a stop or failure still counts toward the stats.
+            var finishedOperations = 0
+            var savedBytes = 0L
             _uiState.update {
                 it.copy(
                     isBusy = true,
@@ -752,7 +761,9 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             executor.apply(
                 rootUri = uri,
                 plan = plan,
-                onProgress = { completed, total ->
+                onProgress = { completed, total, saved ->
+                    finishedOperations = completed
+                    savedBytes = saved
                     _uiState.update {
                         it.copy(
                             operationProgressLabel = applyProgressLabel(plan.mode, completed, total),
@@ -761,7 +772,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                                 ConversionReport(
                                     completed = completed,
                                     total = total,
-                                    spaceSavedBytes = it.conversionReport?.spaceSavedBytes ?: 0L,
+                                    spaceSavedBytes = saved,
                                 )
                             } else {
                                 it.conversionReport
@@ -793,6 +804,11 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                 },
                 cancellation = cancellation,
             )
+                .also {
+                    if (UsageStats.savesSpace(plan.mode, converter)) {
+                        recordUsage(UsageStats.keyFor(plan.mode, converter), plan.completedChanges(finishedOperations), savedBytes)
+                    }
+                }
                 .onSuccess { result ->
                     _uiState.update {
                         it.copy(
@@ -872,6 +888,12 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun info(@StringRes id: Int, vararg args: Any) = StatusMessage(strings.text(id, *args))
+
+    private fun recordUsage(key: String, games: Int, spaceSavedBytes: Long) {
+        if (games <= 0 && spaceSavedBytes == 0L) return
+        val stats = statsStore.record(key, games, spaceSavedBytes)
+        _uiState.update { it.copy(usageStats = stats) }
+    }
 
     /** Checks whether the patched copy's name is already taken in the ROM's folder. */
     private fun refreshPatchOutput() {

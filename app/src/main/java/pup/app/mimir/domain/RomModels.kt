@@ -125,6 +125,11 @@ enum class ChdSystem(
         supportedExtensions = setOf("iso"),
         folderAliases = setOf("playstation 2", "ps2"),
     ),
+    PlayStation3(
+        displayName = "PS3",
+        supportedExtensions = setOf("iso"),
+        folderAliases = setOf("playstation 3", "ps3"),
+    ),
     SegaCd(
         displayName = "Sega CD",
         supportedExtensions = setOf("cue", "iso"),
@@ -201,6 +206,15 @@ data class OperationPlan(
     val operations: List<FileOperation>,
     val conflicts: List<String>,
 ) {
+    /** How many changes were fully applied once the first [completedOperations] operations ran. */
+    fun completedChanges(completedOperations: Int): Int {
+        var remaining = completedOperations
+        return changes.takeWhile { change ->
+            remaining -= change.operations.size
+            remaining >= 0
+        }.size
+    }
+
     fun forSelectedChanges(selectedDetailPaths: Set<String>): OperationPlan {
         val selectedChanges = changes.filter { it.detailPath in selectedDetailPaths }
         return copy(

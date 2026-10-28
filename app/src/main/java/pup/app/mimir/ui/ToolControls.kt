@@ -148,7 +148,7 @@ internal fun ChdOptions(
 ) {
     val palette = LocalMimirPalette.current
     PanelRule()
-    // Six systems do not fit beside a label, so this one setting stacks.
+    // Seven systems do not fit beside a label, so this one setting stacks.
     Text(stringResource(R.string.chd_system), style = MaterialTheme.typography.titleSmall, color = palette.text)
     ChoiceRow(
         options = ChdSystem.entries,

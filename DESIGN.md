@@ -275,7 +275,7 @@ A cold, two-state console palette: navy and steel at rest, nine saturated inks f
 ### Named Rules
 **The Amber Is A Warning Rule.** Amber appears only on a control that destroys or replaces data, or on the line warning that it will. Errors use the error role. If a screen shows amber and nothing on it can be lost, it is wrong.
 
-**The One Ink Per Page Rule.** A tool page speaks only in its own ink, plus the cold edge light for the system chrome. Never mix two tools' inks on one page; home shows all nine only because it shows all nine blocks.
+**The One Ink Per Page Rule.** A tool page speaks only in its own ink, plus the cold edge light for the system chrome. Never mix two tools' inks on one page; home shows all nine only because it shows all nine blocks, and Stats shows each space saver's ink only on that tool's own row.
 
 **The Paired Lighting Rule.** Every colour exists as a night and a daylight value. Never introduce a colour that only works in one.
 
@@ -288,7 +288,7 @@ A cold, two-state console palette: navy and steel at rest, nine saturated inks f
 **Character:** One soft-cornered geometric sans for everything, so hierarchy has to come from weight (400 body, 600 titles and labels, 700 headlines, 800 display) and from reversal (ink text, knocked-out glyph letters), not from a second family.
 
 ### Hierarchy
-- **Display** (800, 32sp/36sp, -0.015em): the "Mimir" name in the home welcome panel only.
+- **Display** (800, 32sp/36sp, -0.015em): the "Mimir" name in the home welcome panel, and the two lifetime totals on Stats (with `tnum`).
 - **Headline Large** (700, 28sp/32sp, -0.01em): the focused tool's name in the home info panel, the scale-contrast moment beside the small blocks.
 - **Headline** (700, 21sp/26sp): data-pane headings (plan header, Vita database, ROM folders) and empty-pane titles.
 - **Title Large** (600, 19sp/24sp): header strip name and tool crumb, slot titles ("Slot 1 • Utilities"), report title.
@@ -355,7 +355,7 @@ Game-card objects share one silhouette: a rounded rectangle with the top-right c
 - **Search field:** Material outlined text field in the page ink. Read-only until activated with A, Enter or a tap, so a controller can pass over it without summoning the keyboard; it returns to read-only when focus leaves, and Up/Down always move focus out of it.
 
 ### Navigation
-- **Header strip:** Home button (tool pages only), Mimir mark (34dp), "Mimir", then a chevron and the tool name in its ink. The breadcrumb takes the remaining width and truncates. At the right, one readout per volume (internal storage, then the SD card when one is mounted): its icon, an 8-segment block meter of used space in steel, and the free space in tabular figures; then the theme toggle. Home's legend bar carries an About Mimir link at its left, which opens the About dialog (support links and credit). Icon buttons carry a circular focus ring.
+- **Header strip:** Home button (tool pages only), Mimir mark (34dp), "Mimir", then a chevron and the tool name in its ink. The breadcrumb takes the remaining width and truncates. At the right, one readout per volume (internal storage, then the SD card when one is mounted): its icon, an 8-segment block meter of used space in steel, and the free space in tabular figures; then the theme toggle. Home's legend bar carries two links at its left: About Mimir, which opens the About dialog (support links and credit), and Stats, which opens the Stats page; on a narrow screen they share the space the legend leaves and ellipsize. On Stats the crumb reads "Stats" in the cold edge light and the legend holds only B Back. Icon buttons carry a circular focus ring.
 - **Legend bar:** panel at 94% along the foot. Each action is a glyph plus a sentence-case label at least 48dp tall. Disabled actions drop to 38% alpha; the screen's primary action is emphasised with an ink tint at 18%, a 60% ink outline and ink-coloured glyph and label.
 - **Controller model:** A selects or opens; B goes back (home); X scans (or downloads on ES-DE); Y applies or converts with the selected count, installs on ES-DE, and toggles the theme on home. The first directional press on a screen lands in content, not the header. Returning home refocuses the block you opened. Touch input never shows focus.
 
@@ -367,6 +367,9 @@ Progress is drawn as a row of segments, never a smooth Material bar: 24 segments
 
 ### Data Row
 A file-list entry: panel fill (ink at 10% when selected), 12dp corners, minimum 56dp tall, 12dp/8dp padding. A checkbox, the title, a size bar, the target name in steel, and an amber line if an output will be replaced; sizes sit at the right in tabular figures. Change rows add an ink format badge (ink text on 14% ink, 8dp corners) and a sources → targets file list with an ink arrow.
+
+### Stats
+The memory card's lifetime totals, in the cold edge light rather than any tool ink. Left (42%): one console panel with Space saved and Games compressed as Display figures, separated by panel rules, then the date counting began in Body Small steel (plus one line of guidance while nothing has been counted). Right (58%): "By tool" as a headline, then one data row per Slot 2 space saver, in home order; the Slot 1 utilities are not tracked. Each row holds the tool's object at 36dp in its ink (55% when unused), its name, and its game count or "Not used yet"; once used, it adds "N saved" in its ink above a 16-segment size meter scaled to the tool that saved the most. Rows take focus (edge-light ring) so a controller can scroll the list.
 
 ### Empty Pane
 Centred in the data pane: the tool's object drawn at 96dp in its ink at 55%, a headline and one line of plain guidance. No illustration beyond the tool's own object.

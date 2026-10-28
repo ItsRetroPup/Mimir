@@ -6,7 +6,7 @@
     <string name="goal_setup_esde">Configurar ES-DE</string><string name="tool_esde_systems">Sistemas ES-DE</string><string name="tool_esde_systems_description">Descarga los sistemas personalizados más recientes de la comunidad para ES-DE en Android, asigna a cada uno su carpeta de ROM y los instala en la carpeta custom_systems de ES-DE. Reinicia ES-DE para cargarlos.</string>
     <string name="goal_convert_switch_packages">Convertir paquetes de Switch</string><string name="tool_nsz_to_nsp">NSZ a NSP</string><string name="tool_nsz_to_nsp_description">Descomprime archivos .nsz de Switch en paquetes .nsp completos para emuladores que no leen NSZ. Necesita tu propio prod.keys. Tus archivos .nsz se conservan.</string>
     <string name="goal_compress_cartridge_roms">Comprimir ROM de cartucho</string><string name="tool_romzipper">RomZipper</string><string name="tool_romzipper_description">Comprime cada ROM de cartucho (Game Boy, GBA, DS, NES, SNES, N64, Mega Drive y más) en su propio .zip para ahorrar espacio. La mayoría de los emuladores abren el zip directamente. La ROM sin comprimir se elimina.</string>
-    <string name="goal_compress_disc_images">Comprimir imágenes de disco</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">Comprime imágenes de disco de PS1, PS2, PSP, Saturn, Dreamcast y Sega CD (.cue/.bin, .gdi, .iso) en un solo archivo .chd por juego. Sin pérdida, así que los juegos funcionan igual y ocupan menos.</string>
+    <string name="goal_compress_disc_images">Comprimir imágenes de disco</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">Comprime imágenes de disco de PS1, PS2, PS3, PSP, Saturn, Dreamcast y Sega CD (.cue/.bin, .gdi, .iso) en un solo archivo .chd por juego. Sin pérdida, así que los juegos funcionan igual y ocupan menos.</string>
     <string name="goal_shrink_gamecube_wii">Reducir juegos de GameCube y Wii</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">Comprime archivos .iso de GameCube y Wii a .rvz, el formato sin pérdida de Dolphin. Los juegos funcionan igual y ocupan mucho menos. Tus archivos .iso se conservan.</string>
     <string name="goal_shrink_3ds">Reducir juegos de Nintendo 3DS</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">Comprime juegos de 3DS descifrados (.3ds, .cci) a .zcci, que Azahar ejecuta directamente. Los volcados cifrados no se pueden convertir. Tus archivos originales se conservan.</string><string name="goal_shrink_xbox">Reducir juegos de Xbox</string><string name="tool_xbox_xiso">Xbox XISO</string><string name="tool_xbox_xiso_description">Elimina la partición de vídeo sin usar y el relleno de los archivos .iso de Xbox de Redump. El XISO recortado reemplaza al original y funciona en xemu y Hakux.</string>
     <string name="goal_patch_rom">Parchear una ROM</string>
@@ -283,4 +283,7 @@
     <string name="storage_internal">Almacenamiento interno</string>
     <string name="storage_sd_card">Tarjeta SD</string>
     <string name="action_close">Cerrar</string>
+
+    <!-- Stats. -->
+    <string name="stats">Estadísticas</string>
 </resources>

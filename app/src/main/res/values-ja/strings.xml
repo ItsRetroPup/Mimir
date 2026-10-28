@@ -6,7 +6,7 @@
     <string name="goal_setup_esde">ES-DEを設定する</string><string name="tool_esde_systems">ES-DEシステム</string><string name="tool_esde_systems_description">Android版ES-DE向けのコミュニティ製カスタムシステムの最新版をダウンロードし、各システムをROMフォルダーに関連付けて、ES-DEのcustom_systemsフォルダーにインストールします。読み込むにはES-DEを再起動してください。</string>
     <string name="goal_convert_switch_packages">Switchパッケージを変換する</string><string name="tool_nsz_to_nsp">NSZからNSP</string><string name="tool_nsz_to_nsp_description">Switchの.nszファイルを、NSZを読めないエミュレーター向けに完全な.nspパッケージへ展開します。ご自身のprod.keysが必要です。.nszファイルはそのまま残ります。</string>
     <string name="goal_compress_cartridge_roms">カートリッジROMを圧縮する</string><string name="tool_romzipper">RomZipper</string><string name="tool_romzipper_description">カートリッジROM（Game Boy、GBA、DS、NES、SNES、N64、Mega Driveなど）を1本ずつ.zipにまとめて容量を節約します。ほとんどのエミュレーターはzipを直接開けます。圧縮前のROMは削除されます。</string>
-    <string name="goal_compress_disc_images">ディスクイメージを圧縮する</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">PS1、PS2、PSP、Saturn、Dreamcast、Sega CDのディスクイメージ（.cue/.bin、.gdi、.iso）をゲームごとに1つの.chdファイルへ圧縮します。可逆圧縮なので、同じようにプレイでき容量は小さくなります。</string>
+    <string name="goal_compress_disc_images">ディスクイメージを圧縮する</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">PS1、PS2、PS3、PSP、Saturn、Dreamcast、Sega CDのディスクイメージ（.cue/.bin、.gdi、.iso）をゲームごとに1つの.chdファイルへ圧縮します。可逆圧縮なので、同じようにプレイでき容量は小さくなります。</string>
     <string name="goal_shrink_gamecube_wii">GameCubeとWiiのゲームを圧縮する</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">GameCubeとWiiの.isoファイルを、Dolphinの可逆圧縮形式である.rvzに圧縮します。同じようにプレイでき、容量は大幅に小さくなります。.isoファイルはそのまま残ります。</string>
     <string name="goal_shrink_3ds">Nintendo 3DSのゲームを圧縮する</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">復号済みの3DSゲーム（.3ds、.cci）を、Azaharで直接遊べる.zcciに圧縮します。暗号化されたダンプは変換できません。元のファイルはそのまま残ります。</string><string name="goal_shrink_xbox">Xboxのゲームを圧縮する</string><string name="tool_xbox_xiso">Xbox XISO</string><string name="tool_xbox_xiso_description">Redump形式のXbox .isoファイルから、未使用のビデオパーティションと余白を取り除きます。トリミングしたXISOが元のファイルを置き換え、xemuとHakuxで動作します。</string>
     <string name="goal_patch_rom">ROMにパッチを当てる</string>
@@ -237,4 +237,7 @@
     <string name="storage_internal">内部ストレージ</string>
     <string name="storage_sd_card">SD カード</string>
     <string name="action_close">閉じる</string>
+
+    <!-- Stats. -->
+    <string name="stats">統計</string>
 </resources>

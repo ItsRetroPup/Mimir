@@ -65,6 +65,7 @@ internal enum class AppSection {
     Xiso,
     Vita,
     Patcher,
+    Stats,
 }
 
 internal data class ToolEntry(

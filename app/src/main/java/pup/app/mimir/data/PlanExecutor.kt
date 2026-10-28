@@ -17,7 +17,8 @@ class PlanExecutor(private val context: Context) {
     fun apply(
         rootUri: Uri,
         plan: OperationPlan,
-        onProgress: ((completedOperations: Int, totalOperations: Int) -> Unit)? = null,
+        /** Called after each operation, with the space saved so far. */
+        onProgress: ((completedOperations: Int, totalOperations: Int, spaceSavedBytes: Long) -> Unit)? = null,
         onCurrentOperationProgress: ((Float) -> Unit)? = null,
         onOperationStarted: ((FileOperation) -> Unit)? = null,
         cancellation: OperationCancellation? = null,
@@ -78,6 +79,7 @@ class PlanExecutor(private val context: Context) {
                             }
                         }
                     }
+                    spaceSavedBytes += sourceFile.length().coerceAtLeast(0L) - target.length()
                     if (!sourceFile.delete()) {
                         error("Failed to remove original file: ${operation.sourcePath}")
                     }
@@ -143,7 +145,7 @@ class PlanExecutor(private val context: Context) {
                     }
                 }
             }
-            onProgress?.invoke(index + 1, plan.operations.size)
+            onProgress?.invoke(index + 1, plan.operations.size, spaceSavedBytes)
         }
         ExecutionResult(completedOperations = plan.operations.size, stopped = false, spaceSavedBytes = spaceSavedBytes)
     }

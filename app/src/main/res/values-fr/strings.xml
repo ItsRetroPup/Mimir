@@ -23,7 +23,7 @@
     <string name="tool_romzipper_description">Compresse chaque ROM sur cartouche (Game Boy, GBA, DS, NES, SNES, N64, Mega Drive et plus) dans son propre .zip pour gagner de la place. La plupart des émulateurs ouvrent le zip directement. La ROM non compressée est supprimée.</string>
     <string name="goal_compress_disc_images">Compresser les images disque</string>
     <string name="tool_chdman">CHDMan</string>
-    <string name="tool_chdman_description">Compresse les images disque PS1, PS2, PSP, Saturn, Dreamcast et Sega CD (.cue/.bin, .gdi, .iso) en un seul fichier .chd par jeu. La compression est sans perte, les jeux fonctionnent donc à l’identique en prenant moins de place.</string>
+    <string name="tool_chdman_description">Compresse les images disque PS1, PS2, PS3, PSP, Saturn, Dreamcast et Sega CD (.cue/.bin, .gdi, .iso) en un seul fichier .chd par jeu. La compression est sans perte, les jeux fonctionnent donc à l’identique en prenant moins de place.</string>
     <string name="goal_shrink_gamecube_wii">Réduire les jeux GameCube et Wii</string>
     <string name="tool_dolphin_rvz">Dolphin RVZ</string>
     <string name="tool_dolphin_rvz_description">Compresse les fichiers .iso GameCube et Wii au format .rvz, le format sans perte de Dolphin. Les jeux fonctionnent à l’identique et prennent bien moins de place. Vos fichiers .iso sont conservés.</string>
@@ -345,4 +345,20 @@
     <string name="msg_patch_result_mismatch">La ROM patchée ne correspond pas à ce qu’attend le patch. La ROM est probablement une autre version que celle prévue par le patch.</string>
     <string name="msg_patch_too_large">Cette ROM est trop volumineuse pour être patchée sur cet appareil.</string>
     <string name="msg_patch_folder_mismatch">Ce dossier ne contient pas %1$s. Choisissez le dossier où se trouve la ROM.</string>
+
+    <!-- Stats. -->
+    <string name="stats">Statistiques</string>
+    <string name="stats_space_saved">Espace libéré</string>
+    <string name="stats_games_compressed">Jeux compressés</string>
+    <string name="stats_since">Comptage depuis le %1$s</string>
+    <string name="stats_empty">Vos totaux s’additionnent ici à mesure que vous utilisez les outils.</string>
+    <string name="stats_by_tool">Par outil</string>
+    <string name="stats_not_used">Pas encore utilisé</string>
+    <string name="stats_saved_value">%1$s libérés</string>
+    <plurals name="stats_games">
+        <item quantity="one">%1$d jeu</item>
+        <item quantity="many">%1$d jeux</item>
+        <item quantity="other">%1$d jeux</item>
+    </plurals>
+    <string name="msg_chd_cache_space">Espace insuffisant pour convertir %1$s. CHDMan travaille sur une copie dans le stockage interne et a besoin d’environ %2$s d’espace libre, mais seuls %3$s sont disponibles.</string>
 </resources>

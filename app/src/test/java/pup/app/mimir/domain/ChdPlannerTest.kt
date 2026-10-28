@@ -43,6 +43,24 @@ class ChdPlannerTest {
     }
 
     @Test
+    fun plansPs3IsoAsDvdChdAndLeavesItsDkeyAlone() {
+        val plan = ChdPlanner.buildPlan(
+            entries = listOf(
+                RomEntry("ps3/Demon's Souls.iso", "Demon's Souls.iso"),
+                RomEntry("ps3/Demon's Souls.dkey", "Demon's Souls.dkey"),
+            ),
+            system = ChdSystem.PlayStation3,
+            discType = ChdDiscType.Dvd,
+            deleteOriginalFiles = true,
+        )
+
+        val operation = plan.operations.single() as FileOperation.ConvertToChd
+        assertEquals("ps3/Demon's Souls.iso", operation.sourcePath)
+        assertEquals("ps3/Demon's Souls.chd", operation.targetPath)
+        assertEquals(ChdDiscType.Dvd, operation.discType)
+    }
+
+    @Test
     fun marksExistingChdForExplicitOverwriteSelection() {
         val plan = ChdPlanner.buildPlan(
             entries = listOf(

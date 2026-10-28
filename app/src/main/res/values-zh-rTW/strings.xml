@@ -6,7 +6,7 @@
     <string name="goal_setup_esde">設定 ES-DE</string><string name="tool_esde_systems">ES-DE 系統</string><string name="tool_esde_systems_description">下載適用於 Android 版 ES-DE 的最新社群自訂系統，為每個系統對應 ROM 資料夾，並安裝到 ES-DE 的 custom_systems 資料夾。重新啟動 ES-DE 即可載入。</string>
     <string name="goal_convert_switch_packages">轉換 Switch 套件</string><string name="tool_nsz_to_nsp">NSZ 轉 NSP</string><string name="tool_nsz_to_nsp_description">將 Switch .nsz 檔案解壓縮為完整的 .nsp 套件，供無法讀取 NSZ 的模擬器使用。需要你自己的 prod.keys。.nsz 檔案會保留。</string>
     <string name="goal_compress_cartridge_roms">壓縮卡帶 ROM</string><string name="tool_romzipper">RomZipper</string><string name="tool_romzipper_description">將每個卡帶 ROM（Game Boy、GBA、DS、NES、SNES、N64、Mega Drive 等）分別封裝為 .zip 以節省空間。大多數模擬器可直接開啟 zip。未壓縮的 ROM 會被刪除。</string>
-    <string name="goal_compress_disc_images">壓縮光碟映像</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">將 PS1、PS2、PSP、Saturn、Dreamcast 和 Sega CD 光碟映像（.cue/.bin、.gdi、.iso）壓縮為每個遊戲一個 .chd 檔案。無損壓縮，遊戲執行不變，佔用空間更小。</string>
+    <string name="goal_compress_disc_images">壓縮光碟映像</string><string name="tool_chdman">CHDMan</string><string name="tool_chdman_description">將 PS1、PS2、PS3、PSP、Saturn、Dreamcast 和 Sega CD 光碟映像（.cue/.bin、.gdi、.iso）壓縮為每個遊戲一個 .chd 檔案。無損壓縮，遊戲執行不變，佔用空間更小。</string>
     <string name="goal_shrink_gamecube_wii">壓縮 GameCube 和 Wii 遊戲</string><string name="tool_dolphin_rvz">Dolphin RVZ</string><string name="tool_dolphin_rvz_description">將 GameCube 和 Wii 的 .iso 檔案壓縮為 Dolphin 的無損格式 .rvz。遊戲執行不變，佔用空間大幅減少。.iso 檔案會保留。</string>
     <string name="goal_shrink_3ds">壓縮 Nintendo 3DS 遊戲</string><string name="tool_azahar_zcci">Azahar ZCCI</string><string name="tool_azahar_zcci_description">將已解密的 3DS 遊戲（.3ds、.cci）壓縮為 Azahar 可直接執行的 .zcci。加密的傾印無法轉換。原始檔案會保留。</string><string name="goal_shrink_xbox">壓縮 Xbox 遊戲</string><string name="tool_xbox_xiso">Xbox XISO</string><string name="tool_xbox_xiso_description">移除 Redump Xbox .iso 檔案中未使用的影片分割區和填充資料。裁剪後的 XISO 會取代原檔案，可在 xemu 和 Hakux 中執行。</string>
     <string name="goal_patch_rom">為 ROM 套用修補檔</string>
@@ -237,4 +237,7 @@
     <string name="storage_internal">內部儲存空間</string>
     <string name="storage_sd_card">SD 卡</string>
     <string name="action_close">關閉</string>
+
+    <!-- Stats. -->
+    <string name="stats">統計</string>
 </resources>

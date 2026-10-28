@@ -36,6 +36,7 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.PhoneAndroid
+import androidx.compose.material.icons.outlined.QueryStats
 import androidx.compose.material.icons.outlined.SdCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,6 +58,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -150,8 +152,11 @@ internal fun MimirScreen(
     }
 
     val tool = toolFor(currentSection)
+    val onStats = currentSection == AppSection.Stats
     val ink = tool?.ink?.resolve(palette) ?: palette.edge
-    val legend = legendFor(
+    val legend = if (onStats) {
+        listOf(LegendAction("B", stringResource(R.string.legend_back), onClick = goHome))
+    } else legendFor(
         tool = tool,
         uiState = uiState,
         onHome = goHome,
@@ -185,7 +190,11 @@ internal fun MimirScreen(
                 containerColor = Color.Transparent,
                 topBar = {
                     HeaderStrip(
-                        tool = tool,
+                        crumb = when {
+                            tool != null -> stringResource(tool.toolName)
+                            onStats -> stringResource(R.string.stats)
+                            else -> null
+                        },
                         uiState = uiState,
                         contentFocus = contentFocus,
                         onHome = goHome,
@@ -194,11 +203,29 @@ internal fun MimirScreen(
                 },
                 bottomBar = {
                     LegendBar(legend) {
-                        if (tool == null) AboutLink(onClick = { showAbout = true })
+                        if (tool == null && !onStats) {
+                            // On a narrow screen the links share what the legend leaves and ellipsize.
+                            FooterLink(
+                                Icons.Outlined.Info,
+                                stringResource(R.string.about_mimir),
+                                onClick = { showAbout = true },
+                                modifier = Modifier.weight(1f, fill = false),
+                            )
+                            FooterLink(
+                                Icons.Outlined.QueryStats,
+                                stringResource(R.string.stats),
+                                onClick = { currentSection = AppSection.Stats },
+                                modifier = Modifier
+                                    .weight(1f, fill = false)
+                                    .then(if (lastToolSection == AppSection.Stats) Modifier.focusRequester(returnFocus) else Modifier),
+                            )
+                        }
                     }
                 },
             ) { innerPadding ->
-                if (tool == null) {
+                if (onStats) {
+                    StatsScreen(uiState.usageStats, contentFocus, Modifier.padding(innerPadding))
+                } else if (tool == null) {
                     HomeScreen(
                         contentFocus = contentFocus,
                         returnSection = lastToolSection,
@@ -396,7 +423,8 @@ private fun legendFor(
 
 @Composable
 private fun HeaderStrip(
-    tool: ToolEntry?,
+    /** The open page's name after the Mimir name, or null on home. */
+    crumb: String?,
     uiState: MimirUiState,
     contentFocus: FocusRequester,
     onHome: () -> Unit,
@@ -419,17 +447,17 @@ private fun HeaderStrip(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            if (tool != null) {
+            if (crumb != null) {
                 IconButton(onClick = onHome, modifier = Modifier.focusRing(CircleShape)) {
                     Icon(Icons.Outlined.Home, contentDescription = stringResource(R.string.go_home), tint = palette.text)
                 }
             }
             MimirMark(Modifier.size(34.dp), contentDescription = stringResource(R.string.app_logo))
             Text(stringResource(R.string.app_name), style = MaterialTheme.typography.titleLarge, color = palette.text, maxLines = 1)
-            if (tool != null) {
+            if (crumb != null) {
                 Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = palette.textMuted)
                 Text(
-                    stringResource(tool.toolName),
+                    crumb,
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,
@@ -760,10 +788,10 @@ private fun ScanResults(
 
 /** The footer link to About Mimir, at the left of the legend bar on home. */
 @Composable
-private fun AboutLink(onClick: () -> Unit) {
+private fun FooterLink(icon: ImageVector, label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val palette = LocalMimirPalette.current
     Row(
-        modifier = Modifier
+        modifier = modifier
             .heightIn(min = 48.dp)
             .clip(RoundedCornerShape(50))
             .focusRing()
@@ -772,7 +800,7 @@ private fun AboutLink(onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Icon(Icons.Outlined.Info, contentDescription = null, tint = palette.textMuted, modifier = Modifier.size(20.dp))
-        Text(stringResource(R.string.about_mimir), style = MaterialTheme.typography.labelLarge, color = palette.text)
+        Icon(icon, contentDescription = null, tint = palette.textMuted, modifier = Modifier.size(20.dp))
+        Text(label, style = MaterialTheme.typography.labelLarge, color = palette.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
