@@ -278,7 +278,7 @@
     <string name="legend_apply_idle">Aplicar</string>
 
     <!-- Memory-card slot names. -->
-    <string name="slot_utilities">Utilidades</string>
+    <string name="slot_utilities">Herramientas</string>
     <string name="slot_space_savers">Ahorro de espacio</string>
 
     <!-- Storage volumes and About. -->

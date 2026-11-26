@@ -125,7 +125,7 @@ private fun ToolBreakdown(stats: UsageStats, contentFocus: FocusRequester) {
         color = palette.text,
         modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
     )
-    spaceSavers.forEachIndexed { index, tool ->
+    sortedByName(spaceSavers).forEachIndexed { index, tool ->
         ToolStatsRow(
             tool = tool,
             stats = stats,

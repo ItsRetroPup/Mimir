@@ -232,7 +232,7 @@
     <string name="legend_apply_idle">应用</string>
 
     <!-- Memory-card slot names. -->
-    <string name="slot_utilities">实用工具</string>
+    <string name="slot_utilities">工具</string>
     <string name="slot_space_savers">节省空间</string>
 
     <!-- Storage volumes and About. -->

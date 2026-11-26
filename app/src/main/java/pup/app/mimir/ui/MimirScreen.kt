@@ -58,6 +58,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.InputMode
@@ -206,7 +207,7 @@ internal fun MimirScreen(
                 bottomBar = {
                     LegendBar(legend) {
                         if (tool == null && !onStats) {
-                            // On a narrow screen the links share what the legend leaves and ellipsize.
+                            // When the links with labels do not fit beside the legend, they show icons only (see LegendBar).
                             FooterLink(
                                 Icons.Outlined.Info,
                                 stringResource(R.string.about_mimir),
@@ -798,21 +799,43 @@ private fun ScanResults(
     }
 }
 
-/** A footer link (About Mimir, Language, Stats), at the left of the legend bar on home. */
+/**
+ * A footer link (About Mimir, Language, Stats), at the left of the legend bar on home. When the
+ * legend bar is short of room ([LegendLeadingMode.Compact]) it shows only its icon, and its label
+ * while the cursor is on it.
+ */
 @Composable
 private fun FooterLink(icon: ImageVector, label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val palette = LocalMimirPalette.current
+    val mode = LocalLegendLeadingMode.current
+    var focused by remember { mutableStateOf(false) }
+    if (mode == LegendLeadingMode.Probe) {
+        // Only measured, never shown or focused: the link's natural size with its label.
+        Row(
+            modifier = Modifier.heightIn(min = 48.dp).padding(horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
+            Text(label, style = MaterialTheme.typography.labelLarge, maxLines = 1)
+        }
+        return
+    }
+    val showLabel = mode == LegendLeadingMode.Full || focused
     Row(
         modifier = modifier
             .heightIn(min = 48.dp)
             .clip(RoundedCornerShape(50))
             .focusRing()
+            .onFocusChanged { focused = it.hasFocus }
             .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Icon(icon, contentDescription = null, tint = palette.textMuted, modifier = Modifier.size(20.dp))
-        Text(label, style = MaterialTheme.typography.labelLarge, color = palette.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Icon(icon, contentDescription = if (showLabel) null else label, tint = palette.textMuted, modifier = Modifier.size(20.dp))
+        if (showLabel) {
+            Text(label, style = MaterialTheme.typography.labelLarge, color = palette.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
     }
 }

@@ -45,6 +45,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -132,6 +135,15 @@ internal data class LegendAction(
     val onClick: (() -> Unit)? = null,
 )
 
+/**
+ * How the links at the left of the legend bar draw. [Full] shows each icon with its label. When
+ * the labels don't all fit, [Compact] shows icons only, plus the label of the link the cursor is on.
+ * [Probe] is an unplaced trial pass that measures how wide the full labels would be.
+ */
+internal enum class LegendLeadingMode { Probe, Full, Compact }
+
+internal val LocalLegendLeadingMode = staticCompositionLocalOf { LegendLeadingMode.Full }
+
 /** The bar along the foot of every screen, like a console's button legend. */
 @Composable
 internal fun LegendBar(
@@ -149,7 +161,25 @@ internal fun LegendBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, content = leading)
+            // Measure the links with full labels first; if they don't fit beside the legend, draw
+            // them compact instead of cutting every label short.
+            SubcomposeLayout(Modifier.weight(1f)) { constraints ->
+                val fullWidth = subcompose(LegendLeadingMode.Probe) {
+                    CompositionLocalProvider(LocalLegendLeadingMode provides LegendLeadingMode.Probe) {
+                        Row(verticalAlignment = Alignment.CenterVertically, content = leading)
+                    }
+                }.maxOfOrNull { it.measure(Constraints()).width } ?: 0
+                val mode = if (fullWidth <= constraints.maxWidth) LegendLeadingMode.Full else LegendLeadingMode.Compact
+                val placeables = subcompose(LegendLeadingMode.Full) {
+                    CompositionLocalProvider(LocalLegendLeadingMode provides mode) {
+                        Row(verticalAlignment = Alignment.CenterVertically, content = leading)
+                    }
+                }.map { it.measure(constraints.copy(minWidth = 0)) }
+                val height = placeables.maxOfOrNull { it.height } ?: 0
+                layout(constraints.maxWidth, height) {
+                    placeables.forEach { it.placeRelative(0, (height - it.height) / 2) }
+                }
+            }
             actions.forEach { LegendItem(it) }
         }
     }

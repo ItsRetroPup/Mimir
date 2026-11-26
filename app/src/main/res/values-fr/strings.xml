@@ -306,7 +306,7 @@
     <string name="legend_apply_idle">Appliquer</string>
 
     <!-- Memory-card slot names. -->
-    <string name="slot_utilities">Utilitaires</string>
+    <string name="slot_utilities">Outils</string>
     <string name="slot_space_savers">Gain de place</string>
 
     <!-- Storage volumes and About. -->
