@@ -303,8 +303,8 @@
     <string name="legend_apply_idle">Zastosuj</string>
 
     <!-- Memory-card slot names. -->
-    <string name="slot_utilities">Gniazdo 1 · Narzędzia</string>
-    <string name="slot_space_savers">Gniazdo 2 · Oszczędzanie miejsca</string>
+    <string name="slot_utilities">Narzędzia</string>
+    <string name="slot_space_savers">Oszczędzanie miejsca</string>
 
     <!-- Storage volumes and About. -->
     <string name="storage_internal">Pamięć wewnętrzna</string>

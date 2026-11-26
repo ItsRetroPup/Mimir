@@ -234,8 +234,8 @@
     <string name="legend_apply_idle">적용</string>
 
     <!-- Memory-card slot names. -->
-    <string name="slot_utilities">슬롯 1 · 유틸리티</string>
-    <string name="slot_space_savers">슬롯 2 · 공간 절약</string>
+    <string name="slot_utilities">도구</string>
+    <string name="slot_space_savers">공간 절약</string>
 
     <!-- Storage volumes and About. -->
     <string name="storage_internal">내부 저장공간</string>
