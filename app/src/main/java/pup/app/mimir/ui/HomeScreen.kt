@@ -33,13 +33,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -146,7 +142,10 @@ internal val spaceSavers = listOf(
 /** The tool shown in [section], or null for the home screen. */
 internal fun toolFor(section: AppSection): ToolEntry? = (utilities + spaceSavers).firstOrNull { it.section == section }
 
-/** Blocks per slot row: room for the fuller slot, so the other slot shows empty blocks to match. */
+/**
+ * Blocks per slot row: room for the fuller slot, so blocks are the same size in both slots. The
+ * shorter slot just ends early; it draws no empty placeholder blocks.
+ */
 private val SLOT_CELLS = maxOf(utilities.size, spaceSavers.size)
 private val SLOT_GAP = 14.dp
 private val SLOT_INNER_GAP = 6.dp
@@ -262,7 +261,6 @@ private fun MemorySlot(
     onOpen: (ToolEntry) -> Unit,
 ) {
     val palette = LocalMimirPalette.current
-    val used = tools.size
     Column(verticalArrangement = Arrangement.spacedBy(SLOT_INNER_GAP)) {
         FittedText(
             title,
@@ -288,7 +286,6 @@ private fun MemorySlot(
                         onClick = { onOpen(tool) },
                     )
                 }
-                repeat(SLOT_CELLS - used) { EmptyCell(column, art) }
             }
         }
     }
@@ -383,25 +380,6 @@ private fun BlockCell(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 2.dp),
-        )
-    }
-}
-
-/** An unused slot cell, drawn as the memory card shows it: a dashed empty frame. */
-@Composable
-private fun EmptyCell(width: Dp, artSize: Dp) {
-    val palette = LocalMimirPalette.current
-    Box(Modifier.width(width), contentAlignment = Alignment.TopCenter) {
-        Box(
-            Modifier
-                .size(artSize)
-                .drawBehind {
-                    drawRoundRect(
-                        palette.gridLine,
-                        cornerRadius = CornerRadius(16.dp.toPx()),
-                        style = Stroke(1.5.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f))),
-                    )
-                },
         )
     }
 }
