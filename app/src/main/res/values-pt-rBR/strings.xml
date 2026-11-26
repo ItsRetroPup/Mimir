@@ -278,8 +278,8 @@
     <string name="legend_apply_idle">Aplicar</string>
 
     <!-- Memory-card slot names. -->
-    <string name="slot_utilities">Slot 1 · Utilitários</string>
-    <string name="slot_space_savers">Slot 2 · Economia de espaço</string>
+    <string name="slot_utilities">Ferramentas</string>
+    <string name="slot_space_savers">Economia de espaço</string>
 
     <!-- Storage volumes and About. -->
     <string name="storage_internal">Armazenamento interno</string>
