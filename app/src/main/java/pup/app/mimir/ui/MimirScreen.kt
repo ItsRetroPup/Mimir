@@ -32,6 +32,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.Gavel
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.Info
@@ -156,9 +157,15 @@ internal fun MimirScreen(
     }
 
     val tool = toolFor(currentSection)
-    val onStats = currentSection == AppSection.Stats
+    // Stats and Licenses are pages opened from the footer: no tool, just a title and Back.
+    val pageTitle = when (currentSection) {
+        AppSection.Stats -> R.string.stats
+        AppSection.Licenses -> R.string.licenses
+        else -> null
+    }
+    val onPage = pageTitle != null
     val ink = tool?.ink?.resolve(palette) ?: palette.edge
-    val legend = if (onStats) {
+    val legend = if (onPage) {
         listOf(LegendAction("B", stringResource(R.string.legend_back), onClick = goHome))
     } else legendFor(
         tool = tool,
@@ -197,7 +204,7 @@ internal fun MimirScreen(
                     HeaderStrip(
                         crumb = when {
                             tool != null -> stringResource(tool.toolName)
-                            onStats -> stringResource(R.string.stats)
+                            pageTitle != null -> stringResource(pageTitle)
                             else -> null
                         },
                         uiState = uiState,
@@ -208,7 +215,7 @@ internal fun MimirScreen(
                 },
                 bottomBar = {
                     LegendBar(legend) {
-                        if (tool == null && !onStats) {
+                        if (tool == null && !onPage) {
                             // Each link takes its natural width. When they don't all fit beside the legend with their
                             // labels, they show icons only (see LegendBar). They don't share the space by weight,
                             // which would cut long labels short even when there is room overall.
@@ -228,12 +235,20 @@ internal fun MimirScreen(
                                 onClick = { currentSection = AppSection.Stats },
                                 modifier = if (lastToolSection == AppSection.Stats) Modifier.focusRequester(returnFocus) else Modifier,
                             )
+                            FooterLink(
+                                Icons.Outlined.Gavel,
+                                stringResource(R.string.licenses),
+                                onClick = { currentSection = AppSection.Licenses },
+                                modifier = if (lastToolSection == AppSection.Licenses) Modifier.focusRequester(returnFocus) else Modifier,
+                            )
                         }
                     }
                 },
             ) { innerPadding ->
-                if (onStats) {
+                if (currentSection == AppSection.Stats) {
                     StatsScreen(uiState.usageStats, contentFocus, Modifier.padding(innerPadding))
+                } else if (currentSection == AppSection.Licenses) {
+                    LicensesScreen(contentFocus, onOpenUrl = openUrl, modifier = Modifier.padding(innerPadding))
                 } else if (tool == null) {
                     HomeScreen(
                         contentFocus = contentFocus,
@@ -808,7 +823,7 @@ private fun ScanResults(
 }
 
 /**
- * A footer link (About Mimir, Language, Stats), at the left of the legend bar on home. When the
+ * A footer link (About Mimir, Language, Stats, Licenses), at the left of the legend bar on home. When the
  * legend bar is short of room ([LegendLeadingMode.Compact]) it shows only its icon, and its label
  * while the cursor is on it.
  */

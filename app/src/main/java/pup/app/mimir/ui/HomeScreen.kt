@@ -71,6 +71,7 @@ internal enum class AppSection {
     Vita,
     Patcher,
     Stats,
+    Licenses,
 }
 
 internal data class ToolEntry(
