@@ -38,6 +38,7 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.PhoneAndroid
 import androidx.compose.material.icons.outlined.QueryStats
 import androidx.compose.material.icons.outlined.SdCard
+import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -126,6 +127,7 @@ internal fun MimirScreen(
     var pendingVitaAdd by remember { mutableStateOf<VitaApp?>(null) }
     var pendingVitaRemove by remember { mutableStateOf<VitaApp?>(null) }
     var showAbout by rememberSaveable { mutableStateOf(false) }
+    var showLanguage by rememberSaveable { mutableStateOf(false) }
     var queueSortOption by rememberSaveable { mutableStateOf(QueueSortOption.NameAscending.name) }
     val openUrl: (String) -> Unit = { url ->
         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
@@ -209,6 +211,12 @@ internal fun MimirScreen(
                                 Icons.Outlined.Info,
                                 stringResource(R.string.about_mimir),
                                 onClick = { showAbout = true },
+                                modifier = Modifier.weight(1f, fill = false),
+                            )
+                            FooterLink(
+                                Icons.Outlined.Translate,
+                                stringResource(R.string.language),
+                                onClick = { showLanguage = true },
                                 modifier = Modifier.weight(1f, fill = false),
                             )
                             FooterLink(
@@ -329,6 +337,10 @@ internal fun MimirScreen(
 
         if (showAbout) {
             AboutDialog(onOpenUrl = openUrl, onDismiss = { showAbout = false })
+        }
+
+        if (showLanguage) {
+            LanguageDialog(onDismiss = { showLanguage = false })
         }
 
         pendingVitaRemove?.let { app ->
@@ -786,7 +798,7 @@ private fun ScanResults(
     }
 }
 
-/** The footer link to About Mimir, at the left of the legend bar on home. */
+/** A footer link (About Mimir, Language, Stats), at the left of the legend bar on home. */
 @Composable
 private fun FooterLink(icon: ImageVector, label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val palette = LocalMimirPalette.current

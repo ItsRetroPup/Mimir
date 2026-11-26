@@ -13,11 +13,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -42,11 +40,12 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import pup.app.mimir.R
@@ -143,9 +142,10 @@ internal fun toolFor(section: AppSection): ToolEntry? = (utilities + spaceSavers
 
 private const val SLOT_CELLS = 5
 private val SLOT_GAP = 14.dp
-private val SLOT_TITLE = 24.dp
 private val SLOT_INNER_GAP = 6.dp
-private val BLOCK_LABEL = 36.dp
+private val BLOCK_LABEL_GAP = 4.dp
+private val MIN_BLOCK_ART = 40.dp
+private val FORMAT_LABEL_MIN = 64.dp
 
 /**
  * Home as a memory card manager: two slots of save blocks on the left, and on the right the info
@@ -161,6 +161,12 @@ internal fun HomeScreen(
 ) {
     var focusedSection by rememberSaveable { mutableStateOf<AppSection?>(null) }
     val focusedTool = focusedSection?.let(::toolFor)
+    // Room for a slot title and two lines of block name at the current font scale, so a larger
+    // system font shrinks the blocks instead of clipping the names.
+    val typography = MaterialTheme.typography
+    val density = LocalDensity.current
+    val slotTitleHeight = with(density) { typography.titleLarge.lineHeight.toDp() }
+    val blockLabelHeight = with(density) { (typography.labelMedium.lineHeight * 2).toDp() } + BLOCK_LABEL_GAP
     BoxWithConstraints(modifier.fillMaxSize()) {
         val wide = maxWidth >= 600.dp
         val slots: @Composable (Modifier, Dp) -> Unit = { slotModifier, cellMax ->
@@ -212,7 +218,8 @@ internal fun HomeScreen(
                         .fillMaxHeight(),
                 ) {
                     // Both slots fit the screen without scrolling: size cells from the height too.
-                    val byHeight = (maxHeight - SLOT_GAP - (SLOT_TITLE + SLOT_INNER_GAP + BLOCK_LABEL) * 2) / 2
+                    val byHeight = ((maxHeight - SLOT_GAP - (slotTitleHeight + SLOT_INNER_GAP + blockLabelHeight) * 2) / 2)
+                        .coerceAtLeast(MIN_BLOCK_ART)
                     slots(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), byHeight)
                 }
                 info(
@@ -250,29 +257,31 @@ private fun MemorySlot(
     val palette = LocalMimirPalette.current
     val used = tools.size
     Column(verticalArrangement = Arrangement.spacedBy(SLOT_INNER_GAP)) {
-        Text(
+        FittedText(
             title,
             style = MaterialTheme.typography.titleLarge,
             color = palette.text,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.height(SLOT_TITLE),
+            minScale = 0.75f,
         )
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             val gap = 10.dp
-            val cell = minOf((maxWidth - gap * (SLOT_CELLS - 1)) / SLOT_CELLS, cellMax)
+            // Each block owns a fifth of the row, so its name has the full column even when the
+            // art is kept small to fit the screen height.
+            val column = (maxWidth - gap * (SLOT_CELLS - 1)) / SLOT_CELLS
+            val art = minOf(column, cellMax)
             Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
                 tools.forEach { tool ->
                     SaveBlock(
                         tool = tool,
-                        size = cell,
+                        width = column,
+                        artSize = art,
                         selected = focusedSection == tool.section,
                         modifier = if (tool.section == returnSection) Modifier.focusRequester(returnFocus) else Modifier,
                         onFocus = { onFocus(tool.section) },
                         onClick = { onOpen(tool) },
                     )
                 }
-                repeat(SLOT_CELLS - used) { EmptyCell(cell) }
+                repeat(SLOT_CELLS - used) { EmptyCell(column, art) }
             }
         }
     }
@@ -282,7 +291,8 @@ private fun MemorySlot(
 @Composable
 private fun SaveBlock(
     tool: ToolEntry,
-    size: Dp,
+    width: Dp,
+    artSize: Dp,
     selected: Boolean,
     onFocus: () -> Unit,
     onClick: () -> Unit,
@@ -293,7 +303,8 @@ private fun SaveBlock(
     var focused by remember { mutableStateOf(false) }
     val name = stringResource(tool.toolName)
     BlockCell(
-        size = size,
+        width = width,
+        artSize = artSize,
         label = name,
         ink = ink,
         focused = focused,
@@ -311,7 +322,8 @@ private fun SaveBlock(
 
 @Composable
 private fun BlockCell(
-    size: Dp,
+    width: Dp,
+    artSize: Dp,
     label: String,
     ink: Color,
     focused: Boolean,
@@ -325,7 +337,7 @@ private fun BlockCell(
     val shape = RoundedCornerShape(16.dp)
     Column(
         modifier = modifier
-            .width(size)
+            .width(width)
             .clip(shape)
             .clickable(
                 interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
@@ -335,12 +347,11 @@ private fun BlockCell(
                 onClick = onClick,
             ),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(BLOCK_LABEL_GAP),
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
+                .size(artSize)
                 .clip(shape)
                 .background(if (focused) ink.copy(alpha = 0.16f) else palette.panel)
                 .border(
@@ -355,35 +366,37 @@ private fun BlockCell(
                 .padding(6.dp),
             contentAlignment = Alignment.Center,
         ) { art() }
-        Text(
+        FittedText(
             label,
             style = MaterialTheme.typography.labelMedium,
             color = if (focused) palette.text else palette.textMuted,
             textAlign = TextAlign.Center,
             maxLines = 2,
             minLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(horizontal = 2.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 2.dp),
         )
     }
 }
 
 /** An unused slot cell, drawn as the memory card shows it: a dashed empty frame. */
 @Composable
-private fun EmptyCell(size: Dp) {
+private fun EmptyCell(width: Dp, artSize: Dp) {
     val palette = LocalMimirPalette.current
-    Box(
-        Modifier
-            .width(size)
-            .aspectRatio(1f)
-            .drawBehind {
-                drawRoundRect(
-                    palette.gridLine,
-                    cornerRadius = CornerRadius(16.dp.toPx()),
-                    style = Stroke(1.5.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f))),
-                )
-            },
-    )
+    Box(Modifier.width(width), contentAlignment = Alignment.TopCenter) {
+        Box(
+            Modifier
+                .size(artSize)
+                .drawBehind {
+                    drawRoundRect(
+                        palette.gridLine,
+                        cornerRadius = CornerRadius(16.dp.toPx()),
+                        style = Stroke(1.5.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f))),
+                    )
+                },
+        )
+    }
 }
 
 @Composable
@@ -393,17 +406,32 @@ private fun ToolInfoPanel(tool: ToolEntry, modifier: Modifier, fillHeight: Boole
     ConsolePanel(modifier, accent = ink, contentPadding = PaddingValues(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             SaveBlockArt(tool.art, ink, hole = palette.panel, modifier = Modifier.size(52.dp))
-            Text(
+            FittedText(
                 stringResource(tool.toolName),
                 style = MaterialTheme.typography.headlineLarge,
                 color = palette.text,
+                maxLines = 2,
+                minScale = 0.6f,
                 modifier = Modifier.weight(1f),
             )
         }
         Text(stringResource(tool.description), style = MaterialTheme.typography.bodyMedium, color = palette.textMuted)
         PanelRule()
-        FormatRow(stringResource(R.string.info_reads), tool.reads, palette.text)
-        FormatRow(stringResource(R.string.info_writes), tool.writes, ink)
+        // Both labels share one width, wide enough for the longer translation, so the values line up.
+        val readsLabel = stringResource(R.string.info_reads)
+        val writesLabel = stringResource(R.string.info_writes)
+        val labelStyle = MaterialTheme.typography.labelLarge
+        val measurer = rememberTextMeasurer()
+        val density = LocalDensity.current
+        val labelWidth = remember(readsLabel, writesLabel, labelStyle, density) {
+            val widest = maxOf(
+                measurer.measure(readsLabel, labelStyle, softWrap = false).size.width,
+                measurer.measure(writesLabel, labelStyle, softWrap = false).size.width,
+            )
+            maxOf(FORMAT_LABEL_MIN, with(density) { widest.toDp() })
+        }
+        FormatRow(readsLabel, tool.reads, palette.text, labelWidth)
+        FormatRow(writesLabel, tool.writes, ink, labelWidth)
         if (fillHeight) Spacer(Modifier.weight(1f))
         // The enter prompt: what pressing A on this block will do.
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -414,10 +442,10 @@ private fun ToolInfoPanel(tool: ToolEntry, modifier: Modifier, fillHeight: Boole
 }
 
 @Composable
-private fun FormatRow(label: String, value: String, valueColor: Color) {
+private fun FormatRow(label: String, value: String, valueColor: Color, labelWidth: Dp) {
     val palette = LocalMimirPalette.current
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(label, style = MaterialTheme.typography.labelLarge, color = palette.textMuted, modifier = Modifier.width(64.dp))
+        Text(label, style = MaterialTheme.typography.labelLarge, color = palette.textMuted, maxLines = 1, modifier = Modifier.width(labelWidth))
         Text(value, style = MaterialTheme.typography.titleMedium, color = valueColor)
     }
 }

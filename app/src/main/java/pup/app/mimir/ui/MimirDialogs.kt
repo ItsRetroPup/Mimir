@@ -18,7 +18,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.RadioButton
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -249,5 +256,53 @@ private fun SupportLink(label: String, icon: ImageVector, onClick: () -> Unit) {
         Icon(imageVector = icon, contentDescription = null)
         Spacer(Modifier.size(10.dp))
         Text(label, maxLines = 1, style = MaterialTheme.typography.labelLarge)
+    }
+}
+
+/** Picks Mimir's language, opened from the footer link on home. Each language is named in itself. */
+@Composable
+internal fun LanguageDialog(onDismiss: () -> Unit) {
+    val chosen = chosenLanguageTag()
+    // A stored tag outside the list (from an older build or system settings) counts as "system".
+    val selected = chosen?.takeIf { tag -> appLanguages.any { it.tag.equals(tag, ignoreCase = true) } }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.language)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                LanguageOption(stringResource(R.string.language_system), selected == null) {
+                    onDismiss()
+                    if (chosen != null) chooseLanguage(null)
+                }
+                appLanguages.forEach { language ->
+                    val isSelected = language.tag.equals(selected, ignoreCase = true)
+                    LanguageOption(language.nativeName, isSelected) {
+                        onDismiss()
+                        if (!isSelected) chooseLanguage(language.tag)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            OutlinedButton(onClick = onDismiss, modifier = Modifier.focusRing()) { Text(stringResource(R.string.action_close)) }
+        },
+    )
+}
+
+@Composable
+private fun LanguageOption(label: String, selected: Boolean, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .focusRing(RoundedCornerShape(12.dp))
+            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+            .padding(horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        RadioButton(selected = selected, onClick = null)
+        Text(label, style = MaterialTheme.typography.bodyLarge)
     }
 }

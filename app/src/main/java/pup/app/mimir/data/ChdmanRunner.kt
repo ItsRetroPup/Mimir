@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.format.Formatter
 import androidx.documentfile.provider.DocumentFile
 import pup.app.mimir.R
+import pup.app.mimir.ui.inAppLanguage
 import pup.app.mimir.domain.FileOperation
 import pup.app.mimir.domain.RelativePaths
 import java.io.File
@@ -115,7 +116,7 @@ class ChdmanRunner(private val context: Context) {
         val needed = inputBytes * 2
         val free = context.cacheDir.usableSpace
         require(free >= needed) {
-            context.getString(
+            context.inAppLanguage().getString(
                 R.string.msg_chd_cache_space,
                 sourceName,
                 Formatter.formatShortFileSize(context, needed),

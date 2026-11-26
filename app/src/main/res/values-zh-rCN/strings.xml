@@ -201,6 +201,8 @@
 
     <!-- Memory-card shell: home, legend bar and empty states. -->
     <string name="about_mimir">关于 Mimir</string>
+    <string name="language">语言</string>
+    <string name="language_system">跟随系统</string>
     <string name="info_reads">读取</string>
     <string name="info_writes">写入</string>
     <string name="legend_open">打开</string>
