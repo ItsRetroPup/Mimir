@@ -8,4 +8,4 @@ local.properties
 *.jks
 keystore.properties
 DESIGN/
-*.DS_Store
+*.DS_Store__pycache__/

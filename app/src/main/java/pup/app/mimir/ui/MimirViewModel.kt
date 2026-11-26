@@ -675,7 +675,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                     return
                 }
                 if (mode == ToolMode.Converter &&
-                    currentState.selectedConverterTool == ConverterTool.NszNsp &&
+                    currentState.selectedConverterTool.needsProdKeys &&
                     !currentState.nszKeysConfigured
                 ) {
                     _uiState.update { it.copy(message = info(R.string.msg_import_keys_first)) }

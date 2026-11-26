@@ -403,7 +403,7 @@ private fun legendFor(
                 )
             }
             else -> {
-                val keysReady = tool.converter != ConverterTool.NszNsp || uiState.nszKeysConfigured
+                val keysReady = tool.converter?.needsProdKeys != true || uiState.nszKeysConfigured
                 add(
                     LegendAction(
                         "X",
@@ -613,7 +613,7 @@ private fun ToolScreen(
                             onSystemSelected = onChdSystemSelected,
                             onDiscTypeSelected = onChdDiscTypeSelected,
                         )
-                        AppSection.Nsz -> NszKeysRow(configured = uiState.nszKeysConfigured, enabled = idle, onSelect = onSelectNszKeys)
+                        AppSection.Nsz, AppSection.NspNsz -> NszKeysRow(configured = uiState.nszKeysConfigured, enabled = idle, onSelect = onSelectNszKeys)
                         else -> Unit
                     }
                 }
