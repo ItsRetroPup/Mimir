@@ -34,6 +34,8 @@ your game library right on the device. Every tool shows you what it will change 
 - **Azahar ZCCI:** compresses decrypted 3DS games to `.zcci`, which Azahar plays directly.
 - **Xbox XISO:** trims the unused video partition and padding from Redump Xbox `.iso` files for xemu
   and Hakux.
+- **NSP to NSZ:** compresses Switch `.nsp` packages into `.nsz`, which Switch emulators install
+  directly. Needs your own `prod.keys`.
 
 **Stats** shows how much space the space savers have freed and how many games they've compressed.
 
@@ -160,7 +162,20 @@ kept after a successful conversion. NSZ requires a user-provided `prod.keys` fil
 storage so it remains available after restarts and does not depend on the original document
 location.
 
-The converter runs entirely on-device. Mimir does not bundle or download Nintendo keys or game
+#### NSP to NSZ
+
+Mimir can also compress Nintendo Switch `.nsp` packages to `.nsz`, using the same NSZ 5.0.0 package
+and the same imported `prod.keys`. It uses NSZ's block compression (`nsz -B`: Zstandard level 18
+in 1 MiB blocks) and drops update delta fragments, as NSZ does by default. Block NSZ files can be
+read in place, so emulators such as Eden list and run them without installing them first. NSZ's
+own block compressor uses child processes, which Android apps cannot start, so Mimir runs the same
+algorithm on a thread pool; the files it writes are byte-for-byte what `nsz -B` writes. After compressing, Mimir runs
+NSZ's quick verify, which decompresses the new file in memory and checks every NCA hash; a file that
+fails is deleted and reported. Select a folder containing `.nsp` files directly or in a `switch` /
+`nintendo switch` subfolder. Source `.nsp` files are kept. Like NSZ to NSP, the package is copied to
+internal storage while it is compressed, so allow free space there of about twice the package's size.
+
+Both Switch converters run entirely on-device. Mimir does not bundle or download Nintendo keys or game
 content. Only use it with keys and content you are legally entitled to use.
 ### PS Vita Shortcuts
 Mimir includes a built-in searchable PS Vita shortcut database.
@@ -185,8 +200,8 @@ needed. UPS and BPS checksums are verified, so a damaged patch or one made for a
 is reported instead of written. The original ROM is never changed.
 
 ### Stats
-The Stats link on the home screen shows lifetime totals for the five space savers (RomZipper,
-CHDMan, Dolphin RVZ, Azahar ZCCI and Xbox XISO): space saved, games compressed, and a breakdown per
+The Stats link on the home screen shows lifetime totals for the six space savers (RomZipper,
+CHDMan, Dolphin RVZ, Azahar ZCCI, Xbox XISO and NSP to NSZ): space saved, games compressed, and a breakdown per
 tool. Totals are kept on the device across restarts and updates, and counting starts the first time
 Mimir 1.0 runs.
 

@@ -47,6 +47,7 @@ class UsageStatsTest {
         assertTrue(UsageStats.savesSpace(ToolMode.Converter, ConverterTool.Chd))
         assertTrue(UsageStats.savesSpace(ToolMode.Converter, ConverterTool.XboxXiso))
         assertFalse(UsageStats.savesSpace(ToolMode.Converter, ConverterTool.NszNsp))
+        assertTrue(UsageStats.savesSpace(ToolMode.Converter, ConverterTool.NspNsz))
         assertFalse(UsageStats.savesSpace(ToolMode.MultiDiscOrganizer, null))
     }
 

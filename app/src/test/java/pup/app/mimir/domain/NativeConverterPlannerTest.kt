@@ -58,6 +58,31 @@ class NativeConverterPlannerTest {
     }
 
     @Test
+    fun buildsNszTargetsFromNspPackagesAndFlagsExistingNsz() {
+        val plan = NativeConverterPlanner.buildPlan(
+            entries = listOf(
+                RomEntry("switch/Game.nsp", "Game.nsp", sizeBytes = 4096L),
+                RomEntry("switch/Game.nsz", "Game.nsz"),
+                RomEntry("switch/Dlc.NSP", "Dlc.NSP", sizeBytes = 256L),
+                RomEntry("switch/Cart.xci", "Cart.xci"),
+            ),
+            tool = ConverterTool.NspNsz,
+        )
+
+        assertEquals(listOf("switch/Dlc.nsz", "switch/Game.nsz"), plan.changes.map { it.detailPath })
+        assertEquals(listOf(false, true), plan.changes.map { it.targetAlreadyExists })
+        assertTrue(plan.operations.all { (it as FileOperation.ConvertWithTool).tool == ConverterTool.NspNsz })
+    }
+
+    @Test
+    fun bothSwitchConvertersNeedProdKeys() {
+        assertTrue(ConverterTool.NszNsp.needsProdKeys)
+        assertTrue(ConverterTool.NspNsz.needsProdKeys)
+        assertFalse(ConverterTool.DolphinRvz.needsProdKeys)
+        assertFalse(ConverterTool.NspNsz.replacesSource)
+    }
+
+    @Test
     fun xisoReplacesSourceWithoutMarkingItAsAnOverwrite() {
         val plan = NativeConverterPlanner.buildPlan(
             entries = listOf(

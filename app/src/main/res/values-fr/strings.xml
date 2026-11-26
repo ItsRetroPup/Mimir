@@ -33,6 +33,9 @@
     <string name="goal_shrink_xbox">Réduire les jeux Xbox</string>
     <string name="tool_xbox_xiso">Xbox XISO</string>
     <string name="tool_xbox_xiso_description">Supprime la partition vidéo inutilisée et le remplissage des fichiers .iso Xbox Redump. Le XISO réduit remplace l’original et fonctionne dans xemu et Hakux.</string>
+    <string name="goal_shrink_switch">Réduire les jeux Switch</string>
+    <string name="tool_nsp_to_nsz">NSP vers NSZ</string>
+    <string name="tool_nsp_to_nsz_description">Compresse les paquets .nsp de la Switch en .nsz, qu’Eden, Citron et d’autres émulateurs Switch installent directement. Chaque NSZ est vérifié après la compression. Nécessite votre propre fichier prod.keys. Vos fichiers .nsp sont conservés.</string>
     <string name="goal_patch_rom">Patcher une ROM</string>
     <string name="tool_rom_patcher">Patcheur de ROM</string>
     <string name="tool_rom_patcher_description">Applique un patch IPS, UPS ou BPS à une ROM, comme une traduction, un romhack ou un correctif, et enregistre la copie patchée dans le même dossier que la ROM. La ROM d’origine reste intacte.</string>
