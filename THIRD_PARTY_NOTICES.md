@@ -1,5 +1,9 @@
 # Third-party notices
 
+Mimir shows these notices in the app under **Licenses** in the home screen footer
+(`app/src/main/java/pup/app/mimir/ui/LicensesScreen.kt`). Keep that list and this file in step when
+a tool or dependency is added.
+
 ## MAME CHDMan
 
 This app includes an Android ARM64 build of CHDMan from the MAME project.
@@ -49,9 +53,23 @@ This app uses NSZ 5.0.0 to decompress NSZ packages to NSP.
 - Source: https://github.com/nicoboss/nsz
 - License: MIT; the license text is included at `app/src/main/assets/licenses/NSZ-MIT.txt`.
 
-NSZ is run using the MIT-licensed Chaquopy Python runtime and its packaged Python dependencies,
-including `zstandard`, `pycryptodome`, and `enlighten`. Their package metadata and license notices
-are supplied by their respective distributions.
+NSZ is run using the Chaquopy Python runtime and these Python packages, installed by pip at build
+time. Their license texts are included in `app/src/main/assets/licenses/`.
+
+| Component | Version | License | License file |
+| --- | --- | --- | --- |
+| [Chaquopy](https://github.com/chaquo/chaquopy) | 17.0.0 | MIT | `Chaquopy-MIT.txt` |
+| [Python](https://github.com/python/cpython) | 3.13 | PSF-2.0 | `Python-PSF-2.0.txt` |
+| [python-zstandard](https://github.com/indygreg/python-zstandard) (bundles Zstandard) | 0.23.0 | BSD-3-Clause | `zstandard-BSD-3-Clause.txt` |
+| [PyCryptodome](https://github.com/Legrandin/pycryptodome) | 3.21.0 | BSD-2-Clause and public domain | `PyCryptodome-BSD-2-Clause.txt` |
+| [Enlighten](https://github.com/Rockhopper-Technologies/enlighten) | resolved by pip | MPL-2.0 | `Enlighten-MPL-2.0.txt` |
+| [Prefixed](https://github.com/Rockhopper-Technologies/prefixed) | resolved by pip | MPL-2.0 | `Prefixed-MPL-2.0.txt` |
+| [Jinxed](https://github.com/Rockhopper-Technologies/jinxed) | resolved by pip | MPL-2.0 (terminfo data: ncurses MIT-style) | `Jinxed-MPL-2.0.txt` |
+| [Blessed](https://github.com/jquast/blessed) | resolved by pip | MIT | `Blessed-MIT.txt` |
+| [wcwidth](https://github.com/jquast/wcwidth) | resolved by pip | MIT | `wcwidth-MIT.txt` |
+
+The MPL-2.0 packages are distributed unmodified; their source code is available from the linked
+repositories and from PyPI.
 
 ## ES-DE Android custom systems
 
@@ -72,3 +90,17 @@ variable-weight build from the Google Fonts repository).
 - Copyright 2015 The Rubik Project Authors
 - License: SIL Open Font License 1.1; the license text is included at
   `app/src/main/assets/licenses/Rubik-OFL-1.1.txt`.
+
+## Android and Kotlin libraries
+
+The app is built with AndroidX (including Jetpack Compose), Material Components for Android, the
+Kotlin standard library and kotlinx.coroutines.
+
+- Sources: https://github.com/androidx/androidx, https://github.com/material-components/material-components-android,
+  https://github.com/JetBrains/kotlin, https://github.com/Kotlin/kotlinx.coroutines
+- License: Apache-2.0; the license text is included at `app/src/main/assets/licenses/Apache-2.0.txt`.
+
+## Mimir
+
+Mimir itself is MIT-licensed. The license text is in `LICENSE` and is shown in the app from
+`app/src/main/assets/licenses/Mimir-MIT.txt`.

@@ -32,6 +32,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.Gavel
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.Info
@@ -154,9 +155,15 @@ internal fun MimirScreen(
     }
 
     val tool = toolFor(currentSection)
-    val onStats = currentSection == AppSection.Stats
+    // Stats and Licenses are pages opened from the footer: no tool, just a title and Back.
+    val pageTitle = when (currentSection) {
+        AppSection.Stats -> R.string.stats
+        AppSection.Licenses -> R.string.licenses
+        else -> null
+    }
+    val onPage = pageTitle != null
     val ink = tool?.ink?.resolve(palette) ?: palette.edge
-    val legend = if (onStats) {
+    val legend = if (onPage) {
         listOf(LegendAction("B", stringResource(R.string.legend_back), onClick = goHome))
     } else legendFor(
         tool = tool,
@@ -194,7 +201,7 @@ internal fun MimirScreen(
                     HeaderStrip(
                         crumb = when {
                             tool != null -> stringResource(tool.toolName)
-                            onStats -> stringResource(R.string.stats)
+                            pageTitle != null -> stringResource(pageTitle)
                             else -> null
                         },
                         uiState = uiState,
@@ -205,7 +212,7 @@ internal fun MimirScreen(
                 },
                 bottomBar = {
                     LegendBar(legend) {
-                        if (tool == null && !onStats) {
+                        if (tool == null && !onPage) {
                             // On a narrow screen the links share what the legend leaves and ellipsize.
                             FooterLink(
                                 Icons.Outlined.Info,
@@ -227,12 +234,22 @@ internal fun MimirScreen(
                                     .weight(1f, fill = false)
                                     .then(if (lastToolSection == AppSection.Stats) Modifier.focusRequester(returnFocus) else Modifier),
                             )
+                            FooterLink(
+                                Icons.Outlined.Gavel,
+                                stringResource(R.string.licenses),
+                                onClick = { currentSection = AppSection.Licenses },
+                                modifier = Modifier
+                                    .weight(1f, fill = false)
+                                    .then(if (lastToolSection == AppSection.Licenses) Modifier.focusRequester(returnFocus) else Modifier),
+                            )
                         }
                     }
                 },
             ) { innerPadding ->
-                if (onStats) {
+                if (currentSection == AppSection.Stats) {
                     StatsScreen(uiState.usageStats, contentFocus, Modifier.padding(innerPadding))
+                } else if (currentSection == AppSection.Licenses) {
+                    LicensesScreen(contentFocus, onOpenUrl = openUrl, modifier = Modifier.padding(innerPadding))
                 } else if (tool == null) {
                     HomeScreen(
                         contentFocus = contentFocus,
@@ -798,7 +815,7 @@ private fun ScanResults(
     }
 }
 
-/** A footer link (About Mimir, Language, Stats), at the left of the legend bar on home. */
+/** A footer link (About Mimir, Language, Stats, Licenses), at the left of the legend bar on home. */
 @Composable
 private fun FooterLink(icon: ImageVector, label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val palette = LocalMimirPalette.current

@@ -363,4 +363,15 @@
         <item quantity="other">%1$d jeux</item>
     </plurals>
     <string name="msg_chd_cache_space">Espace insuffisant pour convertir %1$s. CHDMan travaille sur une copie dans le stockage interne et a besoin d’environ %2$s d’espace libre, mais seuls %3$s sont disponibles.</string>
+
+    <!-- Licenses. Component names and license identifiers stay untranslated. -->
+    <string name="licenses">Licences</string>
+    <string name="licenses_intro">Mimir est construit avec ces outils, bibliothèques et polices open source. Sélectionnez-en un pour lire sa licence et trouver son code source.</string>
+    <string name="licenses_used_by">Utilisé par %1$s</string>
+    <string name="licenses_used_throughout">Utilisé dans tout Mimir</string>
+    <string name="licenses_this_app">Cette application</string>
+    <string name="licenses_upstream_terms">Conditions du projet</string>
+    <string name="licenses_upstream_body">Mimir télécharge ces fichiers lorsque vous utilisez l’outil. Ils restent soumis aux conditions du projet d’origine.</string>
+    <string name="licenses_revision">Révision source %1$s</string>
+    <string name="action_view_source">Voir la source</string>
 </resources>
