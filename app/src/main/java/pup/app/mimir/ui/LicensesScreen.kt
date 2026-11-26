@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -51,6 +52,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -410,6 +412,12 @@ private fun LicenseDialog(entry: LicenseEntry, onOpenUrl: (String) -> Unit, onDi
     }
     AlertDialog(
         onDismissRequest = onDismiss,
+        // License files are hard-wrapped at about 80 characters. The standard dialog is too narrow
+        // for that, so lines wrapped twice; this one is wide enough to show them as written.
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        modifier = Modifier
+            .fillMaxWidth(0.94f)
+            .widthIn(max = 760.dp),
         title = { Text(listOfNotNull(entry.name, entry.version).joinToString(" ")) },
         text = {
             Column(
@@ -419,7 +427,9 @@ private fun LicenseDialog(entry: LicenseEntry, onOpenUrl: (String) -> Unit, onDi
                     .then(dpadScroll)
                     .focusRequester(textFocus)
                     .focusable()
-                    .verticalScroll(scroll),
+                    .verticalScroll(scroll)
+                    // Keeps the text clear of the focus ring drawn around this box.
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(useLabel(entry.use), style = MaterialTheme.typography.bodyMedium, color = palette.textMuted)
