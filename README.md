@@ -8,13 +8,6 @@
 
 # Mimir
 
-The Flutter rebuild is under [`flutter/`](flutter/BUILD.md), alongside the original
-Android application. It contains shared tool logic and an adaptive workspace for
-Android and desktops. Native build validation and desktop converter bundles are
-still required before releasing it as a replacement.
-
-## Original Android Companion
-
 Mimir is an open source Android toolkit for retro handheld owners. It tidies, converts and shrinks
 your game library right on the device. Every tool shows you what it will change before it writes anything.
 
