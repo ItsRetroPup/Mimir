@@ -96,7 +96,13 @@ class NativeConverterRunner(private val context: Context) {
             val expectedOutput = File(workspace, File(operation.targetPath).name)
             val keysFile = File(context.filesDir, "nsz/prod.keys")
             require(keysFile.isFile && keysFile.length() > 0L) {
-                "Import a prod.keys file before converting NSZ packages."
+                "Import a prod.keys file before converting Switch packages."
+            }
+            // Both directions share this staging and key handling; only the Python entry point differs.
+            val pythonFunction = when (operation.tool) {
+                ConverterTool.NszNsp -> "decompress_nsz"
+                ConverterTool.NspNsz -> "compress_nsp"
+                else -> error("${operation.tool.displayName} does not run in the embedded Python runtime.")
             }
             val callback = NszConversionCallback(cancellation, onProgress)
             if (!Python.isStarted()) {
@@ -106,7 +112,7 @@ class NativeConverterRunner(private val context: Context) {
                 Python.getInstance()
                     .getModule("mimir_nsz")
                     .callAttr(
-                        "decompress_nsz",
+                        pythonFunction,
                         stagedSource.absolutePath,
                         expectedOutput.absolutePath,
                         keysFile.absolutePath,
@@ -122,7 +128,7 @@ class NativeConverterRunner(private val context: Context) {
             require(expectedOutput.isFile) {
                 "NSZ failed to convert ${operation.sourcePath}."
             }
-            val retainedOutput = File(context.cacheDir, "converter-output-${UUID.randomUUID()}.nsp")
+            val retainedOutput = File(context.cacheDir, "converter-output-${UUID.randomUUID()}.${operation.tool.outputExtension}")
             expectedOutput.copyTo(retainedOutput, overwrite = true)
             Log.i(
                 TAG,
@@ -149,7 +155,7 @@ class NativeConverterRunner(private val context: Context) {
         ConverterTool.AzaharZcci -> listOf(
             executable.absolutePath, "-c", source.absolutePath, "-o", workspace.absolutePath,
         )
-        ConverterTool.Chd, ConverterTool.NszNsp, ConverterTool.XboxXiso ->
+        ConverterTool.Chd, ConverterTool.NszNsp, ConverterTool.NspNsz, ConverterTool.XboxXiso ->
             error("${tool.displayName} is not run through NativeConverterRunner's command line.")
     }
 

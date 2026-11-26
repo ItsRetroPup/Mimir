@@ -61,6 +61,7 @@ internal enum class AppSection {
     Rvz,
     Zcci,
     Nsz,
+    NspNsz,
     Xiso,
     Vita,
     Patcher,
@@ -135,12 +136,18 @@ internal val spaceSavers = listOf(
         ToolMode.Converter, AppSection.Xiso, ConverterTool.XboxXiso, art = ToolArt.TrimmedDisc,
         ink = ToolInk(Color(0xFF4ADE80), Color(0xFF13803B)), reads = "Redump .iso", writes = "XISO .iso",
     ),
+    ToolEntry(
+        R.string.goal_shrink_switch, R.string.tool_nsp_to_nsz, R.string.tool_nsp_to_nsz_description,
+        ToolMode.Converter, AppSection.NspNsz, ConverterTool.NspNsz, art = ToolArt.PressedSwitchCart,
+        ink = ToolInk(Color(0xFFFF6B6B), Color(0xFFC53030)), reads = ".nsp", writes = ".nsz",
+    ),
 )
 
 /** The tool shown in [section], or null for the home screen. */
 internal fun toolFor(section: AppSection): ToolEntry? = (utilities + spaceSavers).firstOrNull { it.section == section }
 
-private const val SLOT_CELLS = 5
+/** Blocks per slot row: room for the fuller slot, so the other slot shows empty blocks to match. */
+private val SLOT_CELLS = maxOf(utilities.size, spaceSavers.size)
 private val SLOT_GAP = 14.dp
 private val SLOT_INNER_GAP = 6.dp
 private val BLOCK_LABEL_GAP = 4.dp
@@ -265,7 +272,7 @@ private fun MemorySlot(
         )
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             val gap = 10.dp
-            // Each block owns a fifth of the row, so its name has the full column even when the
+            // Each block owns an equal share of the row, so its name has the full column even when the
             // art is kept small to fit the screen height.
             val column = (maxWidth - gap * (SLOT_CELLS - 1)) / SLOT_CELLS
             val art = minOf(column, cellMax)
