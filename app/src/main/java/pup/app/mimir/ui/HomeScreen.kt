@@ -357,7 +357,7 @@ private fun ToolListSlot(
             minScale = 0.75f,
         )
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            tools.forEach { tool ->
+            sortedByName(tools).forEach { tool ->
                 ToolRow(
                     tool = tool,
                     selected = focusedSection == tool.section,
