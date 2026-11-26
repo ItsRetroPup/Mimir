@@ -289,8 +289,8 @@
     <string name="legend_apply_idle">Apply</string>
 
     <!-- Memory-card slot names. -->
-    <string name="slot_utilities">Slot 1 · Utilities</string>
-    <string name="slot_space_savers">Slot 2 · Space savers</string>
+    <string name="slot_utilities">Tools</string>
+    <string name="slot_space_savers">Space savers</string>
 
     <!-- Storage volumes and About. -->
     <string name="storage_internal">Internal storage</string>

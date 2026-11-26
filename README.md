@@ -13,7 +13,7 @@ your game library right on the device. Every tool shows you what it will change 
 
 ## What Mimir does
 
-**Utilities**
+**Tools**
 - **Multi-disc Organizer:** finds games that span more than one disc and writes an `.m3u` playlist
   for each, so your frontend lists the game once and can swap discs.
 - **Vita Shortcuts:** search the built-in PS Vita title list and save a `.psvita` or `.dpt` shortcut,

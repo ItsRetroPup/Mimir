@@ -40,6 +40,8 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -51,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import pup.app.mimir.R
 import pup.app.mimir.domain.ConverterTool
 import pup.app.mimir.domain.ToolMode
+import java.text.Collator
 
 internal enum class AppSection {
     Home,
@@ -142,6 +145,23 @@ internal val spaceSavers = listOf(
         ink = ToolInk(Color(0xFFFF6B6B), Color(0xFFC53030)), reads = ".nsp", writes = ".nsz",
     ),
 )
+
+/**
+ * [tools] in alphabetical order of the names shown on screen, so the order follows the app
+ * language. The collator applies that language's own rules: accents sort with their base letter in
+ * French or German, Japanese kana sort in gojūon order, and Chinese sorts by pinyin (Simplified) or
+ * stroke count (Traditional). Most tool names are product names that stay in Latin letters, so in
+ * practice the order rarely changes between languages.
+ */
+@Composable
+internal fun sortedByName(tools: List<ToolEntry>): List<ToolEntry> {
+    val context = LocalContext.current
+    val locale = LocalConfiguration.current.locales[0]
+    return remember(tools, locale) {
+        val collator = Collator.getInstance(locale)
+        tools.sortedWith(compareBy(collator) { context.getString(it.toolName) })
+    }
+}
 
 /** The tool shown in [section], or null for the home screen. */
 internal fun toolFor(section: AppSection): ToolEntry? = (utilities + spaceSavers).firstOrNull { it.section == section }
@@ -263,6 +283,7 @@ private fun MemorySlot(
 ) {
     val palette = LocalMimirPalette.current
     val used = tools.size
+    val sorted = sortedByName(tools)
     Column(verticalArrangement = Arrangement.spacedBy(SLOT_INNER_GAP)) {
         FittedText(
             title,
@@ -277,7 +298,7 @@ private fun MemorySlot(
             val column = (maxWidth - gap * (SLOT_CELLS - 1)) / SLOT_CELLS
             val art = minOf(column, cellMax)
             Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
-                tools.forEach { tool ->
+                sorted.forEach { tool ->
                     SaveBlock(
                         tool = tool,
                         width = column,
