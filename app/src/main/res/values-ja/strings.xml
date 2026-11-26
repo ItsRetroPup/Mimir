@@ -207,6 +207,8 @@
     <string name="info_writes">書き出し</string>
     <string name="legend_open">開く</string>
     <string name="legend_theme">テーマ</string>
+    <string name="legend_list_view">リスト</string>
+    <string name="legend_grid_view">グリッド</string>
     <string name="legend_select">選択</string>
     <string name="legend_back">戻る</string>
     <string name="legend_download">ダウンロード</string>

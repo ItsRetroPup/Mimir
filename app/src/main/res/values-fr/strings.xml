@@ -280,6 +280,8 @@
     <string name="info_writes">Écrit</string>
     <string name="legend_open">Ouvrir</string>
     <string name="legend_theme">Thème</string>
+    <string name="legend_list_view">Liste</string>
+    <string name="legend_grid_view">Grille</string>
     <string name="legend_select">Sélectionner</string>
     <string name="legend_back">Retour</string>
     <string name="legend_download">Télécharger</string>

@@ -29,3 +29,23 @@ private fun HomeScreenLocalesPreview() {
         }
     }
 }
+
+// Home in list view on the same handheld screen, in German for long tool names.
+
+@Preview(name = "Home list · German · 1.3×", locale = "de", fontScale = 1.3f, widthDp = 840, heightDp = 400)
+@Preview(name = "Home list · English · phone", widthDp = 400, heightDp = 840)
+@Composable
+private fun HomeScreenListPreview() {
+    MimirTheme(useDarkMode = true) {
+        val palette = LocalMimirPalette.current
+        Box(Modifier.fillMaxSize().consoleField(palette)) {
+            HomeScreen(
+                contentFocus = remember { FocusRequester() },
+                returnSection = null,
+                returnFocus = remember { FocusRequester() },
+                onOpen = {},
+                listView = true,
+            )
+        }
+    }
+}
