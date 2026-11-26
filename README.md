@@ -165,8 +165,11 @@ location.
 #### NSP to NSZ
 
 Mimir can also compress Nintendo Switch `.nsp` packages to `.nsz`, using the same NSZ 5.0.0 package
-and the same imported `prod.keys`. It uses NSZ's default solid compression (Zstandard level 18) and
-drops update delta fragments, as the `nsz -C` command does by default. After compressing, Mimir runs
+and the same imported `prod.keys`. It uses NSZ's block compression (`nsz -B`: Zstandard level 18
+in 1 MiB blocks) and drops update delta fragments, as NSZ does by default. Block NSZ files can be
+read in place, so emulators such as Eden list and run them without installing them first. NSZ's
+own block compressor uses child processes, which Android apps cannot start, so Mimir runs the same
+algorithm on a thread pool; the files it writes are byte-for-byte what `nsz -B` writes. After compressing, Mimir runs
 NSZ's quick verify, which decompresses the new file in memory and checks every NCA hash; a file that
 fails is deleted and reported. Select a folder containing `.nsp` files directly or in a `switch` /
 `nintendo switch` subfolder. Source `.nsp` files are kept. Like NSZ to NSP, the package is copied to
