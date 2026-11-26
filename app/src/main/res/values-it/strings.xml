@@ -249,6 +249,8 @@
     <string name="info_writes">Scrive</string>
     <string name="legend_open">Apri</string>
     <string name="legend_theme">Tema</string>
+    <string name="legend_list_view">Elenco</string>
+    <string name="legend_grid_view">Griglia</string>
     <string name="legend_select">Seleziona</string>
     <string name="legend_back">Indietro</string>
     <string name="legend_download">Scarica</string>

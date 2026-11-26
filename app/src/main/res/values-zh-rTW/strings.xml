@@ -207,6 +207,8 @@
     <string name="info_writes">寫入</string>
     <string name="legend_open">開啟</string>
     <string name="legend_theme">主題</string>
+    <string name="legend_list_view">清單</string>
+    <string name="legend_grid_view">格狀</string>
     <string name="legend_select">選取</string>
     <string name="legend_back">返回</string>
     <string name="legend_download">下載</string>

@@ -228,6 +228,8 @@
     <string name="info_writes">Schreibt</string>
     <string name="legend_open">Öffnen</string>
     <string name="legend_theme">Design</string>
+    <string name="legend_list_view">Liste</string>
+    <string name="legend_grid_view">Raster</string>
     <string name="legend_select">Auswählen</string>
     <string name="legend_back">Zurück</string>
     <string name="legend_download">Herunterladen</string>

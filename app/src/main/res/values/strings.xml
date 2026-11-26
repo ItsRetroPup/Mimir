@@ -259,6 +259,8 @@
     <string name="info_writes">Writes</string>
     <string name="legend_open">Open</string>
     <string name="legend_theme">Theme</string>
+    <string name="legend_list_view">List view</string>
+    <string name="legend_grid_view">Grid view</string>
     <string name="legend_select">Select</string>
     <string name="legend_back">Back</string>
     <string name="legend_download">Download</string>

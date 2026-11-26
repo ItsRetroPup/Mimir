@@ -102,6 +102,7 @@ internal fun MimirScreen(
     onDeleteOriginalChdFilesChanged: (Boolean) -> Unit,
     onScanHiddenFoldersChanged: (Boolean) -> Unit,
     onDarkModeToggled: (Boolean) -> Unit,
+    onHomeListViewToggled: (Boolean) -> Unit,
     onVitaQueryChanged: (String) -> Unit,
     onVitaShortcutFormatSelected: (VitaShortcutFormat) -> Unit,
     onVitaShortcutAdd: (VitaApp) -> Unit,
@@ -163,6 +164,7 @@ internal fun MimirScreen(
         uiState = uiState,
         onHome = goHome,
         onToggleTheme = { onDarkModeToggled(!uiState.useDarkMode) },
+        onToggleHomeView = { onHomeListViewToggled(!uiState.homeListView) },
         onScan = onStart,
         onApply = { showApplyConfirmation = true },
         onDownloadEsDe = onRefreshEsDeSystems,
@@ -238,6 +240,7 @@ internal fun MimirScreen(
                         contentFocus = contentFocus,
                         returnSection = lastToolSection,
                         returnFocus = returnFocus,
+                        listView = uiState.homeListView,
                         onOpen = selectTool,
                         modifier = Modifier.padding(innerPadding),
                     )
@@ -363,6 +366,7 @@ private fun legendFor(
     uiState: MimirUiState,
     onHome: () -> Unit,
     onToggleTheme: () -> Unit,
+    onToggleHomeView: () -> Unit,
     onScan: () -> Unit,
     onApply: () -> Unit,
     onDownloadEsDe: () -> Unit,
@@ -372,6 +376,12 @@ private fun legendFor(
     if (tool == null) {
         return listOf(
             LegendAction("A", stringResource(R.string.legend_open)),
+            // Names the view X switches to, so the label says what pressing it will do.
+            LegendAction(
+                "X",
+                stringResource(if (uiState.homeListView) R.string.legend_grid_view else R.string.legend_list_view),
+                onClick = onToggleHomeView,
+            ),
             LegendAction("Y", stringResource(R.string.legend_theme), onClick = onToggleTheme),
         )
     }

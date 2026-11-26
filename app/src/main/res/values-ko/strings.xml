@@ -207,6 +207,8 @@
     <string name="info_writes">쓰기</string>
     <string name="legend_open">열기</string>
     <string name="legend_theme">테마</string>
+    <string name="legend_list_view">목록</string>
+    <string name="legend_grid_view">그리드</string>
     <string name="legend_select">선택</string>
     <string name="legend_back">뒤로</string>
     <string name="legend_download">다운로드</string>
