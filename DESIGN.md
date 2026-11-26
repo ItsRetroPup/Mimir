@@ -291,7 +291,7 @@ A cold, two-state console palette: navy and steel at rest, nine saturated inks f
 - **Display** (800, 32sp/36sp, -0.015em): the "Mimir" name in the home welcome panel, and the two lifetime totals on Stats (with `tnum`).
 - **Headline Large** (700, 28sp/32sp, -0.01em): the focused tool's name in the home info panel, the scale-contrast moment beside the small blocks.
 - **Headline** (700, 21sp/26sp): data-pane headings (plan header, Vita database, ROM folders) and empty-pane titles.
-- **Title Large** (600, 19sp/24sp): header strip name and tool crumb, slot titles ("Slot 1 • Utilities"), report title.
+- **Title Large** (600, 19sp/24sp): header strip name and tool crumb, slot titles ("Utilities"), report title.
 - **Title** (600, 16sp/21sp): row titles in data rows, the Reads/Writes values, the A enter prompt, progress labels.
 - **Title Small** (600, 14sp/18sp): option labels and the selected folder name in the setup pane.
 - **Body Large / Body / Body Small** (400; 16/23, 14/20, 12/17sp): home prompt; descriptions and status text; file paths, option details, target names and the amber/error inline lines.

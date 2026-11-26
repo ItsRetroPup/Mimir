@@ -232,8 +232,8 @@
     <string name="legend_apply_idle">应用</string>
 
     <!-- Memory-card slot names. -->
-    <string name="slot_utilities">插槽 1 · 实用工具</string>
-    <string name="slot_space_savers">插槽 2 · 节省空间</string>
+    <string name="slot_utilities">实用工具</string>
+    <string name="slot_space_savers">节省空间</string>
 
     <!-- Storage volumes and About. -->
     <string name="storage_internal">内部存储空间</string>

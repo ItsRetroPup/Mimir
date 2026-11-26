@@ -278,8 +278,8 @@
     <string name="legend_apply_idle">Aplicar</string>
 
     <!-- Memory-card slot names. -->
-    <string name="slot_utilities">Ranura 1 · Utilidades</string>
-    <string name="slot_space_savers">Ranura 2 · Ahorro de espacio</string>
+    <string name="slot_utilities">Utilidades</string>
+    <string name="slot_space_savers">Ahorro de espacio</string>
 
     <!-- Storage volumes and About. -->
     <string name="storage_internal">Almacenamiento interno</string>
