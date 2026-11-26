@@ -42,6 +42,8 @@ enum class ToolArt {
     MiniDisc,
     /** Azahar ZCCI: a 3DS card. */
     HandheldCart,
+    /** NSP to NSZ: a Switch game card squeezed between two arrows. */
+    PressedSwitchCart,
     /** Xbox XISO: a disc with its unused slice trimmed off. */
     TrimmedDisc,
     /** ROM Patcher: a cartridge with a bandage stuck across its label. */
@@ -93,6 +95,7 @@ internal fun SaveBlockArt(
             ToolArt.PackedDisc -> packedDisc(ink, hole)
             ToolArt.MiniDisc -> miniDisc(ink, hole)
             ToolArt.HandheldCart -> handheldCart(ink)
+            ToolArt.PressedSwitchCart -> pressedSwitchCart(ink)
             ToolArt.TrimmedDisc -> trimmedDisc(ink, hole)
             ToolArt.PatchedCart -> patchedCart(ink)
         }
@@ -222,6 +225,29 @@ private fun DrawScope.switchCart(ink: Color) {
     drawRoundRect(shade(ink, 0.35f), Offset(rect.left + w * 0.12f, rect.top - h * 0.1f), Size(w * 0.76f, h * 0.16f), CornerRadius(w * 0.05f))
     card(rect, ink, corner = w * 0.1f, notch = w * 0.001f)
     label(Rect(rect.left + w * 0.12f, rect.top + h * 0.14f, rect.right - w * 0.12f, rect.bottom - h * 0.14f), ink)
+}
+
+private fun DrawScope.pressedSwitchCart(ink: Color) {
+    // The same Switch card as NSZ to NSP, drawn narrower so there is room for the squeeze.
+    val w = size.width * 0.4f
+    val h = size.height * 0.58f
+    val rect = Rect(center.x - w / 2, center.y - h / 2 + h * 0.04f, center.x + w / 2, center.y + h / 2 + h * 0.04f)
+    drawRoundRect(shade(ink, 0.35f), Offset(rect.left + w * 0.12f, rect.top - h * 0.1f), Size(w * 0.76f, h * 0.16f), CornerRadius(w * 0.05f))
+    card(rect, ink, corner = w * 0.1f, notch = w * 0.001f)
+    label(Rect(rect.left + w * 0.14f, rect.top + h * 0.14f, rect.right - w * 0.14f, rect.bottom - h * 0.14f), ink)
+    // Two arrows pressing in on the card's sides: the package made smaller.
+    val arrow = size.width * 0.1f
+    val tip = arrow * 0.35f
+    listOf(-1f, 1f).forEach { side ->
+        val edge = if (side < 0) rect.left - tip else rect.right + tip
+        val path = Path().apply {
+            moveTo(edge, center.y)
+            lineTo(edge + side * arrow, center.y - arrow * 0.8f)
+            lineTo(edge + side * arrow, center.y + arrow * 0.8f)
+            close()
+        }
+        drawPath(path, light(ink, 0.55f))
+    }
 }
 
 private fun DrawScope.zipCart(ink: Color, hole: Color) {

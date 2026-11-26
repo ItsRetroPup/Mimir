@@ -48,7 +48,7 @@ contains the copyright and license notices for Azahar's statically linked third-
 
 ## NSZ
 
-This app uses NSZ 5.0.0 to decompress NSZ packages to NSP.
+This app uses NSZ 5.0.0 to decompress NSZ packages to NSP and to compress NSP packages to NSZ.
 
 - Source: https://github.com/nicoboss/nsz
 - License: MIT; the license text is included at `app/src/main/assets/licenses/NSZ-MIT.txt`.

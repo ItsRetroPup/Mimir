@@ -61,6 +61,8 @@ data class MimirUiState(
     val deleteOriginalChdFiles: Boolean = false,
     val scanHiddenFolders: Boolean = false,
     val useDarkMode: Boolean = true,
+    /** Home lists the tools as rows instead of the memory-card grid. */
+    val homeListView: Boolean = false,
     val isBusy: Boolean = false,
     val scanProgressLabel: String? = null,
     val operationProgressLabel: String? = null,
@@ -134,6 +136,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             scanHiddenFolders = prefs.getBoolean(KEY_SCAN_HIDDEN_FOLDERS, false),
             deleteOriginalChdFiles = prefs.getBoolean(KEY_DELETE_ORIGINAL_CHD_FILES, false),
             useDarkMode = prefs.getBoolean(KEY_DARK_MODE, true),
+            homeListView = prefs.getBoolean(KEY_HOME_LIST_VIEW, false),
             usageStats = statsStore.load(),
         )
     )
@@ -509,6 +512,13 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update { it.copy(useDarkMode = enabled) }
     }
 
+    fun updateHomeListView(enabled: Boolean) {
+        prefs.edit()
+            .putBoolean(KEY_HOME_LIST_VIEW, enabled)
+            .apply()
+        _uiState.update { it.copy(homeListView = enabled) }
+    }
+
     fun onFolderSelected(uri: Uri) {
         val label = treeLabel(uri)
         prefs.edit()
@@ -675,7 +685,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                     return
                 }
                 if (mode == ToolMode.Converter &&
-                    currentState.selectedConverterTool == ConverterTool.NszNsp &&
+                    currentState.selectedConverterTool.needsProdKeys &&
                     !currentState.nszKeysConfigured
                 ) {
                     _uiState.update { it.copy(message = info(R.string.msg_import_keys_first)) }
@@ -892,6 +902,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         private const val KEY_ESDE_LABEL = "esde_root_label"
         private const val KEY_VITA_SHORTCUT_FORMAT = "vita_shortcut_format"
         private const val KEY_DARK_MODE = "dark_mode"
+        private const val KEY_HOME_LIST_VIEW = "home_list_view"
         private const val KEY_SCAN_HIDDEN_FOLDERS = "scan_hidden_folders"
         private const val KEY_DELETE_ORIGINAL_CHD_FILES = "delete_original_chd_files"
         private const val NSZ_KEYS_RELATIVE_PATH = "nsz/prod.keys"

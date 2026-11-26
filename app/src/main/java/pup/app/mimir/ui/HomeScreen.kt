@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,13 +35,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -48,6 +49,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import pup.app.mimir.R
@@ -64,6 +66,7 @@ internal enum class AppSection {
     Rvz,
     Zcci,
     Nsz,
+    NspNsz,
     Xiso,
     Vita,
     Patcher,
@@ -139,6 +142,11 @@ internal val spaceSavers = listOf(
         ToolMode.Converter, AppSection.Xiso, ConverterTool.XboxXiso, art = ToolArt.TrimmedDisc,
         ink = ToolInk(Color(0xFF4ADE80), Color(0xFF13803B)), reads = "Redump .iso", writes = "XISO .iso",
     ),
+    ToolEntry(
+        R.string.goal_shrink_switch, R.string.tool_nsp_to_nsz, R.string.tool_nsp_to_nsz_description,
+        ToolMode.Converter, AppSection.NspNsz, ConverterTool.NspNsz, art = ToolArt.PressedSwitchCart,
+        ink = ToolInk(Color(0xFFFF6B6B), Color(0xFFC53030)), reads = ".nsp", writes = ".nsz",
+    ),
 )
 
 /**
@@ -161,7 +169,11 @@ internal fun sortedByName(tools: List<ToolEntry>): List<ToolEntry> {
 /** The tool shown in [section], or null for the home screen. */
 internal fun toolFor(section: AppSection): ToolEntry? = (utilities + spaceSavers).firstOrNull { it.section == section }
 
-private const val SLOT_CELLS = 5
+/**
+ * Blocks per slot row: room for the fuller slot, so blocks are the same size in both slots. The
+ * shorter slot just ends early; it draws no empty placeholder blocks.
+ */
+private val SLOT_CELLS = maxOf(utilities.size, spaceSavers.size)
 private val SLOT_GAP = 14.dp
 private val SLOT_INNER_GAP = 6.dp
 private val BLOCK_LABEL_GAP = 4.dp
@@ -171,6 +183,7 @@ private val FORMAT_LABEL_MIN = 64.dp
 /**
  * Home as a memory card manager: two slots of save blocks on the left, and on the right the info
  * panel for whichever block the cursor rests on. About Mimir lives in the footer, not on the card.
+ * With [listView] the slots show their tools as full-width rows instead of a grid of blocks.
  */
 @Composable
 internal fun HomeScreen(
@@ -179,9 +192,28 @@ internal fun HomeScreen(
     returnFocus: FocusRequester,
     onOpen: (ToolEntry) -> Unit,
     modifier: Modifier = Modifier,
+    listView: Boolean = false,
 ) {
     var focusedSection by rememberSaveable { mutableStateOf<AppSection?>(null) }
     val focusedTool = focusedSection?.let(::toolFor)
+    // Switching view swaps every block for a row, and the block that held focus goes with it. With a
+    // controller, put the cursor back on the same tool in the new layout so it isn't lost.
+    val viewFocus = remember { FocusRequester() }
+    val inputModeManager = LocalInputModeManager.current
+    var shownView by remember { mutableStateOf(listView) }
+    LaunchedEffect(listView) {
+        if (shownView == listView) return@LaunchedEffect
+        shownView = listView
+        if (inputModeManager.inputMode != InputMode.Keyboard) return@LaunchedEffect
+        if (focusedSection != null) viewFocus.requestFocus() else contentFocus.requestFocus()
+    }
+    // Which block or row answers which focus request: the one you came back from, and the one the
+    // cursor is on now.
+    val focusFor: (AppSection) -> Modifier = { section ->
+        Modifier
+            .then(if (section == returnSection) Modifier.focusRequester(returnFocus) else Modifier)
+            .then(if (section == focusedSection) Modifier.focusRequester(viewFocus) else Modifier)
+    }
     // Room for a slot title and two lines of block name at the current font scale, so a larger
     // system font shrinks the blocks instead of clipping the names.
     val typography = MaterialTheme.typography
@@ -197,26 +229,31 @@ internal fun HomeScreen(
                     .focusGroup(),
                 verticalArrangement = Arrangement.spacedBy(SLOT_GAP),
             ) {
-                MemorySlot(
-                    title = stringResource(R.string.slot_utilities),
-                    tools = utilities,
-                    cellMax = cellMax,
-                    returnSection = returnSection,
-                    returnFocus = returnFocus,
-                    focusedSection = focusedSection,
-                    onFocus = { focusedSection = it },
-                    onOpen = onOpen,
-                )
-                MemorySlot(
-                    title = stringResource(R.string.slot_space_savers),
-                    tools = spaceSavers,
-                    cellMax = cellMax,
-                    returnSection = returnSection,
-                    returnFocus = returnFocus,
-                    focusedSection = focusedSection,
-                    onFocus = { focusedSection = it },
-                    onOpen = onOpen,
-                )
+                listOf(
+                    stringResource(R.string.slot_utilities) to utilities,
+                    stringResource(R.string.slot_space_savers) to spaceSavers,
+                ).forEach { (title, tools) ->
+                    if (listView) {
+                        ToolListSlot(
+                            title = title,
+                            tools = tools,
+                            focusFor = focusFor,
+                            focusedSection = focusedSection,
+                            onFocus = { focusedSection = it },
+                            onOpen = onOpen,
+                        )
+                    } else {
+                        MemorySlot(
+                            title = title,
+                            tools = tools,
+                            cellMax = cellMax,
+                            focusFor = focusFor,
+                            focusedSection = focusedSection,
+                            onFocus = { focusedSection = it },
+                            onOpen = onOpen,
+                        )
+                    }
+                }
             }
         }
         val info: @Composable (Modifier) -> Unit = { infoModifier ->
@@ -269,14 +306,12 @@ private fun MemorySlot(
     title: String,
     tools: List<ToolEntry>,
     cellMax: Dp,
-    returnSection: AppSection?,
-    returnFocus: FocusRequester,
+    focusFor: (AppSection) -> Modifier,
     focusedSection: AppSection?,
     onFocus: (AppSection) -> Unit,
     onOpen: (ToolEntry) -> Unit,
 ) {
     val palette = LocalMimirPalette.current
-    val used = tools.size
     val sorted = sortedByName(tools)
     Column(verticalArrangement = Arrangement.spacedBy(SLOT_INNER_GAP)) {
         FittedText(
@@ -287,7 +322,7 @@ private fun MemorySlot(
         )
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             val gap = 10.dp
-            // Each block owns a fifth of the row, so its name has the full column even when the
+            // Each block owns an equal share of the row, so its name has the full column even when the
             // art is kept small to fit the screen height.
             val column = (maxWidth - gap * (SLOT_CELLS - 1)) / SLOT_CELLS
             val art = minOf(column, cellMax)
@@ -298,14 +333,113 @@ private fun MemorySlot(
                         width = column,
                         artSize = art,
                         selected = focusedSection == tool.section,
-                        modifier = if (tool.section == returnSection) Modifier.focusRequester(returnFocus) else Modifier,
+                        modifier = focusFor(tool.section),
                         onFocus = { onFocus(tool.section) },
                         onClick = { onOpen(tool) },
                     )
                 }
-                repeat(SLOT_CELLS - used) { EmptyCell(column, art) }
             }
         }
+    }
+}
+
+/** A slot in list view: its title, then one full-width row per tool, so D-pad up and down walks them. */
+@Composable
+private fun ToolListSlot(
+    title: String,
+    tools: List<ToolEntry>,
+    focusFor: (AppSection) -> Modifier,
+    focusedSection: AppSection?,
+    onFocus: (AppSection) -> Unit,
+    onOpen: (ToolEntry) -> Unit,
+) {
+    val palette = LocalMimirPalette.current
+    Column(verticalArrangement = Arrangement.spacedBy(SLOT_INNER_GAP)) {
+        FittedText(
+            title,
+            style = MaterialTheme.typography.titleLarge,
+            color = palette.text,
+            minScale = 0.75f,
+        )
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            sortedByName(tools).forEach { tool ->
+                ToolRow(
+                    tool = tool,
+                    selected = focusedSection == tool.section,
+                    modifier = focusFor(tool.section),
+                    onFocus = { onFocus(tool.section) },
+                    onClick = { onOpen(tool) },
+                )
+            }
+        }
+    }
+}
+
+/**
+ * One tool as a list row: its drawn object, its name and goal, and the format it writes. Focus is
+ * shown the same way as on a save block, by the ink fill and a thicker border.
+ */
+@Composable
+private fun ToolRow(
+    tool: ToolEntry,
+    selected: Boolean,
+    onFocus: () -> Unit,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val palette = LocalMimirPalette.current
+    val ink = tool.ink.resolve(palette)
+    var focused by remember { mutableStateOf(false) }
+    val name = stringResource(tool.toolName)
+    val shape = RoundedCornerShape(14.dp)
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp)
+            .clip(shape)
+            .background(if (focused) ink.copy(alpha = 0.16f) else palette.panel)
+            .border(
+                width = if (focused) 3.dp else 1.dp,
+                color = when {
+                    focused -> ink
+                    selected -> ink.copy(alpha = 0.6f)
+                    else -> palette.edge.copy(alpha = 0.22f)
+                },
+                shape = shape,
+            )
+            .onFocusChanged {
+                focused = it.hasFocus
+                if (it.hasFocus) onFocus()
+            }
+            .clickable(
+                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                indication = null,
+                role = Role.Button,
+                onClickLabel = stringResource(R.string.open_tool, name),
+                onClick = onClick,
+            )
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        SaveBlockArt(tool.art, ink, hole = palette.panel, modifier = Modifier.size(40.dp), turning = focused)
+        Column(Modifier.weight(1f)) {
+            Text(
+                name,
+                style = MaterialTheme.typography.titleMedium,
+                color = palette.text,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                stringResource(tool.goal),
+                style = MaterialTheme.typography.bodySmall,
+                color = palette.textMuted,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Text(tool.writes, style = MaterialTheme.typography.labelLarge, color = ink, maxLines = 1)
     }
 }
 
@@ -398,25 +532,6 @@ private fun BlockCell(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 2.dp),
-        )
-    }
-}
-
-/** An unused slot cell, drawn as the memory card shows it: a dashed empty frame. */
-@Composable
-private fun EmptyCell(width: Dp, artSize: Dp) {
-    val palette = LocalMimirPalette.current
-    Box(Modifier.width(width), contentAlignment = Alignment.TopCenter) {
-        Box(
-            Modifier
-                .size(artSize)
-                .drawBehind {
-                    drawRoundRect(
-                        palette.gridLine,
-                        cornerRadius = CornerRadius(16.dp.toPx()),
-                        style = Stroke(1.5.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f))),
-                    )
-                },
         )
     }
 }

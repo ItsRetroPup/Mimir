@@ -35,7 +35,7 @@ data class UsageStats(
          */
         fun keyFor(mode: ToolMode, converter: ConverterTool? = null): String = converter?.name ?: mode.name
 
-        /** The tools Stats tracks: RomZipper and the compressing converters. NSZ to NSP decompresses, so it is left out. */
+        /** The tools Stats tracks: RomZipper and the compressing converters (NSP to NSZ included). NSZ to NSP decompresses, so it is left out. */
         fun savesSpace(mode: ToolMode, converter: ConverterTool?): Boolean = when (mode) {
             ToolMode.RomZipper -> true
             ToolMode.Converter -> converter != null && converter != ConverterTool.NszNsp

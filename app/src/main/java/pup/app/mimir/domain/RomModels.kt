@@ -35,7 +35,7 @@ sealed interface ConverterBackend {
     /** A bundled ARM64 executable in the app's native library directory. */
     data class NativeExecutable(val fileName: String) : ConverterBackend
 
-    /** The NSZ Python package running in the embedded Chaquopy runtime. */
+    /** The NSZ Python package running in the embedded Chaquopy runtime (NSZ to NSP and NSP to NSZ). */
     data object EmbeddedPython : ConverterBackend
 
     /** Kotlin code that streams the source and replaces it under the same name. */
@@ -83,6 +83,14 @@ enum class ConverterTool(
         backend = ConverterBackend.EmbeddedPython,
         badge = "NSP",
     ),
+    NspNsz(
+        displayName = "NSP to NSZ",
+        sourceExtensions = setOf("nsp"),
+        outputExtension = "nsz",
+        folderAliases = setOf("switch", "nintendo switch"),
+        backend = ConverterBackend.EmbeddedPython,
+        badge = "NSZ",
+    ),
     XboxXiso(
         displayName = "Xbox XISO",
         sourceExtensions = setOf("iso"),
@@ -95,6 +103,9 @@ enum class ConverterTool(
 
     /** True when the converted image replaces its source under the same name. */
     val replacesSource: Boolean get() = backend == ConverterBackend.InPlaceKotlin
+
+    /** True when the tool needs the user's imported prod.keys: both Switch NSZ converters do. */
+    val needsProdKeys: Boolean get() = this == NszNsp || this == NspNsz
 }
 
 enum class ChdDiscType(

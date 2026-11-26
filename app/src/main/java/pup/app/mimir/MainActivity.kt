@@ -137,6 +137,7 @@ class MainActivity : AppCompatActivity() {
                         onDeleteOriginalChdFilesChanged = viewModel::updateDeleteOriginalChdFiles,
                         onScanHiddenFoldersChanged = viewModel::updateScanHiddenFolders,
                         onDarkModeToggled = viewModel::updateDarkMode,
+                        onHomeListViewToggled = viewModel::updateHomeListView,
                         onVitaQueryChanged = viewModel::updateVitaQuery,
                         onVitaShortcutFormatSelected = viewModel::updateVitaShortcutFormat,
                         onVitaShortcutAdd = viewModel::addVitaShortcut,
