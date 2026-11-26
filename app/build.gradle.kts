@@ -66,6 +66,13 @@ android {
         compose = true
     }
 
+    bundle {
+        language {
+            // Ship every translation, so a language picked inside Mimir is always installed.
+            enableSplit = false
+        }
+    }
+
     packaging {
         jniLibs {
             // CHDMan is launched as a process from nativeLibraryDir, so its executable must be extracted.
@@ -93,6 +100,8 @@ dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2024.12.01")
 
     implementation("androidx.core:core-ktx:1.13.1")
+    // Per-app language: stores the choice and applies it on Android 10-12 as well as 13+.
+    implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.activity:activity-compose:1.9.1")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")

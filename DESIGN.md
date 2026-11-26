@@ -310,11 +310,12 @@ A cold, two-state console palette: navy and steel at rest, nine saturated inks f
 
 The screen is a fixed console frame: header strip (minimum 52dp, 12dp horizontal padding) on top, legend bar (minimum 48dp, 16dp horizontal padding) at the foot, content between on the gridded field.
 
-- **Home, wide (600dp and up):** two columns with a 20dp gutter and 20dp/16dp outer padding. Left 60%: two memory-card slots, each a title plus a row of five square cells with 10dp gaps; slots sit 14dp apart and size their cells from the available height so both fit without scrolling. Unused cells are drawn as dashed empty frames (1.5dp, 10/8 dash, grid colour). Right 40%: the info panel for the focused block, filling the height, with the A prompt pinned to its foot.
+- **Home, wide (600dp and up):** two columns with a 20dp gutter and 20dp/16dp outer padding. Left 60%: two memory-card slots, each a title plus a row of five columns with 10dp gaps. Each column takes a fifth of the row; its square cell is sized from the available height (so both slots fit without scrolling) and centred, while the block name beneath spans the whole column. The height kept for titles and names follows the system font scale. Unused cells are drawn as dashed empty frames (1.5dp, 10/8 dash, grid colour). Right 40%: the info panel for the focused block, filling the height, with the A prompt pinned to its foot.
 - **Tool page, wide (700dp and up):** setup pane 42% and data pane 58%, 20dp gutter, each independently scrollable with 12dp vertical padding; setup stacks at 12dp, data at 10dp, data rows at 6dp.
 - **Narrow:** both stack into one scrolling column with 16dp padding.
 - **Rhythm:** a near-linear 2/4/6/8/10/12/16/18/20/24dp scale; panels pad 16dp (info 18dp, welcome 20dp). The 48dp field grid is decorative and does not snap content.
-- **Locale and scale headroom:** labels allow two lines (block names reserve two), legend labels ellipsize to one, and panes scroll rather than clip, so German/French strings and system font scale hold.
+- **Locale and scale headroom:** labels allow two lines (block names reserve two), legend labels ellipsize to one, and panes scroll rather than clip, so German/French strings and system font scale hold. Block names, slot titles and the info-panel tool name never break inside a word: they step their font down (to 70%, 75% and 60% of size) until the longest word fits, and only ellipsize past that.
+- **Language:** Mimir follows the system language unless one is picked from the Language link in the home footer (between About Mimir and Stats). Each language is listed in its own name.
 
 **The Two Pane Rule.** A tool page is always setup on the left, data on the right. Never collapse it into a single column of cards on a wide screen.
 

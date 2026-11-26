@@ -264,6 +264,8 @@
 
     <!-- Memory-card shell: home, legend bar and empty states. -->
     <string name="about_mimir">O Mimir</string>
+    <string name="language">Język</string>
+    <string name="language_system">Język systemu</string>
     <string name="info_reads">Czyta</string>
     <string name="info_writes">Zapisuje</string>
     <string name="legend_open">Otwórz</string>

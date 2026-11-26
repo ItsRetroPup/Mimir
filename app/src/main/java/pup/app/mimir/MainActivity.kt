@@ -2,12 +2,12 @@ package pup.app.mimir
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
@@ -16,19 +16,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import pup.app.mimir.ui.MimirScreen
 import pup.app.mimir.ui.MimirTheme
 import pup.app.mimir.ui.MimirViewModel
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             val viewModel: MimirViewModel = viewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            // The ViewModel outlives a language change, so it re-reads the text it holds.
+            val locales = LocalConfiguration.current.locales
+            LaunchedEffect(locales) { viewModel.onLanguageChanged() }
             // System bar icons follow Mimir's own theme toggle, not the system night mode.
             LaunchedEffect(uiState.useDarkMode) {
                 val style = if (uiState.useDarkMode) {

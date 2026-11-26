@@ -201,6 +201,8 @@
 
     <!-- Memory-card shell: home, legend bar and empty states. -->
     <string name="about_mimir">Mimir 정보</string>
+    <string name="language">언어</string>
+    <string name="language_system">시스템 언어</string>
     <string name="info_reads">읽기</string>
     <string name="info_writes">쓰기</string>
     <string name="legend_open">열기</string>

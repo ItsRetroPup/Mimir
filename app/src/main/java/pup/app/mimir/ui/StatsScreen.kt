@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -172,7 +173,7 @@ private fun ToolStatsRow(tool: ToolEntry, stats: UsageStats, largestSaving: Long
         }
         if (used) {
             val saved = usage.spaceSavedBytes.coerceAtLeast(0L)
-            Column(Modifier.width(160.dp), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(Modifier.widthIn(min = 160.dp), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
                     stringResource(R.string.stats_saved_value, formatBytes(saved)),
                     style = MaterialTheme.typography.labelLarge.copy(fontFeatureSettings = "tnum"),
