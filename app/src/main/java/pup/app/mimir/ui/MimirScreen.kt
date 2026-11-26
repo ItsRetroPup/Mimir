@@ -209,26 +209,24 @@ internal fun MimirScreen(
                 bottomBar = {
                     LegendBar(legend) {
                         if (tool == null && !onStats) {
-                            // When the links with labels do not fit beside the legend, they show icons only (see LegendBar).
+                            // Each link takes its natural width. When they don't all fit beside the legend with their
+                            // labels, they show icons only (see LegendBar). They don't share the space by weight,
+                            // which would cut long labels short even when there is room overall.
                             FooterLink(
                                 Icons.Outlined.Info,
                                 stringResource(R.string.about_mimir),
                                 onClick = { showAbout = true },
-                                modifier = Modifier.weight(1f, fill = false),
                             )
                             FooterLink(
                                 Icons.Outlined.Translate,
                                 stringResource(R.string.language),
                                 onClick = { showLanguage = true },
-                                modifier = Modifier.weight(1f, fill = false),
                             )
                             FooterLink(
                                 Icons.Outlined.QueryStats,
                                 stringResource(R.string.stats),
                                 onClick = { currentSection = AppSection.Stats },
-                                modifier = Modifier
-                                    .weight(1f, fill = false)
-                                    .then(if (lastToolSection == AppSection.Stats) Modifier.focusRequester(returnFocus) else Modifier),
+                                modifier = if (lastToolSection == AppSection.Stats) Modifier.focusRequester(returnFocus) else Modifier,
                             )
                         }
                     }
