@@ -402,4 +402,8 @@
     <string name="stats_reset_title">Réinitialiser les stats ?</string>
     <string name="stats_reset_body">Cela supprime définitivement l\'espace libéré et les jeux compressés de tous les outils, et le décompte repart d\'aujourd\'hui. Cette action est irréversible.</string>
     <string name="action_reset_stats">Réinitialiser</string>
+
+    <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
+    <string name="chd_ps2_use_dvd">Utiliser le convertisseur DVD (pour ARMSX2)</string>
+    <string name="chd_ps2_use_dvd_detail">Laissez désactivé pour NetherSX2, qui demande des CHD CD.</string>
 </resources>

@@ -336,4 +336,8 @@
     <string name="stats_reset_title">Zresetować statystyki?</string>
     <string name="stats_reset_body">Spowoduje to trwałe usunięcie zaoszczędzonego miejsca i liczby skompresowanych gier dla wszystkich narzędzi, a liczenie zacznie się od dziś. Tej operacji nie można cofnąć.</string>
     <string name="action_reset_stats">Resetuj</string>
+
+    <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
+    <string name="chd_ps2_use_dvd">Użyj konwertera DVD (dla ARMSX2)</string>
+    <string name="chd_ps2_use_dvd_detail">Zostaw wyłączone dla NetherSX2, który wymaga CHD CD.</string>
 </resources>

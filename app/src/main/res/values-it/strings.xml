@@ -313,4 +313,8 @@
     <string name="stats_reset_title">Azzerare le statistiche?</string>
     <string name="stats_reset_body">Questo elimina in modo permanente lo spazio risparmiato e i giochi compressi di tutti gli strumenti, e il conteggio riparte da oggi. Non si può annullare.</string>
     <string name="action_reset_stats">Azzera</string>
+
+    <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
+    <string name="chd_ps2_use_dvd">Usa il convertitore DVD (per ARMSX2)</string>
+    <string name="chd_ps2_use_dvd_detail">Lascialo spento per NetherSX2, che richiede CHD CD.</string>
 </resources>

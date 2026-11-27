@@ -139,39 +139,6 @@ internal fun OrganizerOptions(
 }
 
 @Composable
-internal fun ChdOptions(
-    system: ChdSystem,
-    discType: ChdDiscType,
-    enabled: Boolean,
-    onSystemSelected: (ChdSystem) -> Unit,
-    onDiscTypeSelected: (ChdDiscType) -> Unit,
-) {
-    val palette = LocalMimirPalette.current
-    PanelRule()
-    // Seven systems do not fit beside a label, so this one setting stacks.
-    Text(stringResource(R.string.chd_system), style = MaterialTheme.typography.titleSmall, color = palette.text)
-    ChoiceRow(
-        options = ChdSystem.entries,
-        selected = system,
-        enabled = enabled,
-        label = { it.displayName },
-        onSelect = onSystemSelected,
-    )
-    if (system == ChdSystem.PlayStation2) {
-        PanelRule()
-        OptionRow(stringResource(R.string.chd_conversion_type), detail = stringResource(R.string.chd_compatibility_body)) {
-            ChoiceRow(
-                options = ChdDiscType.entries,
-                selected = discType,
-                enabled = enabled,
-                label = { it.displayName },
-                onSelect = onDiscTypeSelected,
-            )
-        }
-    }
-}
-
-@Composable
 internal fun NszKeysRow(configured: Boolean, enabled: Boolean, onSelect: () -> Unit) {
     PanelRule()
     OptionRow(

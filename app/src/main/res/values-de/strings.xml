@@ -290,4 +290,8 @@
     <string name="stats_reset_title">Statistik zurücksetzen?</string>
     <string name="stats_reset_body">Dadurch werden der gesparte Speicherplatz und die komprimierten Spiele aller Tools endgültig gelöscht, und die Zählung beginnt ab heute neu. Das kann nicht rückgängig gemacht werden.</string>
     <string name="action_reset_stats">Zurücksetzen</string>
+
+    <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
+    <string name="chd_ps2_use_dvd">DVD-Konverter verwenden (für ARMSX2)</string>
+    <string name="chd_ps2_use_dvd_detail">Für NetherSX2 ausgeschaltet lassen, es braucht CD-CHDs.</string>
 </resources>

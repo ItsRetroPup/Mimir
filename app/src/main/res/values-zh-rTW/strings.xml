@@ -267,4 +267,8 @@
     <string name="stats_reset_title">要重設統計嗎？</string>
     <string name="stats_reset_body">這會永久刪除所有工具的已節省空間和已壓縮遊戲數，並從今天重新開始計算。此操作無法復原。</string>
     <string name="action_reset_stats">重設</string>
+
+    <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
+    <string name="chd_ps2_use_dvd">使用 DVD 轉換器（適用於 ARMSX2）</string>
+    <string name="chd_ps2_use_dvd_detail">NetherSX2 需要 CD CHD，請保持關閉。</string>
 </resources>

@@ -80,6 +80,7 @@ import pup.app.mimir.R
 import pup.app.mimir.data.StopRequest
 import pup.app.mimir.domain.ChdDiscType
 import pup.app.mimir.domain.ChdSystem
+import pup.app.mimir.domain.FileOperation
 import pup.app.mimir.domain.ConverterTool
 import pup.app.mimir.domain.FrontendPreset
 import pup.app.mimir.domain.ToolMode
@@ -98,8 +99,7 @@ internal fun MimirScreen(
     onPickEsDeSystemFolder: (String) -> Unit,
     onModeSelected: (ToolMode) -> Unit,
     onPresetSelected: (FrontendPreset) -> Unit,
-    onChdSystemSelected: (ChdSystem) -> Unit,
-    onChdDiscTypeSelected: (ChdDiscType) -> Unit,
+    onPs2UseDvdChanged: (Boolean) -> Unit,
     onConverterToolSelected: (ConverterTool) -> Unit,
     onDeleteOriginalsChanged: (ConverterTool, Boolean) -> Unit,
     onScanHiddenFoldersChanged: (Boolean) -> Unit,
@@ -281,8 +281,6 @@ internal fun MimirScreen(
                         onSelectEsDeFolder = onSelectEsDeFolder,
                         onPickEsDeSystemFolder = onPickEsDeSystemFolder,
                         onPresetSelected = onPresetSelected,
-                        onChdSystemSelected = onChdSystemSelected,
-                        onChdDiscTypeSelected = onChdDiscTypeSelected,
                         onScanHiddenFoldersChanged = onScanHiddenFoldersChanged,
                         onVitaQueryChanged = onVitaQueryChanged,
                         onVitaShortcutFormatSelected = onVitaShortcutFormatSelected,
@@ -313,10 +311,17 @@ internal fun MimirScreen(
                     ?.count { it.targetAlreadyExists && it.detailPath in uiState.selectedChangePaths }
                     ?: 0,
                 deleteOriginalFiles = converterTool in uiState.deleteOriginalTools,
+                // Offered only when the queue holds PS2 games, the one system with a CD/DVD choice.
+                offersPs2Dvd = uiState.previewPlan?.changes.orEmpty().any { change ->
+                    change.detailPath in uiState.selectedChangePaths &&
+                        change.operations.any { it is FileOperation.ConvertToChd && it.system == ChdSystem.PlayStation2 }
+                },
+                ps2UseDvd = uiState.ps2DiscType == ChdDiscType.Dvd,
                 enabled = !uiState.isBusy,
                 onDismiss = { showApplyConfirmation = false },
-                onConfirm = { deleteOriginals ->
+                onConfirm = { deleteOriginals, ps2UseDvd ->
                     if (offersDeleteOriginals) onDeleteOriginalsChanged(converterTool, deleteOriginals)
+                    onPs2UseDvdChanged(ps2UseDvd)
                     showApplyConfirmation = false
                     onApply()
                 },
@@ -579,8 +584,6 @@ private fun ToolScreen(
     onSelectEsDeFolder: () -> Unit,
     onPickEsDeSystemFolder: (String) -> Unit,
     onPresetSelected: (FrontendPreset) -> Unit,
-    onChdSystemSelected: (ChdSystem) -> Unit,
-    onChdDiscTypeSelected: (ChdDiscType) -> Unit,
     onScanHiddenFoldersChanged: (Boolean) -> Unit,
     onVitaQueryChanged: (String) -> Unit,
     onVitaShortcutFormatSelected: (VitaShortcutFormat) -> Unit,
@@ -648,13 +651,6 @@ private fun ToolScreen(
                             scanHiddenFolders = uiState.scanHiddenFolders,
                             onScanHiddenFoldersChanged = onScanHiddenFoldersChanged,
                             enabled = idle,
-                        )
-                        AppSection.ChdMan -> ChdOptions(
-                            system = uiState.selectedChdSystem,
-                            discType = uiState.selectedChdDiscType,
-                            enabled = idle,
-                            onSystemSelected = onChdSystemSelected,
-                            onDiscTypeSelected = onChdDiscTypeSelected,
                         )
                         AppSection.Nsz, AppSection.NspNsz -> NszKeysRow(configured = uiState.nszKeysConfigured, enabled = idle, onSelect = onSelectNszKeys)
                         else -> Unit

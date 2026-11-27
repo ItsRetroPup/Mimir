@@ -313,4 +313,8 @@
     <string name="stats_reset_title">Redefinir estatísticas?</string>
     <string name="stats_reset_body">Isso apaga para sempre o espaço economizado e os jogos comprimidos de todas as ferramentas, e a contagem recomeça a partir de hoje. Não é possível desfazer.</string>
     <string name="action_reset_stats">Redefinir</string>
+
+    <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
+    <string name="chd_ps2_use_dvd">Usar conversor de DVD (para ARMSX2)</string>
+    <string name="chd_ps2_use_dvd_detail">Deixe desligado para o NetherSX2, que precisa de CHD de CD.</string>
 </resources>

@@ -267,4 +267,8 @@
     <string name="stats_reset_title">통계를 초기화할까요?</string>
     <string name="stats_reset_body">모든 도구의 절약한 공간과 압축한 게임 수가 영구적으로 삭제되고, 오늘부터 다시 집계합니다. 되돌릴 수 없습니다.</string>
     <string name="action_reset_stats">초기화</string>
+
+    <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
+    <string name="chd_ps2_use_dvd">DVD 변환기 사용 (ARMSX2용)</string>
+    <string name="chd_ps2_use_dvd_detail">CD CHD가 필요한 NetherSX2에서는 끈 상태로 두세요.</string>
 </resources>

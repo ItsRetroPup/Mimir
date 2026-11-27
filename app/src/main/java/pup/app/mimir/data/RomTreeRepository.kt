@@ -7,6 +7,7 @@ import android.os.Environment
 import android.os.StatFs
 import android.os.storage.StorageManager
 import androidx.documentfile.provider.DocumentFile
+import pup.app.mimir.domain.ChdSystem
 import pup.app.mimir.domain.RomEntry
 import pup.app.mimir.domain.SystemFolders
 import pup.app.mimir.domain.ParamSfoParser
@@ -104,6 +105,8 @@ class RomTreeRepository(private val context: Context) {
         folderAliases: Set<String>,
         supportedExtensions: Set<String>,
         outputExtension: String = "chd",
+        /** False when several systems share one scan, so a loose file isn't claimed by all of them. */
+        includeLooseFiles: Boolean = true,
         onFileScanned: ((Int) -> Unit)? = null,
         shouldStop: (() -> Boolean)? = null,
     ): List<RomEntry> {
@@ -120,7 +123,7 @@ class RomTreeRepository(private val context: Context) {
                     if (shouldStop?.invoke() == true) throw OperationStoppedException("Scan stopped by user.")
                     val childName = child.name ?: return@forEach
                     when {
-                        child.isFile && child.extension() in scanExtensions -> {
+                        child.isFile && child.extension() in scanExtensions && (includeLooseFiles || rootIsSystemFolder) -> {
                             addChdEntry(
                                 child = child,
                                 sourceSegments = emptyList(),
@@ -144,6 +147,29 @@ class RomTreeRepository(private val context: Context) {
                     }
                 }
         }
+    }
+
+    /**
+     * Scans every CHD system's folders in one pass of the ROM root, keyed by system. Files loose in
+     * the root count only when the root is itself a system folder, since an .iso alone can't say
+     * which console it is for.
+     */
+    fun scanChdSystems(
+        rootUri: Uri,
+        onFileScanned: ((Int) -> Unit)? = null,
+        shouldStop: (() -> Boolean)? = null,
+    ): Map<ChdSystem, List<RomEntry>> {
+        var scanned = 0
+        return ChdSystem.entries.associateWith { system ->
+            scanChdTree(
+                rootUri = rootUri,
+                folderAliases = system.folderAliases,
+                supportedExtensions = system.supportedExtensions,
+                includeLooseFiles = false,
+                onFileScanned = onFileScanned?.let { report -> { _: Int -> report(++scanned) } },
+                shouldStop = shouldStop,
+            )
+        }.filterValues { it.isNotEmpty() }
     }
 
     /** Keeps the Xbox disc images that still carry a Redump video partition. */

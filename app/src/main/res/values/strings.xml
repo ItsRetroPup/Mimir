@@ -381,4 +381,8 @@
     <string name="stats_reset_title">Reset stats?</string>
     <string name="stats_reset_body">This permanently deletes the space saved and games compressed for every tool, and counting starts again from today. This can\'t be undone.</string>
     <string name="action_reset_stats">Reset</string>
+
+    <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
+    <string name="chd_ps2_use_dvd">Use DVD converter (for ARMSX2)</string>
+    <string name="chd_ps2_use_dvd_detail">Leave off for NetherSX2, which needs CD CHDs.</string>
 </resources>

@@ -65,19 +65,17 @@ class ToolPlanBuilder(
             }
 
             ToolMode.Converter -> if (state.selectedConverterTool == ConverterTool.Chd) {
-                val system = state.selectedChdSystem
-                val entries = repository.scanChdTree(
+                // Every system's folders in one scan; each game keeps the system its folder names.
+                val entriesBySystem = repository.scanChdSystems(
                     rootUri = romUri,
-                    folderAliases = system.folderAliases,
-                    supportedExtensions = system.supportedExtensions,
                     onFileScanned = onFileScanned,
                     shouldStop = shouldStop,
                 )
-                onProgressLabel(strings.plural(R.plurals.scan_checking_chd, entries.size, entries.size, system.displayName))
+                val found = entriesBySystem.values.sumOf { it.size }
+                onProgressLabel(strings.plural(R.plurals.scan_checking_tool, found, found, ConverterTool.Chd.displayName))
                 ChdPlanner.buildPlan(
-                    entries = entries,
-                    system = system,
-                    discType = state.selectedChdDiscType,
+                    entriesBySystem = entriesBySystem,
+                    ps2DiscType = state.ps2DiscType,
                     deleteOriginalFiles = ConverterTool.Chd in state.deleteOriginalTools,
                 )
             } else {

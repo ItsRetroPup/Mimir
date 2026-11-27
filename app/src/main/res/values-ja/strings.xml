@@ -267,4 +267,8 @@
     <string name="stats_reset_title">統計をリセットしますか？</string>
     <string name="stats_reset_body">すべてのツールの節約した容量と圧縮したゲーム数が完全に削除され、今日から集計し直します。この操作は元に戻せません。</string>
     <string name="action_reset_stats">リセット</string>
+
+    <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
+    <string name="chd_ps2_use_dvd">DVD コンバーターを使う（ARMSX2 用）</string>
+    <string name="chd_ps2_use_dvd_detail">CD CHD が必要な NetherSX2 ではオフのままにしてください。</string>
 </resources>

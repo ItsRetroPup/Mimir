@@ -1,5 +1,9 @@
 package pup.app.mimir.ui
 
+import pup.app.mimir.domain.FileOperation
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.background
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -214,7 +218,19 @@ internal fun ConversionQueueList(
                     enabled = enabled,
                 )
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    Text(change.title, style = MaterialTheme.typography.titleMedium, color = palette.text, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    // CHDMan scans every system at once, so each game shows the system it was found under.
+                    val system = change.operations.firstNotNullOfOrNull { (it as? FileOperation.ConvertToChd)?.system }
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            change.title,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = palette.text,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false),
+                        )
+                        if (system != null) SystemChip(system.displayName)
+                    }
                     SizeBar(change.sourceSizeBytes, largest)
                     Text(
                         change.targetFiles.singleOrNull().orEmpty(),
@@ -255,6 +271,22 @@ internal fun ConversionQueueList(
             },
         )
     }
+}
+
+/** A small tinted label naming a game's system. */
+@Composable
+private fun SystemChip(label: String) {
+    val ink = MaterialTheme.colorScheme.primary
+    Text(
+        label,
+        style = MaterialTheme.typography.labelMedium,
+        color = ink,
+        maxLines = 1,
+        modifier = Modifier
+            .clip(MaterialTheme.shapes.extraSmall)
+            .background(ink.copy(alpha = 0.14f))
+            .padding(horizontal = 8.dp, vertical = 3.dp),
+    )
 }
 
 @Composable

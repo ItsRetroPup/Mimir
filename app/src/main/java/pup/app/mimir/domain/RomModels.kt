@@ -169,6 +169,13 @@ enum class ChdSystem(
     ),
 }
 
+/** PSP and PS3 are DVD-sized and the CD-era systems are CDs; PS2 depends on the emulator. */
+fun ChdSystem.discType(ps2DiscType: ChdDiscType): ChdDiscType = when (this) {
+    ChdSystem.PlayStation2 -> ps2DiscType
+    ChdSystem.PlayStation3, ChdSystem.PlayStationPortable -> ChdDiscType.Dvd
+    else -> ChdDiscType.Cd
+}
+
 data class DiscMatch(
     val title: String,
     val discNumber: Int,
