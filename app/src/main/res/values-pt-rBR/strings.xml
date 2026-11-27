@@ -290,4 +290,20 @@
 
     <!-- Stats. -->
     <string name="stats">Estatísticas</string>
+
+    <!-- In-app update check against GitHub Releases. -->
+    <string name="update_title">Mimir %1$s está disponível</string>
+    <string name="update_whats_new">Novidades</string>
+    <string name="update_body_no_notes">Uma nova versão do Mimir está pronta para baixar.</string>
+    <string name="update_action_download">Baixar</string>
+    <string name="update_action_skip">Pular</string>
+    <string name="update_action_skip_version">Pular esta versão</string>
+    <string name="update_downloading">Baixando…</string>
+    <string name="update_downloading_percent">Baixando… %1$d%%</string>
+    <string name="update_ready_body">O instalador do Android está aberto. Escolha Atualizar para concluir. O Mimir vai fechar e abrir de novo atualizado.</string>
+    <string name="update_action_install">Instalar</string>
+    <string name="update_failed_download">O download não terminou. Verifique sua conexão e tente de novo.</string>
+    <string name="update_action_retry">Tentar de novo</string>
+    <string name="update_failed_signature">Esta atualização tem uma assinatura diferente do Mimir instalado, então o Android não vai instalá-la por cima. Desinstale o Mimir e instale a nova versão pela página da versão.</string>
+    <string name="update_action_open_release">Abrir página da versão</string>
 </resources>

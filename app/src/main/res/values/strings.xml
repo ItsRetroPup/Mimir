@@ -358,4 +358,20 @@
     <string name="licenses_upstream_body">Mimir downloads these files when you use the tool. They remain under the terms of the upstream project.</string>
     <string name="licenses_revision">Source revision %1$s</string>
     <string name="action_view_source">View source</string>
+
+    <!-- In-app update check against GitHub Releases. -->
+    <string name="update_title">Mimir %1$s is available</string>
+    <string name="update_whats_new">What\'s new</string>
+    <string name="update_body_no_notes">A new version of Mimir is ready to download.</string>
+    <string name="update_action_download">Download</string>
+    <string name="update_action_skip">Skip</string>
+    <string name="update_action_skip_version">Skip this version</string>
+    <string name="update_downloading">Downloading…</string>
+    <string name="update_downloading_percent">Downloading… %1$d%%</string>
+    <string name="update_ready_body">Android\'s installer is open. Choose Update to finish. Mimir will close and reopen updated.</string>
+    <string name="update_action_install">Install</string>
+    <string name="update_failed_download">The download didn\'t finish. Check your connection and try again.</string>
+    <string name="update_action_retry">Try again</string>
+    <string name="update_failed_signature">This update is signed differently from the Mimir you have installed, so Android won\'t install it over this one. Uninstall Mimir, then install the new version from the release page.</string>
+    <string name="update_action_open_release">Open release page</string>
 </resources>

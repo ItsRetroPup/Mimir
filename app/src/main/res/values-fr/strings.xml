@@ -379,4 +379,20 @@
     <string name="licenses_upstream_body">Mimir télécharge ces fichiers lorsque vous utilisez l’outil. Ils restent soumis aux conditions du projet d’origine.</string>
     <string name="licenses_revision">Révision source %1$s</string>
     <string name="action_view_source">Voir la source</string>
+
+    <!-- In-app update check against GitHub Releases. -->
+    <string name="update_title">Mimir %1$s est disponible</string>
+    <string name="update_whats_new">Nouveautés</string>
+    <string name="update_body_no_notes">Une nouvelle version de Mimir est prête à être téléchargée.</string>
+    <string name="update_action_download">Télécharger</string>
+    <string name="update_action_skip">Ignorer</string>
+    <string name="update_action_skip_version">Ignorer cette version</string>
+    <string name="update_downloading">Téléchargement…</string>
+    <string name="update_downloading_percent">Téléchargement… %1$d %%</string>
+    <string name="update_ready_body">Le programme d\'installation d\'Android est ouvert. Choisissez Mettre à jour pour terminer. Mimir se fermera puis se rouvrira à jour.</string>
+    <string name="update_action_install">Installer</string>
+    <string name="update_failed_download">Le téléchargement n\'a pas abouti. Vérifiez votre connexion et réessayez.</string>
+    <string name="update_action_retry">Réessayer</string>
+    <string name="update_failed_signature">Cette mise à jour n\'est pas signée comme le Mimir installé, donc Android ne l\'installera pas par-dessus. Désinstallez Mimir, puis installez la nouvelle version depuis la page de la version.</string>
+    <string name="update_action_open_release">Ouvrir la page de la version</string>
 </resources>

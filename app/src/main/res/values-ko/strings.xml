@@ -244,4 +244,20 @@
 
     <!-- Stats. -->
     <string name="stats">통계</string>
+
+    <!-- In-app update check against GitHub Releases. -->
+    <string name="update_title">Mimir %1$s 버전을 사용할 수 있습니다</string>
+    <string name="update_whats_new">새로운 기능</string>
+    <string name="update_body_no_notes">Mimir의 새 버전을 다운로드할 수 있습니다.</string>
+    <string name="update_action_download">다운로드</string>
+    <string name="update_action_skip">건너뛰기</string>
+    <string name="update_action_skip_version">이 버전 건너뛰기</string>
+    <string name="update_downloading">다운로드 중…</string>
+    <string name="update_downloading_percent">다운로드 중… %1$d%%</string>
+    <string name="update_ready_body">Android 설치 프로그램이 열렸습니다. 업데이트를 선택해 완료하세요. Mimir가 닫힌 뒤 업데이트된 상태로 다시 열립니다.</string>
+    <string name="update_action_install">설치</string>
+    <string name="update_failed_download">다운로드가 완료되지 않았습니다. 연결을 확인하고 다시 시도하세요.</string>
+    <string name="update_action_retry">다시 시도</string>
+    <string name="update_failed_signature">이 업데이트는 설치된 Mimir와 서명이 달라 Android가 덮어서 설치할 수 없습니다. Mimir를 제거한 다음 릴리스 페이지에서 새 버전을 설치하세요.</string>
+    <string name="update_action_open_release">릴리스 페이지 열기</string>
 </resources>

@@ -244,4 +244,20 @@
 
     <!-- Stats. -->
     <string name="stats">統計</string>
+
+    <!-- In-app update check against GitHub Releases. -->
+    <string name="update_title">Mimir %1$s 已推出</string>
+    <string name="update_whats_new">新功能</string>
+    <string name="update_body_no_notes">Mimir 的新版本可以下載了。</string>
+    <string name="update_action_download">下載</string>
+    <string name="update_action_skip">略過</string>
+    <string name="update_action_skip_version">略過此版本</string>
+    <string name="update_downloading">正在下載…</string>
+    <string name="update_downloading_percent">正在下載… %1$d%%</string>
+    <string name="update_ready_body">Android 安裝程式已開啟。選擇「更新」即可完成。Mimir 會關閉並以新版本重新開啟。</string>
+    <string name="update_action_install">安裝</string>
+    <string name="update_failed_download">下載未完成。請檢查網路連線後再試一次。</string>
+    <string name="update_action_retry">重試</string>
+    <string name="update_failed_signature">此更新的簽署與已安裝的 Mimir 不同，Android 無法覆蓋安裝。請解除安裝 Mimir，然後從發布頁面安裝新版本。</string>
+    <string name="update_action_open_release">開啟發布頁面</string>
 </resources>
