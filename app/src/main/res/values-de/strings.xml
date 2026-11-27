@@ -301,4 +301,12 @@
     <string name="report_new_total">Neue Gesamtgröße</string>
     <string name="report_space_saved_label">Gesparter Speicher</string>
     <string name="report_size_increase_label">Größenzuwachs</string>
+
+    <!-- ROM Patcher output folder choice. -->
+    <string name="patch_output_folder_chosen">Speichert in %1$s</string>
+    <string name="patch_output_choose_title">Speicherort wählen</string>
+    <string name="patch_output_choose_body">Wähle einen Ordner für die gepatchte Kopie von %1$s. Wähle ihren Ordner, um beide zusammenzuhalten.</string>
+    <string name="patch_output_change">Ordner ändern</string>
+    <string name="patch_confirm_body_in">%1$s wird auf %2$s angewendet und das Ergebnis als %3$s in %4$s gespeichert. Das Original-ROM bleibt unverändert.</string>
+    <string name="msg_patch_folder_unwritable">Mimir kann nicht in diesem Ordner speichern. Wähle einen anderen.</string>
 </resources>

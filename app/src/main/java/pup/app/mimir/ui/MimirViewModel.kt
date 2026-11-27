@@ -629,7 +629,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             val folder = runCatching { patchRunner.outputFolderFromGrant(rom, uri) }.getOrNull()
             if (folder == null) {
-                _uiState.update { it.copy(message = failure(R.string.msg_patch_folder_mismatch, rom.name)) }
+                _uiState.update { it.copy(message = failure(R.string.msg_patch_folder_unwritable)) }
                 return@launch
             }
             _uiState.update { it.copy(romPatch = it.romPatch.copy(outputFolder = folder), message = null) }

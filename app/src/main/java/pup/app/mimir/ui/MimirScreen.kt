@@ -346,6 +346,7 @@ internal fun MimirScreen(
                 romName = patch.rom.name,
                 patchName = patch.patch.name,
                 outputName = patchOutputName,
+                folderLabel = patch.outputFolder?.label.orEmpty(),
                 replacesExisting = patch.outputExists,
                 onDismiss = { showPatchConfirmation = false },
                 onConfirm = {

@@ -308,7 +308,11 @@ internal fun RomPatchPane(
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(outputName, style = MaterialTheme.typography.titleMedium, color = palette.text, maxLines = 2, overflow = TextOverflow.Ellipsis)
             state.outputFolder?.let { folder ->
-                Text(stringResource(R.string.patch_output_folder, folder.label), style = MaterialTheme.typography.bodySmall, color = palette.textMuted)
+                Text(
+                    stringResource(if (folder.nextToRom) R.string.patch_output_folder else R.string.patch_output_folder_chosen, folder.label),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = palette.textMuted,
+                )
             }
             if (state.outputExists) {
                 Text(stringResource(R.string.patch_output_exists), style = MaterialTheme.typography.bodySmall, color = palette.caution)
@@ -329,13 +333,18 @@ internal fun RomPatchPane(
     if (state.outputFolder == null) {
         // Android lets Mimir write only inside folders the user has granted.
         ConsolePanel(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(stringResource(R.string.patch_folder_access_title), style = MaterialTheme.typography.titleSmall, color = palette.text)
+            Text(stringResource(R.string.patch_output_choose_title), style = MaterialTheme.typography.titleSmall, color = palette.text)
             Text(
-                stringResource(R.string.patch_folder_access_body, state.rom?.name.orEmpty()),
+                stringResource(R.string.patch_output_choose_body, state.rom?.name.orEmpty()),
                 style = MaterialTheme.typography.bodyMedium,
                 color = palette.textMuted,
             )
             InkButton(onClick = onGrantFolder, enabled = !isBusy) { Text(stringResource(R.string.action_choose_folder), maxLines = 1) }
+        }
+    } else {
+        // The copy can go anywhere the user picks, not only next to the ROM.
+        OutlinedButton(onClick = onGrantFolder, enabled = !isBusy, modifier = Modifier.focusRing()) {
+            Text(stringResource(R.string.patch_output_change), maxLines = 1)
         }
     }
 }

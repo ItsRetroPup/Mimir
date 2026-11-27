@@ -5,10 +5,12 @@ import android.net.Uri
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import androidx.documentfile.provider.DocumentFile
+import java.io.InputStream
 import pup.app.mimir.domain.PatchException
 import pup.app.mimir.domain.PatchFailure
 import pup.app.mimir.domain.PatchFormat
 import pup.app.mimir.domain.RomPatcher
+import pup.app.mimir.domain.ZippedRom
 
 /**
  * Reads a picked ROM and patch, and writes the patched copy into the ROM's own folder. A file
@@ -18,8 +20,11 @@ import pup.app.mimir.domain.RomPatcher
 class RomPatchRunner(private val context: Context) {
     data class PickedFile(val uri: Uri, val name: String, val sizeBytes: Long)
 
-    /** A writable folder: [treeUri] is the granted tree, [relativePath] leads from it to the folder. */
-    data class OutputFolder(val treeUri: Uri, val relativePath: String, val label: String)
+    /**
+     * A writable folder: [treeUri] is the granted tree, [relativePath] leads from it to the folder.
+     * [nextToRom] is false when the user picked somewhere other than the ROM's own folder.
+     */
+    data class OutputFolder(val treeUri: Uri, val relativePath: String, val label: String, val nextToRom: Boolean = true)
 
     fun describe(uri: Uri): PickedFile {
         val resolver = context.contentResolver
@@ -71,30 +76,43 @@ class RomPatchRunner(private val context: Context) {
     }
 
     /**
-     * Accepts a folder the user granted for [rom] when its document IDs are not paths: the folder
-     * counts as the ROM's when it directly holds a file of the same name and size.
+     * The folder the user picked for the patched copy. Any folder works; it only counts as "next to
+     * the ROM" when it directly holds a file of the ROM's name and size.
      */
     fun outputFolderFromGrant(rom: PickedFile, treeUri: Uri): OutputFolder? {
-        outputFolderFor(rom)?.let { return it }
-        val folder = DocumentFile.fromTreeUri(context, treeUri) ?: return null
-        val match = folder.findFile(rom.name) ?: return null
-        if (!match.isFile || (rom.sizeBytes >= 0 && match.length() != rom.sizeBytes)) return null
+        val folder = DocumentFile.fromTreeUri(context, treeUri)?.takeIf { it.isDirectory && it.canWrite() } ?: return null
+        val match = folder.findFile(rom.name)
+        val holdsRom = match != null && match.isFile && (rom.sizeBytes < 0 || match.length() == rom.sizeBytes)
         val label = DocumentsContract.getTreeDocumentId(treeUri).let { it.substringAfter(':').ifEmpty { it } }
-        return OutputFolder(treeUri, "", label)
+        return OutputFolder(treeUri, "", label, nextToRom = holdsRom)
     }
 
     fun outputExists(folder: OutputFolder, fileName: String): Boolean =
         resolve(folder)?.findFile(fileName) != null
 
-    /** Patches [rom] with [patch] and writes [outputName] into [folder], replacing any file of that name. */
+    /**
+     * Patches [rom] with [patch] and writes [outputName] into [folder], replacing any file of that
+     * name. A zipped ROM is patched inside the zip, and the patched copy is zipped the same way.
+     */
     fun patch(rom: PickedFile, patch: PickedFile, folder: OutputFolder, outputName: String): Long {
-        require(!outputName.equals(rom.name, ignoreCase = true)) { "Refusing to overwrite the original ROM." }
+        require(!(folder.nextToRom && outputName.equals(rom.name, ignoreCase = true))) { "Refusing to overwrite the original ROM." }
         val patchBytes = readAll(patch.uri)
-        val romSize = rom.sizeBytes.takeIf { it >= 0 } ?: 0L
+        val zipped = rom.name.endsWith(".zip", ignoreCase = true)
+        val zipEntry = if (zipped) ZippedRom.largestEntry { open(rom.uri) } else null
+        val romSize = zipEntry?.size ?: rom.sizeBytes.takeIf { it >= 0 } ?: 0L
         // The ROM, its patched copy, and the patch are all held in memory at once.
         val budget = Runtime.getRuntime().maxMemory() * 3 / 4
         if (romSize * 2 + patchBytes.size > budget) throw PatchException(PatchFailure.TooLarge)
-        val output = RomPatcher.apply(readAll(rom.uri), patchBytes)
+        val romBytes = if (zipEntry != null) ZippedRom.read(open(rom.uri), zipEntry.name) else readAll(rom.uri)
+        val patched = RomPatcher.apply(romBytes, patchBytes)
+        val output = if (zipEntry == null) {
+            patched
+        } else {
+            // Inside the zip the ROM keeps its own extension: "Hack.zip" holds "Hack.sfc".
+            val innerName = outputName.substringBeforeLast('.') +
+                zipEntry.name.substringAfterLast('/').let { name -> if ('.' in name) ".${name.substringAfterLast('.')}" else "" }
+            ZippedRom.zip(innerName, patched)
+        }
 
         val directory = resolve(folder) ?: error("Unable to open ${folder.label}.")
         directory.findFile(outputName)?.let { existing ->
@@ -118,6 +136,9 @@ class RomPatchRunner(private val context: Context) {
         val root = DocumentFile.fromTreeUri(context, folder.treeUri) ?: return null
         return if (folder.relativePath.isEmpty()) root else root.findRelative(folder.relativePath)
     }
+
+    private fun open(uri: Uri): InputStream =
+        context.contentResolver.openInputStream(uri) ?: error("Unable to read $uri.")
 
     private fun readAll(uri: Uri): ByteArray =
         context.contentResolver.openInputStream(uri)?.use { it.readBytes() }

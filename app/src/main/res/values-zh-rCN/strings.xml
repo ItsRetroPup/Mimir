@@ -278,4 +278,12 @@
     <string name="report_new_total">新的总大小</string>
     <string name="report_space_saved_label">节省的空间</string>
     <string name="report_size_increase_label">增加的大小</string>
+
+    <!-- ROM Patcher output folder choice. -->
+    <string name="patch_output_folder_chosen">保存到 %1$s</string>
+    <string name="patch_output_choose_title">选择保存位置</string>
+    <string name="patch_output_choose_body">为 %1$s 的补丁副本选择一个文件夹。选择它所在的文件夹即可放在一起。</string>
+    <string name="patch_output_change">更改文件夹</string>
+    <string name="patch_confirm_body_in">将把 %1$s 应用到 %2$s，并在 %4$s 中保存为 %3$s。原始 ROM 不会改变。</string>
+    <string name="msg_patch_folder_unwritable">Mimir 无法保存到该文件夹，请选择其他文件夹。</string>
 </resources>

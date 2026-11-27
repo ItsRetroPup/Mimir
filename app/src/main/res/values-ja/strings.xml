@@ -278,4 +278,12 @@
     <string name="report_new_total">新しい合計サイズ</string>
     <string name="report_space_saved_label">節約した容量</string>
     <string name="report_size_increase_label">増えた容量</string>
+
+    <!-- ROM Patcher output folder choice. -->
+    <string name="patch_output_folder_chosen">%1$s に保存</string>
+    <string name="patch_output_choose_title">保存先を選ぶ</string>
+    <string name="patch_output_choose_body">%1$s のパッチ適用コピーを保存するフォルダを選んでください。元のフォルダを選ぶと一緒に保存されます。</string>
+    <string name="patch_output_change">フォルダを変更</string>
+    <string name="patch_confirm_body_in">%2$s に %1$s を適用し、%4$s に %3$s として保存します。元の ROM は変更されません。</string>
+    <string name="msg_patch_folder_unwritable">そのフォルダには保存できません。別のフォルダを選んでください。</string>
 </resources>

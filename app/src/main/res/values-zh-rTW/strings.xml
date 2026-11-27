@@ -278,4 +278,12 @@
     <string name="report_new_total">新的總大小</string>
     <string name="report_space_saved_label">節省的空間</string>
     <string name="report_size_increase_label">增加的大小</string>
+
+    <!-- ROM Patcher output folder choice. -->
+    <string name="patch_output_folder_chosen">儲存到 %1$s</string>
+    <string name="patch_output_choose_title">選擇儲存位置</string>
+    <string name="patch_output_choose_body">為 %1$s 的修補副本選擇一個資料夾。選擇它所在的資料夾即可放在一起。</string>
+    <string name="patch_output_change">變更資料夾</string>
+    <string name="patch_confirm_body_in">將把 %1$s 套用到 %2$s，並在 %4$s 中儲存為 %3$s。原始 ROM 不會改變。</string>
+    <string name="msg_patch_folder_unwritable">Mimir 無法儲存到該資料夾，請選擇其他資料夾。</string>
 </resources>

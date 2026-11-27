@@ -278,4 +278,12 @@
     <string name="report_new_total">새 전체 크기</string>
     <string name="report_space_saved_label">절약한 공간</string>
     <string name="report_size_increase_label">늘어난 크기</string>
+
+    <!-- ROM Patcher output folder choice. -->
+    <string name="patch_output_folder_chosen">%1$s에 저장</string>
+    <string name="patch_output_choose_title">저장 위치 선택</string>
+    <string name="patch_output_choose_body">%1$s의 패치된 사본을 저장할 폴더를 선택하세요. 원본이 있는 폴더를 고르면 함께 보관됩니다.</string>
+    <string name="patch_output_change">폴더 변경</string>
+    <string name="patch_confirm_body_in">%2$s에 %1$s을(를) 적용하고 결과를 %4$s에 %3$s(으)로 저장합니다. 원본 ROM은 바뀌지 않습니다.</string>
+    <string name="msg_patch_folder_unwritable">그 폴더에는 저장할 수 없습니다. 다른 폴더를 선택하세요.</string>
 </resources>

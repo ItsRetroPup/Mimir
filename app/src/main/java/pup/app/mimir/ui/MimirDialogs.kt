@@ -250,6 +250,7 @@ internal fun RomPatchDialog(
     romName: String,
     patchName: String,
     outputName: String,
+    folderLabel: String,
     replacesExisting: Boolean,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
@@ -261,7 +262,7 @@ internal fun RomPatchDialog(
         text = {
             Text(
                 listOfNotNull(
-                    stringResource(R.string.patch_confirm_body, patchName, romName, outputName),
+                    stringResource(R.string.patch_confirm_body_in, patchName, romName, outputName, folderLabel),
                     stringResource(R.string.patch_confirm_replace, outputName).takeIf { replacesExisting },
                 ).joinToString(" "),
             )
