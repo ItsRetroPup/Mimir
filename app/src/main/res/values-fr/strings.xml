@@ -274,12 +274,12 @@
 
     <!-- Memory-card shell: home, legend bar and empty states. -->
     <string name="about_mimir">À propos de Mimir</string>
+    <string name="about_version">Version %1$s</string>
     <string name="language">Langue</string>
     <string name="language_system">Langue du système</string>
     <string name="info_reads">Lit</string>
     <string name="info_writes">Écrit</string>
     <string name="legend_open">Ouvrir</string>
-    <string name="legend_theme">Thème</string>
     <string name="legend_list_view">Liste</string>
     <string name="legend_grid_view">Grille</string>
     <string name="legend_select">Sélectionner</string>

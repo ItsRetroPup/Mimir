@@ -171,7 +171,6 @@ internal fun MimirScreen(
         tool = tool,
         uiState = uiState,
         onHome = goHome,
-        onToggleTheme = { onDarkModeToggled(!uiState.useDarkMode) },
         onToggleHomeView = { onHomeListViewToggled(!uiState.homeListView) },
         onScan = onStart,
         onApply = { showApplyConfirmation = true },
@@ -379,7 +378,6 @@ private fun legendFor(
     tool: ToolEntry?,
     uiState: MimirUiState,
     onHome: () -> Unit,
-    onToggleTheme: () -> Unit,
     onToggleHomeView: () -> Unit,
     onScan: () -> Unit,
     onApply: () -> Unit,
@@ -396,7 +394,6 @@ private fun legendFor(
                 stringResource(if (uiState.homeListView) R.string.legend_grid_view else R.string.legend_list_view),
                 onClick = onToggleHomeView,
             ),
-            LegendAction("Y", stringResource(R.string.legend_theme), onClick = onToggleTheme),
         )
     }
     val idle = !uiState.isBusy

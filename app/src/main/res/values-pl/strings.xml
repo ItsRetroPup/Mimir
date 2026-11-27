@@ -264,12 +264,12 @@
 
     <!-- Memory-card shell: home, legend bar and empty states. -->
     <string name="about_mimir">O Mimir</string>
+    <string name="about_version">Wersja %1$s</string>
     <string name="language">Język</string>
     <string name="language_system">Język systemu</string>
     <string name="info_reads">Czyta</string>
     <string name="info_writes">Zapisuje</string>
     <string name="legend_open">Otwórz</string>
-    <string name="legend_theme">Motyw</string>
     <string name="legend_list_view">Lista</string>
     <string name="legend_grid_view">Siatka</string>
     <string name="legend_select">Wybierz</string>

@@ -201,12 +201,12 @@
 
     <!-- Memory-card shell: home, legend bar and empty states. -->
     <string name="about_mimir">關於 Mimir</string>
+    <string name="about_version">版本 %1$s</string>
     <string name="language">語言</string>
     <string name="language_system">跟隨系統</string>
     <string name="info_reads">讀取</string>
     <string name="info_writes">寫入</string>
     <string name="legend_open">開啟</string>
-    <string name="legend_theme">主題</string>
     <string name="legend_list_view">清單</string>
     <string name="legend_grid_view">格狀</string>
     <string name="legend_select">選取</string>

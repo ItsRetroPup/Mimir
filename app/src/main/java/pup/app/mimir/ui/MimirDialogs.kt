@@ -34,6 +34,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -222,6 +224,11 @@ internal fun RomPatchDialog(
 @Composable
 internal fun AboutDialog(onOpenUrl: (String) -> Unit, onDismiss: () -> Unit) {
     val palette = LocalMimirPalette.current
+    val context = LocalContext.current
+    // The installed version name, such as 1.2.0, read from the app's own package.
+    val versionName = remember {
+        runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull()
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.about_mimir)) },
@@ -231,6 +238,9 @@ internal fun AboutDialog(onOpenUrl: (String) -> Unit, onDismiss: () -> Unit) {
                 modifier = Modifier.verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                versionName?.let {
+                    Text(stringResource(R.string.about_version, it), style = MaterialTheme.typography.titleSmall, color = palette.text)
+                }
                 Text(stringResource(R.string.support_body), style = MaterialTheme.typography.bodyMedium, color = palette.textMuted)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     SupportLink("YouTube", Icons.Outlined.Subscriptions) { onOpenUrl(YOUTUBE_CHANNEL_URL) }
