@@ -139,6 +139,26 @@ internal fun EsDeInstallDialog(
     )
 }
 
+/** Confirms wiping every tool's Stats totals; the amber button marks it as permanent. */
+@Composable
+internal fun ResetStatsDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.stats_reset_title)) },
+        text = { Text(stringResource(R.string.stats_reset_body)) },
+        confirmButton = {
+            InkButton(
+                onClick = onConfirm,
+                containerColor = LocalMimirPalette.current.caution,
+                contentColor = LocalMimirPalette.current.onCaution,
+            ) { Text(stringResource(R.string.action_reset_stats)) }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = onDismiss, modifier = Modifier.focusRing()) { Text(stringResource(R.string.action_cancel)) }
+        },
+    )
+}
+
 @Composable
 internal fun VitaShortcutAddDialog(
     app: VitaApp,

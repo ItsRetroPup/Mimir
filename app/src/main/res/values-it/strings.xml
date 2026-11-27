@@ -306,4 +306,10 @@
     <string name="update_action_retry">Riprova</string>
     <string name="update_failed_signature">Questo aggiornamento ha una firma diversa dal Mimir installato, quindi Android non lo installerà sopra. Disinstalla Mimir, poi installa la nuova versione dalla pagina della release.</string>
     <string name="update_action_open_release">Apri pagina della release</string>
+
+    <!-- Resetting the Stats totals. -->
+    <string name="legend_reset_stats">Azzera statistiche</string>
+    <string name="stats_reset_title">Azzerare le statistiche?</string>
+    <string name="stats_reset_body">Questo elimina in modo permanente lo spazio risparmiato e i giochi compressi di tutti gli strumenti, e il conteggio riparte da oggi. Non si può annullare.</string>
+    <string name="action_reset_stats">Azzera</string>
 </resources>

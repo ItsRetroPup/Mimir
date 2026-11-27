@@ -120,6 +120,7 @@ internal fun MimirScreen(
     onSelectPatchFile: () -> Unit,
     onGrantPatchFolder: () -> Unit,
     onApplyPatch: () -> Unit,
+    onResetStats: () -> Unit,
 ) {
     val context = LocalContext.current
     val palette = LocalMimirPalette.current
@@ -127,6 +128,7 @@ internal fun MimirScreen(
     var showApplyConfirmation by rememberSaveable { mutableStateOf(false) }
     var showEsDeConfirmation by rememberSaveable { mutableStateOf(false) }
     var showPatchConfirmation by rememberSaveable { mutableStateOf(false) }
+    var showResetStats by rememberSaveable { mutableStateOf(false) }
     var pendingVitaAdd by remember { mutableStateOf<VitaApp?>(null) }
     var pendingVitaRemove by remember { mutableStateOf<VitaApp?>(null) }
     var showAbout by rememberSaveable { mutableStateOf(false) }
@@ -166,7 +168,16 @@ internal fun MimirScreen(
     val onPage = pageTitle != null
     val ink = tool?.ink?.resolve(palette) ?: palette.edge
     val legend = if (onPage) {
-        listOf(LegendAction("B", stringResource(R.string.legend_back), onClick = goHome))
+        listOfNotNull(
+            LegendAction("B", stringResource(R.string.legend_back), onClick = goHome),
+            // Y resets Stats, through a confirmation; there is nothing to reset until a tool has run.
+            LegendAction(
+                "Y",
+                stringResource(R.string.legend_reset_stats),
+                enabled = uiState.usageStats.tools.isNotEmpty(),
+                onClick = { showResetStats = true },
+            ).takeIf { currentSection == AppSection.Stats },
+        )
     } else legendFor(
         tool = tool,
         uiState = uiState,
@@ -353,6 +364,16 @@ internal fun MimirScreen(
 
         if (showAbout) {
             AboutDialog(onOpenUrl = openUrl, onDismiss = { showAbout = false })
+        }
+
+        if (showResetStats) {
+            ResetStatsDialog(
+                onDismiss = { showResetStats = false },
+                onConfirm = {
+                    showResetStats = false
+                    onResetStats()
+                },
+            )
         }
 
         if (showLanguage) {

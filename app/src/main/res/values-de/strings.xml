@@ -283,4 +283,10 @@
     <string name="update_action_retry">Erneut versuchen</string>
     <string name="update_failed_signature">Dieses Update ist anders signiert als dein installiertes Mimir, daher installiert Android es nicht darüber. Deinstalliere Mimir und installiere dann die neue Version von der Release-Seite.</string>
     <string name="update_action_open_release">Release-Seite öffnen</string>
+
+    <!-- Resetting the Stats totals. -->
+    <string name="legend_reset_stats">Statistik zurücksetzen</string>
+    <string name="stats_reset_title">Statistik zurücksetzen?</string>
+    <string name="stats_reset_body">Dadurch werden der gesparte Speicherplatz und die komprimierten Spiele aller Tools endgültig gelöscht, und die Zählung beginnt ab heute neu. Das kann nicht rückgängig gemacht werden.</string>
+    <string name="action_reset_stats">Zurücksetzen</string>
 </resources>

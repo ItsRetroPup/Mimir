@@ -260,4 +260,10 @@
     <string name="update_action_retry">再試行</string>
     <string name="update_failed_signature">このアップデートはインストール済みの Mimir と署名が異なるため、Android は上書きインストールできません。Mimir をアンインストールしてから、リリースページで新しいバージョンをインストールしてください。</string>
     <string name="update_action_open_release">リリースページを開く</string>
+
+    <!-- Resetting the Stats totals. -->
+    <string name="legend_reset_stats">統計をリセット</string>
+    <string name="stats_reset_title">統計をリセットしますか？</string>
+    <string name="stats_reset_body">すべてのツールの節約した容量と圧縮したゲーム数が完全に削除され、今日から集計し直します。この操作は元に戻せません。</string>
+    <string name="action_reset_stats">リセット</string>
 </resources>

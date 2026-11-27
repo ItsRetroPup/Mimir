@@ -260,4 +260,10 @@
     <string name="update_action_retry">重試</string>
     <string name="update_failed_signature">此更新的簽署與已安裝的 Mimir 不同，Android 無法覆蓋安裝。請解除安裝 Mimir，然後從發布頁面安裝新版本。</string>
     <string name="update_action_open_release">開啟發布頁面</string>
+
+    <!-- Resetting the Stats totals. -->
+    <string name="legend_reset_stats">重設統計</string>
+    <string name="stats_reset_title">要重設統計嗎？</string>
+    <string name="stats_reset_body">這會永久刪除所有工具的已節省空間和已壓縮遊戲數，並從今天重新開始計算。此操作無法復原。</string>
+    <string name="action_reset_stats">重設</string>
 </resources>

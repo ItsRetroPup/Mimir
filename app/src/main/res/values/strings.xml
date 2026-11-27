@@ -374,4 +374,10 @@
     <string name="update_action_retry">Try again</string>
     <string name="update_failed_signature">This update is signed differently from the Mimir you have installed, so Android won\'t install it over this one. Uninstall Mimir, then install the new version from the release page.</string>
     <string name="update_action_open_release">Open release page</string>
+
+    <!-- Resetting the Stats totals. -->
+    <string name="legend_reset_stats">Reset stats</string>
+    <string name="stats_reset_title">Reset stats?</string>
+    <string name="stats_reset_body">This permanently deletes the space saved and games compressed for every tool, and counting starts again from today. This can\'t be undone.</string>
+    <string name="action_reset_stats">Reset</string>
 </resources>

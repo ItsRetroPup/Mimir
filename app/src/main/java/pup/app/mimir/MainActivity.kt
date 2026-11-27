@@ -158,6 +158,7 @@ class MainActivity : AppCompatActivity() {
                         onSelectPatchFile = { patchFileLauncher.launch(arrayOf("*/*")) },
                         onGrantPatchFolder = { patchFolderLauncher.launch(uiState.romPatch.rom?.uri) },
                         onApplyPatch = viewModel::applyPatch,
+                        onResetStats = viewModel::resetStats,
                     )
                     UpdateDialog(
                         state = updateState,

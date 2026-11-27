@@ -911,6 +911,12 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun info(@StringRes id: Int, vararg args: Any) = StatusMessage(strings.text(id, *args))
 
+    /** Clears the Stats totals for good; the screen asks first. */
+    fun resetStats() {
+        val stats = statsStore.reset()
+        _uiState.update { it.copy(usageStats = stats) }
+    }
+
     private fun recordUsage(key: String, games: Int, spaceSavedBytes: Long) {
         if (games <= 0 && spaceSavedBytes == 0L) return
         val stats = statsStore.record(key, games, spaceSavedBytes)
