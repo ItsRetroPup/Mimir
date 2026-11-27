@@ -9,21 +9,22 @@ class ChdSystemTest {
     fun dreamcastHasExpectedFolderAliasesAndInputs() {
         val system = ChdSystem.Dreamcast
 
-        assertEquals(setOf("dreamcast", "dc"), system.folderAliases)
+        assertTrue(listOf("dreamcast", "dc", "Sega - Dreamcast").all { SystemFolders.matches(it, system.folderAliases) })
         assertTrue(setOf("gdi", "cue", "iso").all { it in system.supportedExtensions })
     }
 
     @Test
     fun ps3ReadsIsoImagesFromItsFolders() {
-        assertEquals(setOf("playstation 3", "ps3"), ChdSystem.PlayStation3.folderAliases)
+        assertTrue(listOf("ps3", "PlayStation 3").all { SystemFolders.matches(it, ChdSystem.PlayStation3.folderAliases) })
         assertEquals(setOf("iso"), ChdSystem.PlayStation3.supportedExtensions)
     }
 
     @Test
     fun segaCdIncludesMegaCdAliases() {
-        assertEquals(
-            setOf("sega cd", "segacd", "mega cd", "megacd"),
-            ChdSystem.SegaCd.folderAliases,
+        val aliases = ChdSystem.SegaCd.folderAliases
+        assertTrue(
+            listOf("sega cd", "segacd", "Mega CD", "megacd", "Sega - Mega CD & Sega CD")
+                .all { SystemFolders.matches(it, aliases) },
         )
     }
 }

@@ -8,6 +8,7 @@ import android.os.StatFs
 import android.os.storage.StorageManager
 import androidx.documentfile.provider.DocumentFile
 import pup.app.mimir.domain.RomEntry
+import pup.app.mimir.domain.SystemFolders
 import pup.app.mimir.domain.ParamSfoParser
 import pup.app.mimir.domain.VitaApp
 import pup.app.mimir.domain.VitaShortcutFormat
@@ -96,6 +97,7 @@ class RomTreeRepository(private val context: Context) {
     /**
      * Scans compatible files in the selected root and system-specific child folders only.
      * This keeps, for example, a Dreamcast scan from picking up PS1 cue sheets elsewhere in a ROM root.
+     * Folder names are matched loosely, so "dc", "Dreamcast" and "Sega - Dreamcast" all count.
      */
     fun scanChdTree(
         rootUri: Uri,
@@ -106,10 +108,11 @@ class RomTreeRepository(private val context: Context) {
         shouldStop: (() -> Boolean)? = null,
     ): List<RomEntry> {
         val root = DocumentFile.fromTreeUri(context, rootUri) ?: return emptyList()
-        val normalizedAliases = folderAliases.map(String::lowercase).toSet()
         // Existing outputs are included so the planner can mark their matching source image as an
         // overwrite choice. The planner itself only creates operations for supported source types.
         val scanExtensions = supportedExtensions + outputExtension
+        // When the picked folder is itself the system folder, such as "Nintendo 3DS", scan all of it.
+        val rootIsSystemFolder = SystemFolders.matches(root.name.orEmpty(), folderAliases)
         return buildList {
             root.listFiles()
                 .sortedBy { it.name.orEmpty().lowercase() }
@@ -127,7 +130,7 @@ class RomTreeRepository(private val context: Context) {
                             )
                         }
 
-                        child.isDirectory && childName.lowercase() in normalizedAliases -> {
+                        child.isDirectory && (rootIsSystemFolder || SystemFolders.matches(childName, folderAliases)) -> {
                             walkChdDirectory(
                                 node = child,
                                 sourceSegments = listOf(childName),
