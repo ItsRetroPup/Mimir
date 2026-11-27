@@ -724,7 +724,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         selectedChangePaths = plan.changes
                             .filterNot { mode == ToolMode.Converter && it.targetAlreadyExists }
                             .mapTo(linkedSetOf()) { it.detailPath },
-                        message = if (plan.changes.isEmpty()) StatusMessage(planBuilder.emptyResultText(currentState)) else null,
+                        message = if (plan.changes.isEmpty()) StatusMessage(plan.conflicts.firstOrNull() ?: planBuilder.emptyResultText(currentState)) else null,
                         stopRequest = StopRequest.None,
                     )
                 }

@@ -141,10 +141,17 @@ internal fun OrganizerOptions(
 @Composable
 internal fun NszKeysRow(configured: Boolean, enabled: Boolean, onSelect: () -> Unit) {
     PanelRule()
-    OptionRow(
-        label = stringResource(R.string.nsz_keys_title),
-        detail = stringResource(if (configured) R.string.nsz_keys_configured else R.string.nsz_keys_missing),
-    ) {
+    // Stacked rather than side by side: the setup column is narrow, and the detail is a sentence.
+    val palette = LocalMimirPalette.current
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(stringResource(R.string.nsz_keys_title), style = MaterialTheme.typography.titleSmall, color = palette.text)
+            Text(
+                stringResource(if (configured) R.string.nsz_keys_configured else R.string.nsz_keys_missing),
+                style = MaterialTheme.typography.bodySmall,
+                color = palette.textMuted,
+            )
+        }
         val label = stringResource(if (configured) R.string.action_replace_keys else R.string.action_import_keys)
         if (configured) {
             OutlinedButton(onClick = onSelect, enabled = enabled, modifier = Modifier.focusRing()) { Text(label, maxLines = 1) }

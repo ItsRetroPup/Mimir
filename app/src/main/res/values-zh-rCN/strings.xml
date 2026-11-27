@@ -286,4 +286,8 @@
     <string name="patch_output_change">更改文件夹</string>
     <string name="patch_confirm_body_in">将把 %1$s 应用到 %2$s，并在 %4$s 中保存为 %3$s。原始 ROM 不会改变。</string>
     <string name="msg_patch_folder_unwritable">Mimir 无法保存到该文件夹，请选择其他文件夹。</string>
+
+    <plurals name="msg_xiso_all_trimmed">
+        <item quantity="other">找到 %1$d 个 Xbox .iso 文件，但它们已是 XISO 或不是 Xbox 光盘，无需精简。</item>
+    </plurals>
 </resources>

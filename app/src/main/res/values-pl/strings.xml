@@ -355,4 +355,11 @@
     <string name="patch_output_change">Zmień folder</string>
     <string name="patch_confirm_body_in">%1$s zostanie zastosowany do %2$s, a wynik zapisany jako %3$s w %4$s. Oryginalny ROM się nie zmieni.</string>
     <string name="msg_patch_folder_unwritable">Mimir nie może zapisać w tym folderze. Wybierz inny.</string>
+
+    <plurals name="msg_xiso_all_trimmed">
+        <item quantity="one">Znaleziono %1$d plik .iso Xbox, który jest już XISO lub nie jest płytą Xbox, więc nie ma czego przycinać.</item>
+        <item quantity="few">Znaleziono %1$d plików .iso Xbox, które są już XISO lub nie są płytami Xbox, więc nie ma czego przycinać.</item>
+        <item quantity="many">Znaleziono %1$d plików .iso Xbox, które są już XISO lub nie są płytami Xbox, więc nie ma czego przycinać.</item>
+        <item quantity="other">Znaleziono %1$d plików .iso Xbox, które są już XISO lub nie są płytami Xbox, więc nie ma czego przycinać.</item>
+    </plurals>
 </resources>

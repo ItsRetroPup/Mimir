@@ -286,4 +286,8 @@
     <string name="patch_output_change">フォルダを変更</string>
     <string name="patch_confirm_body_in">%2$s に %1$s を適用し、%4$s に %3$s として保存します。元の ROM は変更されません。</string>
     <string name="msg_patch_folder_unwritable">そのフォルダには保存できません。別のフォルダを選んでください。</string>
+
+    <plurals name="msg_xiso_all_trimmed">
+        <item quantity="other">Xbox の .iso ファイルが %1$d 件見つかりましたが、すでに XISO か Xbox ディスクではないため、縮小するものはありません。</item>
+    </plurals>
 </resources>

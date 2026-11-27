@@ -332,4 +332,9 @@
     <string name="patch_output_change">Trocar pasta</string>
     <string name="patch_confirm_body_in">%1$s será aplicado a %2$s e o resultado salvo como %3$s em %4$s. A ROM original não muda.</string>
     <string name="msg_patch_folder_unwritable">O Mimir não consegue salvar nessa pasta. Escolha outra.</string>
+
+    <plurals name="msg_xiso_all_trimmed">
+        <item quantity="one">Foi encontrado %1$d arquivo .iso de Xbox que já é XISO ou não é um disco de Xbox, então não há nada para reduzir.</item>
+        <item quantity="other">Foram encontrados %1$d arquivos .iso de Xbox que já são XISO ou não são discos de Xbox, então não há nada para reduzir.</item>
+    </plurals>
 </resources>

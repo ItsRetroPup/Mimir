@@ -400,4 +400,9 @@
     <string name="patch_output_change">Change folder</string>
     <string name="patch_confirm_body_in">This will apply %1$s to %2$s and save the result as %3$s in %4$s. The original ROM is not changed.</string>
     <string name="msg_patch_folder_unwritable">Mimir can\'t save to that folder. Choose another one.</string>
+
+    <plurals name="msg_xiso_all_trimmed">
+        <item quantity="one">Found %1$d Xbox .iso file that is already an XISO or isn\'t an Xbox disc, so there\'s nothing to trim.</item>
+        <item quantity="other">Found %1$d Xbox .iso files that are already XISOs or aren\'t Xbox discs, so there\'s nothing to trim.</item>
+    </plurals>
 </resources>

@@ -286,4 +286,8 @@
     <string name="patch_output_change">폴더 변경</string>
     <string name="patch_confirm_body_in">%2$s에 %1$s을(를) 적용하고 결과를 %4$s에 %3$s(으)로 저장합니다. 원본 ROM은 바뀌지 않습니다.</string>
     <string name="msg_patch_folder_unwritable">그 폴더에는 저장할 수 없습니다. 다른 폴더를 선택하세요.</string>
+
+    <plurals name="msg_xiso_all_trimmed">
+        <item quantity="other">Xbox .iso 파일 %1$d개를 찾았지만 이미 XISO이거나 Xbox 디스크가 아니어서 줄일 것이 없습니다.</item>
+    </plurals>
 </resources>

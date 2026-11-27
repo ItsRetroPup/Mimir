@@ -421,4 +421,9 @@
     <string name="patch_output_change">Changer de dossier</string>
     <string name="patch_confirm_body_in">%1$s sera appliqué à %2$s et le résultat enregistré sous %3$s dans %4$s. La ROM d\'origine n\'est pas modifiée.</string>
     <string name="msg_patch_folder_unwritable">Mimir ne peut pas enregistrer dans ce dossier. Choisissez-en un autre.</string>
+
+    <plurals name="msg_xiso_all_trimmed">
+        <item quantity="one">%1$d fichier .iso Xbox trouvé, déjà en XISO ou qui n\'est pas un disque Xbox : rien à réduire.</item>
+        <item quantity="other">%1$d fichiers .iso Xbox trouvés, déjà en XISO ou qui ne sont pas des disques Xbox : rien à réduire.</item>
+    </plurals>
 </resources>

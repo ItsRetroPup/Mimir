@@ -94,7 +94,14 @@ class ToolPlanBuilder(
                 } else {
                     scannedEntries
                 }
-                NativeConverterPlanner.buildPlan(entries, tool)
+                val plan = NativeConverterPlanner.buildPlan(entries, tool)
+                val skippedImages = scannedEntries.size - entries.size
+                if (tool == ConverterTool.XboxXiso && plan.changes.isEmpty() && skippedImages > 0) {
+                    // Say why the .iso files found were left out, rather than "nothing found".
+                    plan.copy(conflicts = listOf(strings.plural(R.plurals.msg_xiso_all_trimmed, skippedImages, skippedImages)))
+                } else {
+                    plan
+                }
             }
 
             ToolMode.VitaAppIds, ToolMode.EsDeSystems, ToolMode.RomPatcher -> error("This tool does not use ROM scanning.")
