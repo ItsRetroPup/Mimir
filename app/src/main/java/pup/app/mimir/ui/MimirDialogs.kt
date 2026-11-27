@@ -34,6 +34,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -55,22 +57,29 @@ internal fun ApplyConfirmationDialog(
     converterTool: ConverterTool,
     changeCount: Int,
     existingOutputCount: Int,
-    deleteOriginalChdFiles: Boolean,
+    deleteOriginalFiles: Boolean,
+    offersPs2Dvd: Boolean,
+    ps2UseDvd: Boolean,
     enabled: Boolean,
     onDismiss: () -> Unit,
-    onConfirm: (deleteOriginalChdFiles: Boolean) -> Unit,
+    onConfirm: (deleteOriginalFiles: Boolean, ps2UseDvd: Boolean) -> Unit,
 ) {
     val palette = LocalMimirPalette.current
     val isConversion = mode == ToolMode.Converter
-    val offersDeleteOriginals = isConversion && converterTool == ConverterTool.Chd
-    var deleteOriginals by rememberSaveable { mutableStateOf(deleteOriginalChdFiles) }
+    val offersDeleteOriginals = isConversion && converterTool.canDeleteOriginals
+    var deleteOriginals by rememberSaveable { mutableStateOf(deleteOriginalFiles) }
+    var useDvd by rememberSaveable { mutableStateOf(ps2UseDvd) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(stringResource(if (isConversion) R.string.apply_title_convert else R.string.apply_title_changes))
         },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            // Both switches can show at once, so the body scrolls on the Thor's short screen.
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
                 Text(
                     when {
                         !isConversion -> pluralStringResource(R.plurals.apply_body_changes, changeCount, changeCount)
@@ -83,6 +92,14 @@ internal fun ApplyConfirmationDialog(
                         ).joinToString(" ")
                     }
                 )
+                if (offersPs2Dvd) {
+                    DialogSwitchRow(
+                        title = stringResource(R.string.chd_ps2_use_dvd),
+                        detail = stringResource(R.string.chd_ps2_use_dvd_detail),
+                        checked = useDvd,
+                        onCheckedChange = { useDvd = it },
+                    )
+                }
                 if (offersDeleteOriginals) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -92,7 +109,14 @@ internal fun ApplyConfirmationDialog(
                         Column(modifier = Modifier.weight(1f)) {
                             Text(stringResource(R.string.apply_delete_originals), style = MaterialTheme.typography.bodyLarge)
                             Text(
-                                stringResource(R.string.apply_delete_originals_detail),
+                                stringResource(
+                                    if (converterTool == ConverterTool.Chd) {
+                                        R.string.apply_delete_originals_detail
+                                    } else {
+                                        R.string.apply_delete_originals_detail_single
+                                    },
+                                    converterTool.sourceExtensions.sorted().joinToString(" / ") { ".$it" },
+                                ),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
                             )
@@ -104,7 +128,7 @@ internal fun ApplyConfirmationDialog(
         },
         confirmButton = {
             InkButton(
-                onClick = { onConfirm(deleteOriginals) },
+                onClick = { onConfirm(deleteOriginals, useDvd) },
                 enabled = enabled && changeCount > 0,
                 containerColor = palette.caution,
                 contentColor = palette.onCaution,
@@ -130,6 +154,46 @@ internal fun EsDeInstallDialog(
         text = { Text(pluralStringResource(R.plurals.esde_install_body, systemCount, systemCount)) },
         confirmButton = {
             InkButton(onClick = onConfirm) { Text(stringResource(R.string.action_install_systems)) }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = onDismiss, modifier = Modifier.focusRing()) { Text(stringResource(R.string.action_cancel)) }
+        },
+    )
+}
+
+/** A labelled switch inside a confirmation dialog. */
+@Composable
+private fun DialogSwitchRow(title: String, detail: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                detail,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
+            )
+        }
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
+    }
+}
+
+/** Confirms wiping every tool's Stats totals; the amber button marks it as permanent. */
+@Composable
+internal fun ResetStatsDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.stats_reset_title)) },
+        text = { Text(stringResource(R.string.stats_reset_body)) },
+        confirmButton = {
+            InkButton(
+                onClick = onConfirm,
+                containerColor = LocalMimirPalette.current.caution,
+                contentColor = LocalMimirPalette.current.onCaution,
+            ) { Text(stringResource(R.string.action_reset_stats)) }
         },
         dismissButton = {
             OutlinedButton(onClick = onDismiss, modifier = Modifier.focusRing()) { Text(stringResource(R.string.action_cancel)) }
@@ -186,6 +250,7 @@ internal fun RomPatchDialog(
     romName: String,
     patchName: String,
     outputName: String,
+    folderLabel: String,
     replacesExisting: Boolean,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
@@ -197,7 +262,7 @@ internal fun RomPatchDialog(
         text = {
             Text(
                 listOfNotNull(
-                    stringResource(R.string.patch_confirm_body, patchName, romName, outputName),
+                    stringResource(R.string.patch_confirm_body_in, patchName, romName, outputName, folderLabel),
                     stringResource(R.string.patch_confirm_replace, outputName).takeIf { replacesExisting },
                 ).joinToString(" "),
             )
@@ -222,6 +287,11 @@ internal fun RomPatchDialog(
 @Composable
 internal fun AboutDialog(onOpenUrl: (String) -> Unit, onDismiss: () -> Unit) {
     val palette = LocalMimirPalette.current
+    val context = LocalContext.current
+    // The installed version name, such as 1.2.0, read from the app's own package.
+    val versionName = remember {
+        runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull()
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.about_mimir)) },
@@ -231,6 +301,9 @@ internal fun AboutDialog(onOpenUrl: (String) -> Unit, onDismiss: () -> Unit) {
                 modifier = Modifier.verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                versionName?.let {
+                    Text(stringResource(R.string.about_version, it), style = MaterialTheme.typography.titleSmall, color = palette.text)
+                }
                 Text(stringResource(R.string.support_body), style = MaterialTheme.typography.bodyMedium, color = palette.textMuted)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     SupportLink("YouTube", Icons.Outlined.Subscriptions) { onOpenUrl(YOUTUBE_CHANNEL_URL) }

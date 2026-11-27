@@ -108,8 +108,8 @@ PS3 CHDs load in ARMSX3 1.0.6 and later; an encrypted image keeps using the `.dk
 Mimir leaves in place. CHDMan works on a copy in internal storage, so a conversion needs free space
 there of about twice the image's size; Mimir checks this before starting.
 
-Each scan includes compatible files in the selected folder plus matching system subfolders, case-insensitively:
-`dreamcast`/`dc`, `playstation 1`/`ps1`/`psx`, `playstation 2`/`ps2`, `playstation 3`/`ps3`, `sega cd`/`segacd`/`mega cd`/`megacd`, `sega saturn`/`saturn`, and `playstation portable`/`psp`. `.bin` files are consumed through their `.cue` sheet and are not independent conversion targets.
+Each scan includes compatible files in the selected folder plus matching system subfolders (see
+[System folders](#system-folders)). `.bin` files are consumed through their `.cue` sheet and are not independent conversion targets.
 
 Conversion progress reports completed images out of the selected total. Users can stop a scan or
 conversion immediately, or finish the current conversion and stop before the next one. An optional
@@ -141,7 +141,7 @@ Mimir bundles the following Android ARM64 command-line backends in
 #### Xbox XISO
 
 Mimir can trim original Xbox Redump `.iso` dumps to XISO for Hakux and xemu. Select a folder
-containing `.iso` files directly or in an `xbox` / `microsoft xbox` subfolder. The scan only lists
+containing `.iso` files directly or in an Xbox subfolder (see [System folders](#system-folders)). The scan only lists
 images that still contain the Redump video partition (XGD1, XGD2, or XGD3); existing XISOs and
 non-Xbox ISOs are left out.
 
@@ -155,8 +155,8 @@ write succeeds. Make sure the storage has room for one extra XISO while converti
 
 Mimir can decompress Nintendo Switch `.nsz` packages to `.nsp`. The converter uses the MIT-licensed
 NSZ 5.0.0 Python package through the embedded Chaquopy Python runtime, with Android ARM64 builds of
-`zstandard` and `pycryptodome`. Select a folder containing `.nsz` files directly or in a `switch` /
-`nintendo switch` subfolder, scan it, and choose the packages to convert. Source `.nsz` files are
+`zstandard` and `pycryptodome`. Select a folder containing `.nsz` files directly or in a Switch subfolder
+(see [System folders](#system-folders)), scan it, and choose the packages to convert. Source `.nsz` files are
 kept after a successful conversion. NSZ requires a user-provided `prod.keys` file; use the
 **Import prod.keys** action on the NSZ to NSP page. Mimir copies the selected file into app-private
 storage so it remains available after restarts and does not depend on the original document
@@ -171,12 +171,33 @@ read in place, so emulators such as Eden list and run them without installing th
 own block compressor uses child processes, which Android apps cannot start, so Mimir runs the same
 algorithm on a thread pool; the files it writes are byte-for-byte what `nsz -B` writes. After compressing, Mimir runs
 NSZ's quick verify, which decompresses the new file in memory and checks every NCA hash; a file that
-fails is deleted and reported. Select a folder containing `.nsp` files directly or in a `switch` /
-`nintendo switch` subfolder. Source `.nsp` files are kept. Like NSZ to NSP, the package is copied to
+fails is deleted and reported. Select a folder containing `.nsp` files directly or in a Switch subfolder
+(see [System folders](#system-folders)). Source `.nsp` files are kept. Like NSZ to NSP, the package is copied to
 internal storage while it is compressed, so allow free space there of about twice the package's size.
 
 Both Switch converters run entirely on-device. Mimir does not bundle or download Nintendo keys or game
 content. Only use it with keys and content you are legally entitled to use.
+#### System folders
+
+Converter scans read the selected folder and any subfolder named after the tool's system. Names are
+matched loosely: case, spaces, dashes, underscores, dots and trailing tags such as `(Decrypted)` are
+ignored, so `Nintendo 3DS`, `nintendo_3ds` and the No-Intro `Nintendo - Nintendo 3DS (Decrypted)`
+all count. Selecting a system folder itself, such as `n3ds`, scans everything inside it.
+
+- Azahar ZCCI: `3ds`, `n3ds`, `new 3ds`, `nintendo 3ds`, `new nintendo 3ds`
+- Dolphin RVZ: `gamecube`, `gc`, `gcn`, `ngc`, `nintendo gamecube`, `wii`, `nintendo wii`
+- NSZ to NSP and NSP to NSZ: `switch`, `nsw`, `nintendo switch`
+- Xbox XISO: `xbox`, `ogxbox`, `original xbox`, `microsoft xbox`
+- CHDMan Dreamcast: `dreamcast`, `dc`, `sega dreamcast`
+- CHDMan PS1: `ps1`, `psx`, `psone`, `playstation`, `playstation 1`, `sony playstation`
+- CHDMan PS2 / PS3: `ps2` / `ps3`, `playstation 2` / `playstation 3`, with an optional `sony` prefix
+- CHDMan Sega CD: `sega cd`, `segacd`, `mega cd`, `megacd`, `sega mega cd`
+- CHDMan Saturn: `saturn`, `sega saturn`
+- CHDMan PSP: `psp`, `playstation portable`, `sony psp`
+
+No-Intro and Redump folder names (`Nintendo - Wii`, `Sony - PlayStation`, `Microsoft - Xbox` and so on)
+are recognised too.
+
 ### PS Vita Shortcuts
 Mimir includes a built-in searchable PS Vita shortcut database.
 
@@ -206,6 +227,14 @@ tool. Totals are kept on the device across restarts and updates, and counting st
 Mimir 1.0 runs.
 
 #
+## Updates
+
+When Mimir opens it checks the latest [GitHub release](https://github.com/ItsRetroPup/Mimir/releases).
+If it is newer, a dialog lists what's new with **Skip** (ask again next launch), **Skip this
+version** and **Download**. The APK is checked against GitHub's SHA-256 and against the installed
+app's signing key, then Android's installer opens; Android asks once to allow installs from Mimir.
+Debug builds don't check, since a release can't install over a debug-signed app.
+
 ## Open Source
 
 Mimir is an open source project, and suggestions are welcome. If there are tools or workflows you think would be useful for retro handheld owners, open an issue or suggest them through the project page.

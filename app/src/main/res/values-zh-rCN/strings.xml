@@ -60,6 +60,7 @@
     <string name="apply_body_cannot_undo">Mimir 无法撤消此操作。</string>
     <string name="apply_delete_originals">删除原始文件</string>
     <string name="apply_delete_originals_detail">转换成功后，同时删除 .cue 或 .gdi 文件所引用的同一文件夹中的音轨。</string>
+    <string name="apply_delete_originals_detail_single">转换成功后删除对应的 %1$s 文件。</string>
     <string name="action_start_conversions">开始转换</string>
     <string name="action_apply_changes">应用更改</string>
     <string name="esde_install_title">安装自定义系统？</string>
@@ -201,12 +202,12 @@
 
     <!-- Memory-card shell: home, legend bar and empty states. -->
     <string name="about_mimir">关于 Mimir</string>
+    <string name="about_version">版本 %1$s</string>
     <string name="language">语言</string>
     <string name="language_system">跟随系统</string>
     <string name="info_reads">读取</string>
     <string name="info_writes">写入</string>
     <string name="legend_open">打开</string>
-    <string name="legend_theme">主题</string>
     <string name="legend_list_view">列表</string>
     <string name="legend_grid_view">网格</string>
     <string name="legend_select">选择</string>
@@ -244,4 +245,49 @@
 
     <!-- Stats. -->
     <string name="stats">统计</string>
+
+    <!-- In-app update check against GitHub Releases. -->
+    <string name="update_title">Mimir %1$s 已发布</string>
+    <string name="update_whats_new">新功能</string>
+    <string name="update_body_no_notes">Mimir 的新版本可以下载了。</string>
+    <string name="update_action_download">下载</string>
+    <string name="update_action_skip">跳过</string>
+    <string name="update_action_skip_version">跳过此版本</string>
+    <string name="update_downloading">正在下载…</string>
+    <string name="update_downloading_percent">正在下载… %1$d%%</string>
+    <string name="update_ready_body">Android 安装程序已打开。选择“更新”即可完成。Mimir 会关闭并以新版本重新打开。</string>
+    <string name="update_action_install">安装</string>
+    <string name="update_failed_download">下载未完成。请检查网络连接后重试。</string>
+    <string name="update_action_retry">重试</string>
+    <string name="update_failed_signature">此更新的签名与已安装的 Mimir 不同，Android 无法覆盖安装。请卸载 Mimir，然后从发布页面安装新版本。</string>
+    <string name="update_action_open_release">打开发布页面</string>
+
+    <!-- Resetting the Stats totals. -->
+    <string name="legend_reset_stats">重置统计</string>
+    <string name="stats_reset_title">要重置统计吗？</string>
+    <string name="stats_reset_body">这会永久删除所有工具的已节省空间和已压缩游戏数，并从今天重新开始计算。此操作无法撤销。</string>
+    <string name="action_reset_stats">重置</string>
+
+    <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
+    <string name="chd_ps2_use_dvd">使用 DVD 转换器（适用于 ARMSX2）</string>
+    <string name="chd_ps2_use_dvd_detail">NetherSX2 需要 CD CHD，请保持关闭。</string>
+
+    <!-- Scan result sorting and conversion report totals. -->
+    <string name="sort_size">大小</string>
+    <string name="report_original_total">原始总大小</string>
+    <string name="report_new_total">新的总大小</string>
+    <string name="report_space_saved_label">节省的空间</string>
+    <string name="report_size_increase_label">增加的大小</string>
+
+    <!-- ROM Patcher output folder choice. -->
+    <string name="patch_output_folder_chosen">保存到 %1$s</string>
+    <string name="patch_output_choose_title">选择保存位置</string>
+    <string name="patch_output_choose_body">为 %1$s 的补丁副本选择一个文件夹。选择它所在的文件夹即可放在一起。</string>
+    <string name="patch_output_change">更改文件夹</string>
+    <string name="patch_confirm_body_in">将把 %1$s 应用到 %2$s，并在 %4$s 中保存为 %3$s。原始 ROM 不会改变。</string>
+    <string name="msg_patch_folder_unwritable">Mimir 无法保存到该文件夹，请选择其他文件夹。</string>
+
+    <plurals name="msg_xiso_all_trimmed">
+        <item quantity="other">找到 %1$d 个 Xbox .iso 文件，但它们已是 XISO 或不是 Xbox 光盘，无需精简。</item>
+    </plurals>
 </resources>

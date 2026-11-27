@@ -37,6 +37,14 @@ class UsageStatsStore(context: Context) {
         return updated
     }
 
+    /** Deletes every tool's totals and starts counting again from now. This can't be undone. */
+    @Synchronized
+    fun reset(): UsageStats {
+        val now = System.currentTimeMillis()
+        prefs.edit().clear().putLong(KEY_SINCE, now).apply()
+        return UsageStats(sinceMillis = now)
+    }
+
     private companion object {
         const val KEY_SINCE = "since"
         const val GAMES_PREFIX = "games_"

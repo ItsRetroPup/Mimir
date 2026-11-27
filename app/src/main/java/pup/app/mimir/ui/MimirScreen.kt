@@ -80,6 +80,7 @@ import pup.app.mimir.R
 import pup.app.mimir.data.StopRequest
 import pup.app.mimir.domain.ChdDiscType
 import pup.app.mimir.domain.ChdSystem
+import pup.app.mimir.domain.FileOperation
 import pup.app.mimir.domain.ConverterTool
 import pup.app.mimir.domain.FrontendPreset
 import pup.app.mimir.domain.ToolMode
@@ -98,10 +99,9 @@ internal fun MimirScreen(
     onPickEsDeSystemFolder: (String) -> Unit,
     onModeSelected: (ToolMode) -> Unit,
     onPresetSelected: (FrontendPreset) -> Unit,
-    onChdSystemSelected: (ChdSystem) -> Unit,
-    onChdDiscTypeSelected: (ChdDiscType) -> Unit,
+    onPs2UseDvdChanged: (Boolean) -> Unit,
     onConverterToolSelected: (ConverterTool) -> Unit,
-    onDeleteOriginalChdFilesChanged: (Boolean) -> Unit,
+    onDeleteOriginalsChanged: (ConverterTool, Boolean) -> Unit,
     onScanHiddenFoldersChanged: (Boolean) -> Unit,
     onDarkModeToggled: (Boolean) -> Unit,
     onHomeListViewToggled: (Boolean) -> Unit,
@@ -120,6 +120,7 @@ internal fun MimirScreen(
     onSelectPatchFile: () -> Unit,
     onGrantPatchFolder: () -> Unit,
     onApplyPatch: () -> Unit,
+    onResetStats: () -> Unit,
 ) {
     val context = LocalContext.current
     val palette = LocalMimirPalette.current
@@ -127,6 +128,7 @@ internal fun MimirScreen(
     var showApplyConfirmation by rememberSaveable { mutableStateOf(false) }
     var showEsDeConfirmation by rememberSaveable { mutableStateOf(false) }
     var showPatchConfirmation by rememberSaveable { mutableStateOf(false) }
+    var showResetStats by rememberSaveable { mutableStateOf(false) }
     var pendingVitaAdd by remember { mutableStateOf<VitaApp?>(null) }
     var pendingVitaRemove by remember { mutableStateOf<VitaApp?>(null) }
     var showAbout by rememberSaveable { mutableStateOf(false) }
@@ -166,12 +168,20 @@ internal fun MimirScreen(
     val onPage = pageTitle != null
     val ink = tool?.ink?.resolve(palette) ?: palette.edge
     val legend = if (onPage) {
-        listOf(LegendAction("B", stringResource(R.string.legend_back), onClick = goHome))
+        listOfNotNull(
+            LegendAction("B", stringResource(R.string.legend_back), onClick = goHome),
+            // Y resets Stats, through a confirmation; there is nothing to reset until a tool has run.
+            LegendAction(
+                "Y",
+                stringResource(R.string.legend_reset_stats),
+                enabled = uiState.usageStats.tools.isNotEmpty(),
+                onClick = { showResetStats = true },
+            ).takeIf { currentSection == AppSection.Stats },
+        )
     } else legendFor(
         tool = tool,
         uiState = uiState,
         onHome = goHome,
-        onToggleTheme = { onDarkModeToggled(!uiState.useDarkMode) },
         onToggleHomeView = { onHomeListViewToggled(!uiState.homeListView) },
         onScan = onStart,
         onApply = { showApplyConfirmation = true },
@@ -271,8 +281,6 @@ internal fun MimirScreen(
                         onSelectEsDeFolder = onSelectEsDeFolder,
                         onPickEsDeSystemFolder = onPickEsDeSystemFolder,
                         onPresetSelected = onPresetSelected,
-                        onChdSystemSelected = onChdSystemSelected,
-                        onChdDiscTypeSelected = onChdDiscTypeSelected,
                         onScanHiddenFoldersChanged = onScanHiddenFoldersChanged,
                         onVitaQueryChanged = onVitaQueryChanged,
                         onVitaShortcutFormatSelected = onVitaShortcutFormatSelected,
@@ -293,8 +301,8 @@ internal fun MimirScreen(
         }
 
         if (showApplyConfirmation) {
-            val isChdConversion = uiState.selectedMode == ToolMode.Converter &&
-                uiState.selectedConverterTool == ConverterTool.Chd
+            val converterTool = uiState.selectedConverterTool
+            val offersDeleteOriginals = uiState.selectedMode == ToolMode.Converter && converterTool.canDeleteOriginals
             ApplyConfirmationDialog(
                 mode = uiState.selectedMode,
                 converterTool = uiState.selectedConverterTool,
@@ -302,11 +310,18 @@ internal fun MimirScreen(
                 existingOutputCount = uiState.previewPlan?.changes
                     ?.count { it.targetAlreadyExists && it.detailPath in uiState.selectedChangePaths }
                     ?: 0,
-                deleteOriginalChdFiles = uiState.deleteOriginalChdFiles,
+                deleteOriginalFiles = converterTool in uiState.deleteOriginalTools,
+                // Offered only when the queue holds PS2 games, the one system with a CD/DVD choice.
+                offersPs2Dvd = uiState.previewPlan?.changes.orEmpty().any { change ->
+                    change.detailPath in uiState.selectedChangePaths &&
+                        change.operations.any { it is FileOperation.ConvertToChd && it.system == ChdSystem.PlayStation2 }
+                },
+                ps2UseDvd = uiState.ps2DiscType == ChdDiscType.Dvd,
                 enabled = !uiState.isBusy,
                 onDismiss = { showApplyConfirmation = false },
-                onConfirm = { deleteOriginals ->
-                    if (isChdConversion) onDeleteOriginalChdFilesChanged(deleteOriginals)
+                onConfirm = { deleteOriginals, ps2UseDvd ->
+                    if (offersDeleteOriginals) onDeleteOriginalsChanged(converterTool, deleteOriginals)
+                    onPs2UseDvdChanged(ps2UseDvd)
                     showApplyConfirmation = false
                     onApply()
                 },
@@ -331,6 +346,7 @@ internal fun MimirScreen(
                 romName = patch.rom.name,
                 patchName = patch.patch.name,
                 outputName = patchOutputName,
+                folderLabel = patch.outputFolder?.label.orEmpty(),
                 replacesExisting = patch.outputExists,
                 onDismiss = { showPatchConfirmation = false },
                 onConfirm = {
@@ -356,6 +372,16 @@ internal fun MimirScreen(
             AboutDialog(onOpenUrl = openUrl, onDismiss = { showAbout = false })
         }
 
+        if (showResetStats) {
+            ResetStatsDialog(
+                onDismiss = { showResetStats = false },
+                onConfirm = {
+                    showResetStats = false
+                    onResetStats()
+                },
+            )
+        }
+
         if (showLanguage) {
             LanguageDialog(onDismiss = { showLanguage = false })
         }
@@ -379,7 +405,6 @@ private fun legendFor(
     tool: ToolEntry?,
     uiState: MimirUiState,
     onHome: () -> Unit,
-    onToggleTheme: () -> Unit,
     onToggleHomeView: () -> Unit,
     onScan: () -> Unit,
     onApply: () -> Unit,
@@ -396,7 +421,6 @@ private fun legendFor(
                 stringResource(if (uiState.homeListView) R.string.legend_grid_view else R.string.legend_list_view),
                 onClick = onToggleHomeView,
             ),
-            LegendAction("Y", stringResource(R.string.legend_theme), onClick = onToggleTheme),
         )
     }
     val idle = !uiState.isBusy
@@ -561,8 +585,6 @@ private fun ToolScreen(
     onSelectEsDeFolder: () -> Unit,
     onPickEsDeSystemFolder: (String) -> Unit,
     onPresetSelected: (FrontendPreset) -> Unit,
-    onChdSystemSelected: (ChdSystem) -> Unit,
-    onChdDiscTypeSelected: (ChdDiscType) -> Unit,
     onScanHiddenFoldersChanged: (Boolean) -> Unit,
     onVitaQueryChanged: (String) -> Unit,
     onVitaShortcutFormatSelected: (VitaShortcutFormat) -> Unit,
@@ -631,23 +653,20 @@ private fun ToolScreen(
                             onScanHiddenFoldersChanged = onScanHiddenFoldersChanged,
                             enabled = idle,
                         )
-                        AppSection.ChdMan -> ChdOptions(
-                            system = uiState.selectedChdSystem,
-                            discType = uiState.selectedChdDiscType,
-                            enabled = idle,
-                            onSystemSelected = onChdSystemSelected,
-                            onDiscTypeSelected = onChdDiscTypeSelected,
-                        )
                         AppSection.Nsz, AppSection.NspNsz -> NszKeysRow(configured = uiState.nszKeysConfigured, enabled = idle, onSelect = onSelectNszKeys)
                         else -> Unit
                     }
                 }
             }
         }
+        // Status lives under the setup panel, so the scan results start at the top of their column.
+        DataPaneProgress(uiState, onStopNow, onStopAfterCurrent)
+        if (uiState.selectedMode == ToolMode.Converter && !uiState.isBusy) {
+            uiState.conversionReport?.let { ConversionReportPanel(it) }
+        }
+        uiState.message?.let { StatusLine(it) }
     }
     val data: @Composable ColumnScope.() -> Unit = {
-        DataPaneProgress(uiState, onStopNow, onStopAfterCurrent)
-        uiState.message?.let { StatusLine(it) }
         when (tool.mode) {
             ToolMode.VitaAppIds -> VitaDatabasePane(
                 vitaQuery = uiState.vitaQuery,
@@ -687,7 +706,8 @@ private fun ToolScreen(
             ) {
                 Column(
                     modifier = Modifier
-                        .weight(0.42f)
+                        // Narrower setup column, so the scan results get the room.
+                        .weight(0.34f)
                         .fillMaxHeight()
                         .verticalScroll(rememberScrollState())
                         .padding(vertical = 12.dp)
@@ -697,7 +717,7 @@ private fun ToolScreen(
                 )
                 Column(
                     modifier = Modifier
-                        .weight(0.58f)
+                        .weight(0.66f)
                         .fillMaxHeight()
                         .verticalScroll(rememberScrollState())
                         .padding(vertical = 12.dp)
@@ -759,9 +779,6 @@ private fun ScanResults(
     val palette = LocalMimirPalette.current
     val plan = uiState.previewPlan
     val enabled = !uiState.isBusy
-    if (uiState.selectedMode == ToolMode.Converter && !uiState.isBusy) {
-        uiState.conversionReport?.let { ConversionReportPanel(it) }
-    }
     if (plan == null || plan.changes.isEmpty()) {
         if (uiState.isBusy) return
         val art: @Composable () -> Unit = {

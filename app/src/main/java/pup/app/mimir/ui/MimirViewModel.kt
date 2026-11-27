@@ -25,6 +25,7 @@ import pup.app.mimir.data.RomTreeRepository
 import pup.app.mimir.data.StopRequest
 import pup.app.mimir.data.UsageStatsStore
 import pup.app.mimir.domain.ChdDiscType
+import pup.app.mimir.domain.ChdPlanner
 import pup.app.mimir.domain.ChdSystem
 import pup.app.mimir.domain.ConverterTool
 import pup.app.mimir.domain.FileOperation
@@ -51,14 +52,15 @@ data class MimirUiState(
     val addedVitaShortcuts: Map<String, String> = emptyMap(),
     val selectedMode: ToolMode = ToolMode.MultiDiscOrganizer,
     val selectedPreset: FrontendPreset = FrontendPreset.EsDe,
-    val selectedChdSystem: ChdSystem = ChdSystem.Dreamcast,
-    val selectedChdDiscType: ChdDiscType = ChdDiscType.Cd,
+    /** CD for NetherSX2 or DVD for ARMSX2, picked in the convert dialog when PS2 games are queued. */
+    val ps2DiscType: ChdDiscType = ChdDiscType.Cd,
     val selectedConverterTool: ConverterTool = ConverterTool.Chd,
     val nszKeysConfigured: Boolean = false,
     val esDeRootUri: Uri? = null,
     val esDeRootName: String = "",
     val esDeSystems: List<EsDeSystem> = emptyList(),
-    val deleteOriginalChdFiles: Boolean = false,
+    /** Converters set to delete each source file once its conversion succeeds. */
+    val deleteOriginalTools: Set<ConverterTool> = emptySet(),
     val scanHiddenFolders: Boolean = false,
     val useDarkMode: Boolean = true,
     /** Home lists the tools as rows instead of the memory-card grid. */
@@ -104,8 +106,12 @@ data class ConversionReport(
     val completed: Int,
     val total: Int,
     val spaceSavedBytes: Long = 0L,
+    /** Size of the converted sources before conversion; their outputs total this minus [spaceSavedBytes]. */
+    val originalBytes: Long = 0L,
     val stopped: Boolean = false,
-)
+) {
+    val newBytes: Long get() = originalBytes - spaceSavedBytes
+}
 
 class MimirViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = RomTreeRepository(application)
@@ -134,7 +140,10 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             esDeRootUri = prefs.getString(KEY_ESDE_URI, null)?.let(Uri::parse),
             esDeRootName = prefs.getString(KEY_ESDE_LABEL, null) ?: strings.text(R.string.no_esde_folder_selected),
             scanHiddenFolders = prefs.getBoolean(KEY_SCAN_HIDDEN_FOLDERS, false),
-            deleteOriginalChdFiles = prefs.getBoolean(KEY_DELETE_ORIGINAL_CHD_FILES, false),
+            ps2DiscType = if (prefs.getBoolean(KEY_PS2_USE_DVD, false)) ChdDiscType.Dvd else ChdDiscType.Cd,
+            deleteOriginalTools = ConverterTool.entries
+                .filter { it.canDeleteOriginals && prefs.getBoolean(deleteOriginalsKey(it), false) }
+                .toSet(),
             useDarkMode = prefs.getBoolean(KEY_DARK_MODE, true),
             homeListView = prefs.getBoolean(KEY_HOME_LIST_VIEW, false),
             usageStats = statsStore.load(),
@@ -308,37 +317,17 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun updateChdSystem(system: ChdSystem) {
-        _uiState.update {
-            it.copy(
-                selectedChdSystem = system,
-                selectedChdDiscType = when (system) {
-                    ChdSystem.PlayStationPortable, ChdSystem.PlayStation3 -> ChdDiscType.Dvd
-                    ChdSystem.PlayStation2 -> it.selectedChdDiscType
-                    else -> ChdDiscType.Cd
-                },
-                previewPlan = null,
-                selectedChangePaths = emptySet(),
-                message = null,
-            )
-        }
-    }
-
-    fun updateChdDiscType(discType: ChdDiscType) {
-        _uiState.update {
-            if (it.selectedChdSystem != ChdSystem.PlayStation2) it else it.copy(
-                selectedChdDiscType = discType,
-                previewPlan = null,
-                selectedChangePaths = emptySet(),
-                message = null,
-            )
-        }
+    /** "Use DVD converter (for ARMSX2)" in the convert dialog; applyChanges applies it to queued PS2 games. */
+    fun updatePs2UseDvd(useDvd: Boolean) {
+        prefs.edit().putBoolean(KEY_PS2_USE_DVD, useDvd).apply()
+        _uiState.update { it.copy(ps2DiscType = if (useDvd) ChdDiscType.Dvd else ChdDiscType.Cd) }
     }
 
     fun updateConverterTool(tool: ConverterTool) {
         _uiState.update {
             it.copy(
                 selectedConverterTool = tool,
+                conversionReport = null,
                 previewPlan = null,
                 previewCount = 0,
                 selectedChangePaths = emptySet(),
@@ -347,14 +336,21 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun updateDeleteOriginalChdFiles(enabled: Boolean) {
-        prefs.edit().putBoolean(KEY_DELETE_ORIGINAL_CHD_FILES, enabled).apply()
+    /** Remembers each converter's "Delete original files" choice separately. */
+    fun updateDeleteOriginals(tool: ConverterTool, enabled: Boolean) {
+        if (!tool.canDeleteOriginals) return
+        prefs.edit().putBoolean(deleteOriginalsKey(tool), enabled).apply()
         _uiState.update {
             // This choice is made in the final conversion dialog, so keep the current scan and
-            // selection intact. applyChanges applies the value to the queued CHD operations.
-            it.copy(deleteOriginalChdFiles = enabled, message = null)
+            // selection intact. applyChanges applies the value to the queued operations.
+            val tools = if (enabled) it.deleteOriginalTools + tool else it.deleteOriginalTools - tool
+            it.copy(deleteOriginalTools = tools, message = null)
         }
     }
+
+    /** CHDMan keeps its original key, so the choice made before 1.2.0 carries over. */
+    private fun deleteOriginalsKey(tool: ConverterTool): String =
+        if (tool == ConverterTool.Chd) KEY_DELETE_ORIGINAL_CHD_FILES else "delete_original_files_${tool.name}"
 
     fun stopNow() {
         activeCancellation?.stopNow()
@@ -382,6 +378,8 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update {
             it.copy(
                 selectedMode = mode,
+                // A finished run's report belongs to the tool that ran it.
+                conversionReport = null,
                 previewPlan = null,
                 previewCount = 0,
                 selectedChangePaths = emptySet(),
@@ -631,7 +629,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             val folder = runCatching { patchRunner.outputFolderFromGrant(rom, uri) }.getOrNull()
             if (folder == null) {
-                _uiState.update { it.copy(message = failure(R.string.msg_patch_folder_mismatch, rom.name)) }
+                _uiState.update { it.copy(message = failure(R.string.msg_patch_folder_unwritable)) }
                 return@launch
             }
             _uiState.update { it.copy(romPatch = it.romPatch.copy(outputFolder = folder), message = null) }
@@ -726,7 +724,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                         selectedChangePaths = plan.changes
                             .filterNot { mode == ToolMode.Converter && it.targetAlreadyExists }
                             .mapTo(linkedSetOf()) { it.detailPath },
-                        message = if (plan.changes.isEmpty()) StatusMessage(planBuilder.emptyResultText(currentState)) else null,
+                        message = if (plan.changes.isEmpty()) StatusMessage(plan.conflicts.firstOrNull() ?: planBuilder.emptyResultText(currentState)) else null,
                         stopRequest = StopRequest.None,
                     )
                 }
@@ -748,7 +746,8 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         val current = _uiState.value
         val plan = current.previewPlan
             ?.forSelectedChanges(current.selectedChangePaths)
-            ?.withChdDeleteOriginalFiles(current.deleteOriginalChdFiles)
+            ?.withDeleteOriginalFiles(current.deleteOriginalTools)
+            ?.withPs2DiscType(current.ps2DiscType)
             ?.takeIf { it.operations.isNotEmpty() }
             ?: return
         val uri = when (plan.mode) {
@@ -782,7 +781,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             executor.apply(
                 rootUri = uri,
                 plan = plan,
-                onProgress = { completed, total, saved ->
+                onProgress = { completed, total, saved, original ->
                     finishedOperations = completed
                     savedBytes = saved
                     _uiState.update {
@@ -794,6 +793,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                                     completed = completed,
                                     total = total,
                                     spaceSavedBytes = saved,
+                                    originalBytes = original,
                                 )
                             } else {
                                 it.conversionReport
@@ -844,6 +844,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                                     completed = result.completedOperations,
                                     total = plan.operations.size,
                                     spaceSavedBytes = result.spaceSavedBytes,
+                                    originalBytes = result.originalBytes,
                                     stopped = result.stopped,
                                 )
                             } else {
@@ -873,6 +874,9 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                                 ConversionReport(
                                     completed = it.conversionReport?.completed ?: 0,
                                     total = plan.operations.size,
+                                    // Keep what the finished conversions saved before the failure or stop.
+                                    spaceSavedBytes = it.conversionReport?.spaceSavedBytes ?: 0L,
+                                    originalBytes = it.conversionReport?.originalBytes ?: 0L,
                                     stopped = error is OperationStoppedException,
                                 )
                             } else {
@@ -904,12 +908,19 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         private const val KEY_DARK_MODE = "dark_mode"
         private const val KEY_HOME_LIST_VIEW = "home_list_view"
         private const val KEY_SCAN_HIDDEN_FOLDERS = "scan_hidden_folders"
+        private const val KEY_PS2_USE_DVD = "chd_ps2_use_dvd"
         private const val KEY_DELETE_ORIGINAL_CHD_FILES = "delete_original_chd_files"
         private const val NSZ_KEYS_RELATIVE_PATH = "nsz/prod.keys"
         private const val MAX_VITA_RESULTS = 40
     }
 
     private fun info(@StringRes id: Int, vararg args: Any) = StatusMessage(strings.text(id, *args))
+
+    /** Clears the Stats totals for good; the screen asks first. */
+    fun resetStats() {
+        val stats = statsStore.reset()
+        _uiState.update { it.copy(usageStats = stats) }
+    }
 
     private fun recordUsage(key: String, games: Int, spaceSavedBytes: Long) {
         if (games <= 0 && spaceSavedBytes == 0L) return
@@ -947,10 +958,20 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
     private fun treeLabel(uri: Uri): String =
         DocumentsContract.getTreeDocumentId(uri).substringAfterLast(':')
 
-    private fun OperationPlan.withChdDeleteOriginalFiles(deleteOriginalFiles: Boolean): OperationPlan {
+    private fun OperationPlan.withPs2DiscType(discType: ChdDiscType): OperationPlan = copy(
+        changes = changes.map { change ->
+            change.copy(operations = change.operations.map { ChdPlanner.withPs2DiscType(it, discType) })
+        },
+        operations = operations.map { ChdPlanner.withPs2DiscType(it, discType) },
+    )
+
+    private fun OperationPlan.withDeleteOriginalFiles(tools: Set<ConverterTool>): OperationPlan {
         if (mode != ToolMode.Converter) return this
         fun update(operation: FileOperation): FileOperation = when (operation) {
-            is FileOperation.ConvertToChd -> operation.copy(deleteOriginalFiles = deleteOriginalFiles)
+            is FileOperation.ConvertToChd -> operation.copy(deleteOriginalFiles = ConverterTool.Chd in tools)
+            is FileOperation.ConvertWithTool -> operation.copy(
+                deleteOriginalFile = operation.tool.canDeleteOriginals && operation.tool in tools,
+            )
             else -> operation
         }
         return copy(

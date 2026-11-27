@@ -70,6 +70,7 @@
     <string name="apply_body_cannot_undo">Mimir no puede deshacer esta acción.</string>
     <string name="apply_delete_originals">Eliminar archivos originales</string>
     <string name="apply_delete_originals_detail">También elimina las pistas de la misma carpeta referenciadas por un archivo .cue o .gdi cuando la conversión se completa.</string>
+    <string name="apply_delete_originals_detail_single">Elimina cada archivo %1$s cuando su conversión termina correctamente.</string>
     <string name="action_start_conversions">Iniciar conversiones</string>
     <string name="action_apply_changes">Aplicar cambios</string>
     <string name="esde_install_title">¿Instalar sistemas personalizados?</string>
@@ -243,12 +244,12 @@
 
     <!-- Memory-card shell: home, legend bar and empty states. -->
     <string name="about_mimir">Acerca de Mimir</string>
+    <string name="about_version">Versión %1$s</string>
     <string name="language">Idioma</string>
     <string name="language_system">Idioma del sistema</string>
     <string name="info_reads">Lee</string>
     <string name="info_writes">Escribe</string>
     <string name="legend_open">Abrir</string>
-    <string name="legend_theme">Tema</string>
     <string name="legend_list_view">Lista</string>
     <string name="legend_grid_view">Cuadrícula</string>
     <string name="legend_select">Seleccionar</string>
@@ -290,4 +291,50 @@
 
     <!-- Stats. -->
     <string name="stats">Estadísticas</string>
+
+    <!-- In-app update check against GitHub Releases. -->
+    <string name="update_title">Mimir %1$s está disponible</string>
+    <string name="update_whats_new">Novedades</string>
+    <string name="update_body_no_notes">Hay una nueva versión de Mimir lista para descargar.</string>
+    <string name="update_action_download">Descargar</string>
+    <string name="update_action_skip">Omitir</string>
+    <string name="update_action_skip_version">Omitir esta versión</string>
+    <string name="update_downloading">Descargando…</string>
+    <string name="update_downloading_percent">Descargando… %1$d%%</string>
+    <string name="update_ready_body">El instalador de Android está abierto. Elige Actualizar para terminar. Mimir se cerrará y se abrirá actualizado.</string>
+    <string name="update_action_install">Instalar</string>
+    <string name="update_failed_download">La descarga no terminó. Comprueba tu conexión e inténtalo de nuevo.</string>
+    <string name="update_action_retry">Reintentar</string>
+    <string name="update_failed_signature">Esta actualización está firmada de forma distinta a tu Mimir instalado, así que Android no la instalará encima. Desinstala Mimir e instala la nueva versión desde la página de la versión.</string>
+    <string name="update_action_open_release">Abrir página de la versión</string>
+
+    <!-- Resetting the Stats totals. -->
+    <string name="legend_reset_stats">Restablecer estadísticas</string>
+    <string name="stats_reset_title">¿Restablecer estadísticas?</string>
+    <string name="stats_reset_body">Esto borra para siempre el espacio ahorrado y los juegos comprimidos de todas las herramientas, y el recuento empieza de nuevo desde hoy. No se puede deshacer.</string>
+    <string name="action_reset_stats">Restablecer</string>
+
+    <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
+    <string name="chd_ps2_use_dvd">Usar conversor DVD (para ARMSX2)</string>
+    <string name="chd_ps2_use_dvd_detail">Déjalo desactivado para NetherSX2, que necesita CHD de CD.</string>
+
+    <!-- Scan result sorting and conversion report totals. -->
+    <string name="sort_size">Tamaño</string>
+    <string name="report_original_total">Tamaño total original</string>
+    <string name="report_new_total">Nuevo tamaño total</string>
+    <string name="report_space_saved_label">Espacio ahorrado</string>
+    <string name="report_size_increase_label">Aumento de tamaño</string>
+
+    <!-- ROM Patcher output folder choice. -->
+    <string name="patch_output_folder_chosen">Se guarda en %1$s</string>
+    <string name="patch_output_choose_title">Elige dónde guardar</string>
+    <string name="patch_output_choose_body">Elige una carpeta para la copia parcheada de %1$s. Elige la carpeta donde está para mantenerlas juntas.</string>
+    <string name="patch_output_change">Cambiar carpeta</string>
+    <string name="patch_confirm_body_in">Se aplicará %1$s a %2$s y el resultado se guardará como %3$s en %4$s. La ROM original no cambia.</string>
+    <string name="msg_patch_folder_unwritable">Mimir no puede guardar en esa carpeta. Elige otra.</string>
+
+    <plurals name="msg_xiso_all_trimmed">
+        <item quantity="one">Se encontró %1$d archivo .iso de Xbox que ya es XISO o no es un disco de Xbox, así que no hay nada que recortar.</item>
+        <item quantity="other">Se encontraron %1$d archivos .iso de Xbox que ya son XISO o no son discos de Xbox, así que no hay nada que recortar.</item>
+    </plurals>
 </resources>

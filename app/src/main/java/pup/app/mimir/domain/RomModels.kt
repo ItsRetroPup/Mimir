@@ -46,6 +46,7 @@ enum class ConverterTool(
     val displayName: String,
     val sourceExtensions: Set<String>,
     val outputExtension: String,
+    /** Folder names this tool scans, matched loosely by [SystemFolders]. */
     val folderAliases: Set<String>,
     val backend: ConverterBackend,
     /** Short output label shown on queued conversions. */
@@ -63,7 +64,10 @@ enum class ConverterTool(
         displayName = "Dolphin RVZ",
         sourceExtensions = setOf("iso"),
         outputExtension = "rvz",
-        folderAliases = setOf("gamecube", "gc", "nintendo gamecube", "wii", "nintendo wii"),
+        folderAliases = setOf(
+            "gamecube", "gc", "gcn", "ngc", "nintendo gamecube", "nintendo - gamecube",
+            "wii", "nintendo wii", "nintendo - wii",
+        ),
         backend = ConverterBackend.NativeExecutable("libdolphintool.so"),
         badge = "RVZ",
     ),
@@ -71,7 +75,10 @@ enum class ConverterTool(
         displayName = "Azahar ZCCI",
         sourceExtensions = setOf("3ds", "cci"),
         outputExtension = "zcci",
-        folderAliases = setOf("3ds", "nintendo 3ds"),
+        folderAliases = setOf(
+            "3ds", "n3ds", "new 3ds", "nintendo 3ds", "new nintendo 3ds",
+            "nintendo - nintendo 3ds", "nintendo - new nintendo 3ds",
+        ),
         backend = ConverterBackend.NativeExecutable("libazahar.so"),
         badge = "ZCCI",
     ),
@@ -79,7 +86,7 @@ enum class ConverterTool(
         displayName = "NSZ to NSP",
         sourceExtensions = setOf("nsz"),
         outputExtension = "nsp",
-        folderAliases = setOf("switch", "nintendo switch"),
+        folderAliases = setOf("switch", "nsw", "nintendo switch", "nintendo - nintendo switch"),
         backend = ConverterBackend.EmbeddedPython,
         badge = "NSP",
     ),
@@ -87,7 +94,7 @@ enum class ConverterTool(
         displayName = "NSP to NSZ",
         sourceExtensions = setOf("nsp"),
         outputExtension = "nsz",
-        folderAliases = setOf("switch", "nintendo switch"),
+        folderAliases = setOf("switch", "nsw", "nintendo switch", "nintendo - nintendo switch"),
         backend = ConverterBackend.EmbeddedPython,
         badge = "NSZ",
     ),
@@ -95,7 +102,7 @@ enum class ConverterTool(
         displayName = "Xbox XISO",
         sourceExtensions = setOf("iso"),
         outputExtension = "iso",
-        folderAliases = setOf("xbox", "microsoft xbox"),
+        folderAliases = setOf("xbox", "ogxbox", "original xbox", "xbox original", "microsoft xbox", "microsoft - xbox"),
         backend = ConverterBackend.InPlaceKotlin,
         badge = "XISO",
     ),
@@ -103,6 +110,9 @@ enum class ConverterTool(
 
     /** True when the converted image replaces its source under the same name. */
     val replacesSource: Boolean get() = backend == ConverterBackend.InPlaceKotlin
+
+    /** Every converter can delete its originals except Xbox XISO, which already rewrites the image in place. */
+    val canDeleteOriginals: Boolean get() = !replacesSource
 
     /** True when the tool needs the user's imported prod.keys: both Switch NSZ converters do. */
     val needsProdKeys: Boolean get() = this == NszNsp || this == NspNsz
@@ -119,43 +129,51 @@ enum class ChdDiscType(
 enum class ChdSystem(
     val displayName: String,
     val supportedExtensions: Set<String>,
+    /** Folder names this system scans, matched loosely by [SystemFolders]. */
     val folderAliases: Set<String>,
 ) {
     Dreamcast(
         displayName = "Dreamcast",
         supportedExtensions = setOf("gdi", "cue", "iso"),
-        folderAliases = setOf("dreamcast", "dc"),
+        folderAliases = setOf("dreamcast", "dc", "sega dreamcast", "sega - dreamcast"),
     ),
     PlayStation1(
         displayName = "PS1",
         supportedExtensions = setOf("cue", "iso"),
-        folderAliases = setOf("playstation 1", "ps1", "psx"),
+        folderAliases = setOf("ps1", "psx", "psone", "playstation", "playstation 1", "sony playstation", "sony - playstation"),
     ),
     PlayStation2(
         displayName = "PS2",
         supportedExtensions = setOf("iso"),
-        folderAliases = setOf("playstation 2", "ps2"),
+        folderAliases = setOf("ps2", "playstation 2", "sony playstation 2", "sony - playstation 2"),
     ),
     PlayStation3(
         displayName = "PS3",
         supportedExtensions = setOf("iso"),
-        folderAliases = setOf("playstation 3", "ps3"),
+        folderAliases = setOf("ps3", "playstation 3", "sony playstation 3", "sony - playstation 3"),
     ),
     SegaCd(
         displayName = "Sega CD",
         supportedExtensions = setOf("cue", "iso"),
-        folderAliases = setOf("sega cd", "segacd", "mega cd", "megacd"),
+        folderAliases = setOf("sega cd", "segacd", "mega cd", "megacd", "sega mega cd", "sega - mega cd & sega cd"),
     ),
     SegaSaturn(
         displayName = "Sega Saturn",
         supportedExtensions = setOf("cue", "iso"),
-        folderAliases = setOf("sega saturn", "saturn"),
+        folderAliases = setOf("saturn", "sega saturn", "sega - saturn"),
     ),
     PlayStationPortable(
         displayName = "PSP",
         supportedExtensions = setOf("iso"),
-        folderAliases = setOf("playstation portable", "psp"),
+        folderAliases = setOf("psp", "playstation portable", "sony psp", "sony - playstation portable"),
     ),
+}
+
+/** PSP and PS3 are DVD-sized and the CD-era systems are CDs; PS2 depends on the emulator. */
+fun ChdSystem.discType(ps2DiscType: ChdDiscType): ChdDiscType = when (this) {
+    ChdSystem.PlayStation2 -> ps2DiscType
+    ChdSystem.PlayStation3, ChdSystem.PlayStationPortable -> ChdDiscType.Dvd
+    else -> ChdDiscType.Cd
 }
 
 data class DiscMatch(
@@ -195,6 +213,8 @@ sealed interface FileOperation {
         val sourcePath: String,
         val targetPath: String,
         val tool: ConverterTool,
+        /** Remove the source once the converted file is written. */
+        val deleteOriginalFile: Boolean = false,
     ) : FileOperation
 }
 

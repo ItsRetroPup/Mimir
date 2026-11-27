@@ -65,20 +65,18 @@ class ToolPlanBuilder(
             }
 
             ToolMode.Converter -> if (state.selectedConverterTool == ConverterTool.Chd) {
-                val system = state.selectedChdSystem
-                val entries = repository.scanChdTree(
+                // Every system's folders in one scan; each game keeps the system its folder names.
+                val entriesBySystem = repository.scanChdSystems(
                     rootUri = romUri,
-                    folderAliases = system.folderAliases,
-                    supportedExtensions = system.supportedExtensions,
                     onFileScanned = onFileScanned,
                     shouldStop = shouldStop,
                 )
-                onProgressLabel(strings.plural(R.plurals.scan_checking_chd, entries.size, entries.size, system.displayName))
+                val found = entriesBySystem.values.sumOf { it.size }
+                onProgressLabel(strings.plural(R.plurals.scan_checking_tool, found, found, ConverterTool.Chd.displayName))
                 ChdPlanner.buildPlan(
-                    entries = entries,
-                    system = system,
-                    discType = state.selectedChdDiscType,
-                    deleteOriginalFiles = state.deleteOriginalChdFiles,
+                    entriesBySystem = entriesBySystem,
+                    ps2DiscType = state.ps2DiscType,
+                    deleteOriginalFiles = ConverterTool.Chd in state.deleteOriginalTools,
                 )
             } else {
                 val tool = state.selectedConverterTool
@@ -96,7 +94,14 @@ class ToolPlanBuilder(
                 } else {
                     scannedEntries
                 }
-                NativeConverterPlanner.buildPlan(entries, tool)
+                val plan = NativeConverterPlanner.buildPlan(entries, tool)
+                val skippedImages = scannedEntries.size - entries.size
+                if (tool == ConverterTool.XboxXiso && plan.changes.isEmpty() && skippedImages > 0) {
+                    // Say why the .iso files found were left out, rather than "nothing found".
+                    plan.copy(conflicts = listOf(strings.plural(R.plurals.msg_xiso_all_trimmed, skippedImages, skippedImages)))
+                } else {
+                    plan
+                }
             }
 
             ToolMode.VitaAppIds, ToolMode.EsDeSystems, ToolMode.RomPatcher -> error("This tool does not use ROM scanning.")

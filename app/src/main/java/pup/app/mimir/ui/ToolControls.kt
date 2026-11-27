@@ -139,45 +139,19 @@ internal fun OrganizerOptions(
 }
 
 @Composable
-internal fun ChdOptions(
-    system: ChdSystem,
-    discType: ChdDiscType,
-    enabled: Boolean,
-    onSystemSelected: (ChdSystem) -> Unit,
-    onDiscTypeSelected: (ChdDiscType) -> Unit,
-) {
-    val palette = LocalMimirPalette.current
-    PanelRule()
-    // Seven systems do not fit beside a label, so this one setting stacks.
-    Text(stringResource(R.string.chd_system), style = MaterialTheme.typography.titleSmall, color = palette.text)
-    ChoiceRow(
-        options = ChdSystem.entries,
-        selected = system,
-        enabled = enabled,
-        label = { it.displayName },
-        onSelect = onSystemSelected,
-    )
-    if (system == ChdSystem.PlayStation2) {
-        PanelRule()
-        OptionRow(stringResource(R.string.chd_conversion_type), detail = stringResource(R.string.chd_compatibility_body)) {
-            ChoiceRow(
-                options = ChdDiscType.entries,
-                selected = discType,
-                enabled = enabled,
-                label = { it.displayName },
-                onSelect = onDiscTypeSelected,
-            )
-        }
-    }
-}
-
-@Composable
 internal fun NszKeysRow(configured: Boolean, enabled: Boolean, onSelect: () -> Unit) {
     PanelRule()
-    OptionRow(
-        label = stringResource(R.string.nsz_keys_title),
-        detail = stringResource(if (configured) R.string.nsz_keys_configured else R.string.nsz_keys_missing),
-    ) {
+    // Stacked rather than side by side: the setup column is narrow, and the detail is a sentence.
+    val palette = LocalMimirPalette.current
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(stringResource(R.string.nsz_keys_title), style = MaterialTheme.typography.titleSmall, color = palette.text)
+            Text(
+                stringResource(if (configured) R.string.nsz_keys_configured else R.string.nsz_keys_missing),
+                style = MaterialTheme.typography.bodySmall,
+                color = palette.textMuted,
+            )
+        }
         val label = stringResource(if (configured) R.string.action_replace_keys else R.string.action_import_keys)
         if (configured) {
             OutlinedButton(onClick = onSelect, enabled = enabled, modifier = Modifier.focusRing()) { Text(label, maxLines = 1) }
@@ -341,7 +315,11 @@ internal fun RomPatchPane(
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(outputName, style = MaterialTheme.typography.titleMedium, color = palette.text, maxLines = 2, overflow = TextOverflow.Ellipsis)
             state.outputFolder?.let { folder ->
-                Text(stringResource(R.string.patch_output_folder, folder.label), style = MaterialTheme.typography.bodySmall, color = palette.textMuted)
+                Text(
+                    stringResource(if (folder.nextToRom) R.string.patch_output_folder else R.string.patch_output_folder_chosen, folder.label),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = palette.textMuted,
+                )
             }
             if (state.outputExists) {
                 Text(stringResource(R.string.patch_output_exists), style = MaterialTheme.typography.bodySmall, color = palette.caution)
@@ -362,13 +340,18 @@ internal fun RomPatchPane(
     if (state.outputFolder == null) {
         // Android lets Mimir write only inside folders the user has granted.
         ConsolePanel(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(stringResource(R.string.patch_folder_access_title), style = MaterialTheme.typography.titleSmall, color = palette.text)
+            Text(stringResource(R.string.patch_output_choose_title), style = MaterialTheme.typography.titleSmall, color = palette.text)
             Text(
-                stringResource(R.string.patch_folder_access_body, state.rom?.name.orEmpty()),
+                stringResource(R.string.patch_output_choose_body, state.rom?.name.orEmpty()),
                 style = MaterialTheme.typography.bodyMedium,
                 color = palette.textMuted,
             )
             InkButton(onClick = onGrantFolder, enabled = !isBusy) { Text(stringResource(R.string.action_choose_folder), maxLines = 1) }
+        }
+    } else {
+        // The copy can go anywhere the user picks, not only next to the ROM.
+        OutlinedButton(onClick = onGrantFolder, enabled = !isBusy, modifier = Modifier.focusRing()) {
+            Text(stringResource(R.string.patch_output_change), maxLines = 1)
         }
     }
 }

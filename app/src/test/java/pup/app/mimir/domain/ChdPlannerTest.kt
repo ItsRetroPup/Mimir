@@ -137,4 +137,32 @@ class ChdPlannerTest {
 
         assertEquals(1_234_567L, plan.changes.single().sourceSizeBytes)
     }
+
+    @Test
+    fun plansEverySystemInOneScanWithItsOwnDiscType() {
+        val plan = ChdPlanner.buildPlan(
+            entriesBySystem = mapOf(
+                ChdSystem.PlayStation1 to listOf(RomEntry("psx/Crash.cue", "Crash.cue")),
+                ChdSystem.PlayStation2 to listOf(RomEntry("ps2/Okami.iso", "Okami.iso")),
+                ChdSystem.PlayStationPortable to listOf(RomEntry("psp/Patapon.iso", "Patapon.iso")),
+            ),
+            ps2DiscType = ChdDiscType.Cd,
+            deleteOriginalFiles = false,
+        )
+
+        val bySource = plan.operations.map { it as FileOperation.ConvertToChd }.associateBy { it.sourcePath }
+        assertEquals(ChdDiscType.Cd, bySource.getValue("psx/Crash.cue").discType)
+        assertEquals(ChdDiscType.Cd, bySource.getValue("ps2/Okami.iso").discType)
+        assertEquals(ChdDiscType.Dvd, bySource.getValue("psp/Patapon.iso").discType)
+        assertEquals(listOf("PS1", "PS2", "PSP"), plan.changes.map { it.detailLabel })
+    }
+
+    @Test
+    fun dvdChoiceOnlyChangesPs2Games() {
+        val ps2 = FileOperation.ConvertToChd("ps2/Okami.iso", "ps2/Okami.chd", ChdSystem.PlayStation2, ChdDiscType.Cd, false)
+        val ps1 = FileOperation.ConvertToChd("psx/Crash.cue", "psx/Crash.chd", ChdSystem.PlayStation1, ChdDiscType.Cd, false)
+
+        assertEquals(ChdDiscType.Dvd, (ChdPlanner.withPs2DiscType(ps2, ChdDiscType.Dvd) as FileOperation.ConvertToChd).discType)
+        assertEquals(ChdDiscType.Cd, (ChdPlanner.withPs2DiscType(ps1, ChdDiscType.Dvd) as FileOperation.ConvertToChd).discType)
+    }
 }

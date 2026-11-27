@@ -60,6 +60,7 @@
     <string name="apply_body_cannot_undo">Mimir는 이 작업을 되돌릴 수 없습니다.</string>
     <string name="apply_delete_originals">원본 파일 삭제</string>
     <string name="apply_delete_originals_detail">변환이 성공하면 .cue 또는 .gdi 파일이 참조하는 같은 폴더의 트랙도 삭제합니다.</string>
+    <string name="apply_delete_originals_detail_single">변환에 성공한 %1$s 파일을 삭제합니다.</string>
     <string name="action_start_conversions">변환 시작</string>
     <string name="action_apply_changes">변경 사항 적용</string>
     <string name="esde_install_title">사용자 지정 시스템을 설치할까요?</string>
@@ -201,12 +202,12 @@
 
     <!-- Memory-card shell: home, legend bar and empty states. -->
     <string name="about_mimir">Mimir 정보</string>
+    <string name="about_version">버전 %1$s</string>
     <string name="language">언어</string>
     <string name="language_system">시스템 언어</string>
     <string name="info_reads">읽기</string>
     <string name="info_writes">쓰기</string>
     <string name="legend_open">열기</string>
-    <string name="legend_theme">테마</string>
     <string name="legend_list_view">목록</string>
     <string name="legend_grid_view">그리드</string>
     <string name="legend_select">선택</string>
@@ -244,4 +245,49 @@
 
     <!-- Stats. -->
     <string name="stats">통계</string>
+
+    <!-- In-app update check against GitHub Releases. -->
+    <string name="update_title">Mimir %1$s 버전을 사용할 수 있습니다</string>
+    <string name="update_whats_new">새로운 기능</string>
+    <string name="update_body_no_notes">Mimir의 새 버전을 다운로드할 수 있습니다.</string>
+    <string name="update_action_download">다운로드</string>
+    <string name="update_action_skip">건너뛰기</string>
+    <string name="update_action_skip_version">이 버전 건너뛰기</string>
+    <string name="update_downloading">다운로드 중…</string>
+    <string name="update_downloading_percent">다운로드 중… %1$d%%</string>
+    <string name="update_ready_body">Android 설치 프로그램이 열렸습니다. 업데이트를 선택해 완료하세요. Mimir가 닫힌 뒤 업데이트된 상태로 다시 열립니다.</string>
+    <string name="update_action_install">설치</string>
+    <string name="update_failed_download">다운로드가 완료되지 않았습니다. 연결을 확인하고 다시 시도하세요.</string>
+    <string name="update_action_retry">다시 시도</string>
+    <string name="update_failed_signature">이 업데이트는 설치된 Mimir와 서명이 달라 Android가 덮어서 설치할 수 없습니다. Mimir를 제거한 다음 릴리스 페이지에서 새 버전을 설치하세요.</string>
+    <string name="update_action_open_release">릴리스 페이지 열기</string>
+
+    <!-- Resetting the Stats totals. -->
+    <string name="legend_reset_stats">통계 초기화</string>
+    <string name="stats_reset_title">통계를 초기화할까요?</string>
+    <string name="stats_reset_body">모든 도구의 절약한 공간과 압축한 게임 수가 영구적으로 삭제되고, 오늘부터 다시 집계합니다. 되돌릴 수 없습니다.</string>
+    <string name="action_reset_stats">초기화</string>
+
+    <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
+    <string name="chd_ps2_use_dvd">DVD 변환기 사용 (ARMSX2용)</string>
+    <string name="chd_ps2_use_dvd_detail">CD CHD가 필요한 NetherSX2에서는 끈 상태로 두세요.</string>
+
+    <!-- Scan result sorting and conversion report totals. -->
+    <string name="sort_size">크기</string>
+    <string name="report_original_total">원래 전체 크기</string>
+    <string name="report_new_total">새 전체 크기</string>
+    <string name="report_space_saved_label">절약한 공간</string>
+    <string name="report_size_increase_label">늘어난 크기</string>
+
+    <!-- ROM Patcher output folder choice. -->
+    <string name="patch_output_folder_chosen">%1$s에 저장</string>
+    <string name="patch_output_choose_title">저장 위치 선택</string>
+    <string name="patch_output_choose_body">%1$s의 패치된 사본을 저장할 폴더를 선택하세요. 원본이 있는 폴더를 고르면 함께 보관됩니다.</string>
+    <string name="patch_output_change">폴더 변경</string>
+    <string name="patch_confirm_body_in">%2$s에 %1$s을(를) 적용하고 결과를 %4$s에 %3$s(으)로 저장합니다. 원본 ROM은 바뀌지 않습니다.</string>
+    <string name="msg_patch_folder_unwritable">그 폴더에는 저장할 수 없습니다. 다른 폴더를 선택하세요.</string>
+
+    <plurals name="msg_xiso_all_trimmed">
+        <item quantity="other">Xbox .iso 파일 %1$d개를 찾았지만 이미 XISO이거나 Xbox 디스크가 아니어서 줄일 것이 없습니다.</item>
+    </plurals>
 </resources>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Only the update downloads folder in the cache is shared, nothing else Mimir stores. -->
+    <cache-path name="updates" path="updates/" />
+</paths>

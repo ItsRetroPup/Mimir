@@ -33,4 +33,6 @@ data class ExecutionResult(
     val completedOperations: Int,
     val stopped: Boolean,
     val spaceSavedBytes: Long = 0L,
+    /** Size of the sources that were converted, before conversion. */
+    val originalBytes: Long = 0L,
 )

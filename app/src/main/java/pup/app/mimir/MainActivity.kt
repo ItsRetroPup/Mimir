@@ -22,6 +22,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import pup.app.mimir.ui.MimirScreen
 import pup.app.mimir.ui.MimirTheme
 import pup.app.mimir.ui.MimirViewModel
+import pup.app.mimir.ui.UpdateDialog
+import pup.app.mimir.ui.UpdateViewModel
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +32,9 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val viewModel: MimirViewModel = viewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            // Checks GitHub for a newer release once per launch; its dialog sits above every screen.
+            val updateViewModel: UpdateViewModel = viewModel()
+            val updateState by updateViewModel.state.collectAsStateWithLifecycle()
             // The ViewModel outlives a language change, so it re-reads the text it holds.
             val locales = LocalConfiguration.current.locales
             LaunchedEffect(locales) { viewModel.onLanguageChanged() }
@@ -131,10 +136,9 @@ class MainActivity : AppCompatActivity() {
                         },
                         onModeSelected = viewModel::updateMode,
                         onPresetSelected = viewModel::updatePreset,
-                        onChdSystemSelected = viewModel::updateChdSystem,
-                        onChdDiscTypeSelected = viewModel::updateChdDiscType,
+                        onPs2UseDvdChanged = viewModel::updatePs2UseDvd,
                         onConverterToolSelected = viewModel::updateConverterTool,
-                        onDeleteOriginalChdFilesChanged = viewModel::updateDeleteOriginalChdFiles,
+                        onDeleteOriginalsChanged = viewModel::updateDeleteOriginals,
                         onScanHiddenFoldersChanged = viewModel::updateScanHiddenFolders,
                         onDarkModeToggled = viewModel::updateDarkMode,
                         onHomeListViewToggled = viewModel::updateHomeListView,
@@ -153,6 +157,14 @@ class MainActivity : AppCompatActivity() {
                         onSelectPatchFile = { patchFileLauncher.launch(arrayOf("*/*")) },
                         onGrantPatchFolder = { patchFolderLauncher.launch(uiState.romPatch.rom?.uri) },
                         onApplyPatch = viewModel::applyPatch,
+                        onResetStats = viewModel::resetStats,
+                    )
+                    UpdateDialog(
+                        state = updateState,
+                        onSkip = updateViewModel::dismiss,
+                        onSkipThisVersion = updateViewModel::skipThisVersion,
+                        onDownload = updateViewModel::download,
+                        onInstall = updateViewModel::install,
                     )
                 }
             }

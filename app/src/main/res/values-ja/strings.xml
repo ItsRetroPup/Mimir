@@ -60,6 +60,7 @@
     <string name="apply_body_cannot_undo">Mimir はこの操作を元に戻せません。</string>
     <string name="apply_delete_originals">元のファイルを削除</string>
     <string name="apply_delete_originals_detail">変換が成功した後、.cue または .gdi ファイルが参照している同じフォルダー内のトラックも削除します。</string>
+    <string name="apply_delete_originals_detail_single">変換に成功した %1$s ファイルを削除します。</string>
     <string name="action_start_conversions">変換を開始</string>
     <string name="action_apply_changes">変更を適用</string>
     <string name="esde_install_title">カスタムシステムをインストールしますか？</string>
@@ -201,12 +202,12 @@
 
     <!-- Memory-card shell: home, legend bar and empty states. -->
     <string name="about_mimir">Mimir について</string>
+    <string name="about_version">バージョン %1$s</string>
     <string name="language">言語</string>
     <string name="language_system">システムの言語</string>
     <string name="info_reads">読み込み</string>
     <string name="info_writes">書き出し</string>
     <string name="legend_open">開く</string>
-    <string name="legend_theme">テーマ</string>
     <string name="legend_list_view">リスト</string>
     <string name="legend_grid_view">グリッド</string>
     <string name="legend_select">選択</string>
@@ -244,4 +245,49 @@
 
     <!-- Stats. -->
     <string name="stats">統計</string>
+
+    <!-- In-app update check against GitHub Releases. -->
+    <string name="update_title">Mimir %1$s が利用可能です</string>
+    <string name="update_whats_new">新機能</string>
+    <string name="update_body_no_notes">Mimir の新しいバージョンをダウンロードできます。</string>
+    <string name="update_action_download">ダウンロード</string>
+    <string name="update_action_skip">スキップ</string>
+    <string name="update_action_skip_version">このバージョンをスキップ</string>
+    <string name="update_downloading">ダウンロード中…</string>
+    <string name="update_downloading_percent">ダウンロード中… %1$d%%</string>
+    <string name="update_ready_body">Android のインストーラーが開いています。「更新」を選んで完了してください。Mimir は終了し、更新されて再び開きます。</string>
+    <string name="update_action_install">インストール</string>
+    <string name="update_failed_download">ダウンロードが完了しませんでした。接続を確認してもう一度お試しください。</string>
+    <string name="update_action_retry">再試行</string>
+    <string name="update_failed_signature">このアップデートはインストール済みの Mimir と署名が異なるため、Android は上書きインストールできません。Mimir をアンインストールしてから、リリースページで新しいバージョンをインストールしてください。</string>
+    <string name="update_action_open_release">リリースページを開く</string>
+
+    <!-- Resetting the Stats totals. -->
+    <string name="legend_reset_stats">統計をリセット</string>
+    <string name="stats_reset_title">統計をリセットしますか？</string>
+    <string name="stats_reset_body">すべてのツールの節約した容量と圧縮したゲーム数が完全に削除され、今日から集計し直します。この操作は元に戻せません。</string>
+    <string name="action_reset_stats">リセット</string>
+
+    <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
+    <string name="chd_ps2_use_dvd">DVD コンバーターを使う（ARMSX2 用）</string>
+    <string name="chd_ps2_use_dvd_detail">CD CHD が必要な NetherSX2 ではオフのままにしてください。</string>
+
+    <!-- Scan result sorting and conversion report totals. -->
+    <string name="sort_size">サイズ</string>
+    <string name="report_original_total">元の合計サイズ</string>
+    <string name="report_new_total">新しい合計サイズ</string>
+    <string name="report_space_saved_label">節約した容量</string>
+    <string name="report_size_increase_label">増えた容量</string>
+
+    <!-- ROM Patcher output folder choice. -->
+    <string name="patch_output_folder_chosen">%1$s に保存</string>
+    <string name="patch_output_choose_title">保存先を選ぶ</string>
+    <string name="patch_output_choose_body">%1$s のパッチ適用コピーを保存するフォルダを選んでください。元のフォルダを選ぶと一緒に保存されます。</string>
+    <string name="patch_output_change">フォルダを変更</string>
+    <string name="patch_confirm_body_in">%2$s に %1$s を適用し、%4$s に %3$s として保存します。元の ROM は変更されません。</string>
+    <string name="msg_patch_folder_unwritable">そのフォルダには保存できません。別のフォルダを選んでください。</string>
+
+    <plurals name="msg_xiso_all_trimmed">
+        <item quantity="other">Xbox の .iso ファイルが %1$d 件見つかりましたが、すでに XISO か Xbox ディスクではないため、縮小するものはありません。</item>
+    </plurals>
 </resources>
