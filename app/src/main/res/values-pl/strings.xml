@@ -340,4 +340,11 @@
     <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
     <string name="chd_ps2_use_dvd">Użyj konwertera DVD (dla ARMSX2)</string>
     <string name="chd_ps2_use_dvd_detail">Zostaw wyłączone dla NetherSX2, który wymaga CHD CD.</string>
+
+    <!-- Scan result sorting and conversion report totals. -->
+    <string name="sort_size">Rozmiar</string>
+    <string name="report_original_total">Pierwotny rozmiar łączny</string>
+    <string name="report_new_total">Nowy rozmiar łączny</string>
+    <string name="report_space_saved_label">Zaoszczędzone miejsce</string>
+    <string name="report_size_increase_label">Wzrost rozmiaru</string>
 </resources>

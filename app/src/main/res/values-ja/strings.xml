@@ -271,4 +271,11 @@
     <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
     <string name="chd_ps2_use_dvd">DVD コンバーターを使う（ARMSX2 用）</string>
     <string name="chd_ps2_use_dvd_detail">CD CHD が必要な NetherSX2 ではオフのままにしてください。</string>
+
+    <!-- Scan result sorting and conversion report totals. -->
+    <string name="sort_size">サイズ</string>
+    <string name="report_original_total">元の合計サイズ</string>
+    <string name="report_new_total">新しい合計サイズ</string>
+    <string name="report_space_saved_label">節約した容量</string>
+    <string name="report_size_increase_label">増えた容量</string>
 </resources>

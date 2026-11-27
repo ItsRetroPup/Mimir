@@ -1,5 +1,6 @@
 package pup.app.mimir.ui
 
+import androidx.compose.foundation.layout.Spacer
 import pup.app.mimir.domain.FileOperation
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.draw.clip
@@ -48,11 +49,23 @@ import pup.app.mimir.domain.OperationPlan
 import pup.app.mimir.domain.PlannedChange
 import pup.app.mimir.domain.ToolMode
 
-internal enum class QueueSortOption(@StringRes val label: Int) {
-    NameAscending(R.string.sort_name_ascending),
-    NameDescending(R.string.sort_name_descending),
-    SizeLargest(R.string.sort_size_largest),
-    SizeSmallest(R.string.sort_size_smallest),
+internal enum class QueueSortOption {
+    NameAscending,
+    NameDescending,
+    SizeLargest,
+    SizeSmallest,
+}
+
+/** The two sort chips; picking the current one again flips its direction. */
+private enum class QueueSortKey { Name, Size }
+
+private val QueueSortOption.key: QueueSortKey
+    get() = if (this == QueueSortOption.NameAscending || this == QueueSortOption.NameDescending) QueueSortKey.Name else QueueSortKey.Size
+
+private fun QueueSortOption.next(key: QueueSortKey): QueueSortOption = when (key) {
+    QueueSortKey.Name -> if (this == QueueSortOption.NameAscending) QueueSortOption.NameDescending else QueueSortOption.NameAscending
+    // Largest first is the useful start: the big images save the most.
+    QueueSortKey.Size -> if (this == QueueSortOption.SizeLargest) QueueSortOption.SizeSmallest else QueueSortOption.SizeLargest
 }
 
 internal fun formatBytes(bytes: Long): String {
@@ -156,18 +169,16 @@ internal fun PlanHeader(
         style = MaterialTheme.typography.headlineSmall,
         color = palette.text,
     )
+    // Selection and sorting share one row, so the results start higher up.
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
         OutlinedButton(onClick = onSelectAll, enabled = enabled, modifier = Modifier.focusRing()) { Text(stringResource(R.string.action_select_all)) }
         OutlinedButton(onClick = onDeselectAll, enabled = enabled, modifier = Modifier.focusRing()) { Text(stringResource(R.string.action_deselect_all)) }
+        if (isConversion) {
+            Spacer(Modifier.weight(1f))
+            SortChips(sortOption, enabled, onSortOptionChanged)
+        }
     }
     if (isConversion) {
-        ChoiceRow(
-            options = QueueSortOption.entries,
-            selected = sortOption,
-            enabled = enabled,
-            label = { stringResource(it.label) },
-            onSelect = onSortOptionChanged,
-        )
         if (storageInfo != null) {
             val lowSpace = selectedBytes > storageInfo.freeBytes
             Text(
@@ -289,6 +300,42 @@ private fun SystemChip(label: String) {
     )
 }
 
+/** A–Z and Size; picking the current one again flips its direction. */
+@Composable
+private fun SortChips(sortOption: QueueSortOption, enabled: Boolean, onSortOptionChanged: (QueueSortOption) -> Unit) {
+    ChoiceRow(
+        options = QueueSortKey.entries,
+        selected = sortOption.key,
+        enabled = enabled,
+        label = { key ->
+            when (key) {
+                QueueSortKey.Name -> if (sortOption == QueueSortOption.NameDescending) "Z–A" else "A–Z"
+                QueueSortKey.Size -> stringResource(R.string.sort_size) +
+                    if (sortOption == QueueSortOption.SizeSmallest) " ↑" else " ↓"
+            }
+        },
+        onSelect = { key -> onSortOptionChanged(sortOption.next(key)) },
+    )
+}
+
+@Composable
+private fun ReportFigure(label: String, value: String, highlight: Boolean = false) {
+    val palette = LocalMimirPalette.current
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(label, style = MaterialTheme.typography.bodyMedium, color = palette.textMuted, modifier = Modifier.weight(1f))
+        Text(
+            value,
+            style = MaterialTheme.typography.titleMedium.copy(fontFeatureSettings = "tnum"),
+            color = if (highlight) MaterialTheme.colorScheme.primary else palette.text,
+            maxLines = 1,
+        )
+    }
+}
+
 @Composable
 internal fun ConversionReportPanel(report: ConversionReport) {
     val palette = LocalMimirPalette.current
@@ -302,12 +349,22 @@ internal fun ConversionReportPanel(report: ConversionReport) {
         Text(
             listOfNotNull(
                 pluralStringResource(R.plurals.report_completed, report.total, report.completed, report.total),
-                sizeSummary,
+                sizeSummary.takeIf { report.originalBytes == 0L },
                 stringResource(R.string.report_stopped).takeIf { report.stopped },
             ).joinToString(" "),
             style = MaterialTheme.typography.bodyMedium,
             color = palette.textMuted,
         )
+        // The totals only mean something once a conversion has finished.
+        if (report.originalBytes > 0L) {
+            ReportFigure(stringResource(R.string.report_original_total), formatBytes(report.originalBytes))
+            ReportFigure(stringResource(R.string.report_new_total), formatBytes(report.newBytes.coerceAtLeast(0L)))
+            ReportFigure(
+                stringResource(if (report.spaceSavedBytes < 0L) R.string.report_size_increase_label else R.string.report_space_saved_label),
+                formatBytes(kotlin.math.abs(report.spaceSavedBytes)),
+                highlight = report.spaceSavedBytes > 0L,
+            )
+        }
     }
 }
 

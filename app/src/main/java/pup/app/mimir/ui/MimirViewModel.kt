@@ -106,8 +106,12 @@ data class ConversionReport(
     val completed: Int,
     val total: Int,
     val spaceSavedBytes: Long = 0L,
+    /** Size of the converted sources before conversion; their outputs total this minus [spaceSavedBytes]. */
+    val originalBytes: Long = 0L,
     val stopped: Boolean = false,
-)
+) {
+    val newBytes: Long get() = originalBytes - spaceSavedBytes
+}
 
 class MimirViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = RomTreeRepository(application)
@@ -777,7 +781,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             executor.apply(
                 rootUri = uri,
                 plan = plan,
-                onProgress = { completed, total, saved ->
+                onProgress = { completed, total, saved, original ->
                     finishedOperations = completed
                     savedBytes = saved
                     _uiState.update {
@@ -789,6 +793,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                                     completed = completed,
                                     total = total,
                                     spaceSavedBytes = saved,
+                                    originalBytes = original,
                                 )
                             } else {
                                 it.conversionReport
@@ -839,6 +844,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                                     completed = result.completedOperations,
                                     total = plan.operations.size,
                                     spaceSavedBytes = result.spaceSavedBytes,
+                                    originalBytes = result.originalBytes,
                                     stopped = result.stopped,
                                 )
                             } else {
@@ -868,6 +874,9 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
                                 ConversionReport(
                                     completed = it.conversionReport?.completed ?: 0,
                                     total = plan.operations.size,
+                                    // Keep what the finished conversions saved before the failure or stop.
+                                    spaceSavedBytes = it.conversionReport?.spaceSavedBytes ?: 0L,
+                                    originalBytes = it.conversionReport?.originalBytes ?: 0L,
                                     stopped = error is OperationStoppedException,
                                 )
                             } else {

@@ -658,10 +658,14 @@ private fun ToolScreen(
                 }
             }
         }
+        // Status lives under the setup panel, so the scan results start at the top of their column.
+        DataPaneProgress(uiState, onStopNow, onStopAfterCurrent)
+        if (uiState.selectedMode == ToolMode.Converter && !uiState.isBusy) {
+            uiState.conversionReport?.let { ConversionReportPanel(it) }
+        }
+        uiState.message?.let { StatusLine(it) }
     }
     val data: @Composable ColumnScope.() -> Unit = {
-        DataPaneProgress(uiState, onStopNow, onStopAfterCurrent)
-        uiState.message?.let { StatusLine(it) }
         when (tool.mode) {
             ToolMode.VitaAppIds -> VitaDatabasePane(
                 vitaQuery = uiState.vitaQuery,
@@ -701,7 +705,8 @@ private fun ToolScreen(
             ) {
                 Column(
                     modifier = Modifier
-                        .weight(0.42f)
+                        // Narrower setup column, so the scan results get the room.
+                        .weight(0.34f)
                         .fillMaxHeight()
                         .verticalScroll(rememberScrollState())
                         .padding(vertical = 12.dp)
@@ -711,7 +716,7 @@ private fun ToolScreen(
                 )
                 Column(
                     modifier = Modifier
-                        .weight(0.58f)
+                        .weight(0.66f)
                         .fillMaxHeight()
                         .verticalScroll(rememberScrollState())
                         .padding(vertical = 12.dp)
@@ -773,9 +778,6 @@ private fun ScanResults(
     val palette = LocalMimirPalette.current
     val plan = uiState.previewPlan
     val enabled = !uiState.isBusy
-    if (uiState.selectedMode == ToolMode.Converter && !uiState.isBusy) {
-        uiState.conversionReport?.let { ConversionReportPanel(it) }
-    }
     if (plan == null || plan.changes.isEmpty()) {
         if (uiState.isBusy) return
         val art: @Composable () -> Unit = {

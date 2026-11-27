@@ -17,8 +17,8 @@ class PlanExecutor(private val context: Context) {
     fun apply(
         rootUri: Uri,
         plan: OperationPlan,
-        /** Called after each operation, with the space saved so far. */
-        onProgress: ((completedOperations: Int, totalOperations: Int, spaceSavedBytes: Long) -> Unit)? = null,
+        /** Called after each operation, with the space saved so far and the size of the sources converted so far. */
+        onProgress: ((completedOperations: Int, totalOperations: Int, spaceSavedBytes: Long, originalBytes: Long) -> Unit)? = null,
         onCurrentOperationProgress: ((Float) -> Unit)? = null,
         onOperationStarted: ((FileOperation) -> Unit)? = null,
         cancellation: OperationCancellation? = null,
@@ -28,9 +28,10 @@ class PlanExecutor(private val context: Context) {
             ?: error("Unable to access selected ROM folder.")
 
         var spaceSavedBytes = 0L
+        var originalBytes = 0L
         plan.operations.forEachIndexed { index, operation ->
             if (cancellation?.shouldStopBeforeNextOperation() == true) {
-                return@runCatching ExecutionResult(completedOperations = index, stopped = true, spaceSavedBytes = spaceSavedBytes)
+                return@runCatching ExecutionResult(completedOperations = index, stopped = true, spaceSavedBytes = spaceSavedBytes, originalBytes = originalBytes)
             }
             onOperationStarted?.invoke(operation)
             when (operation) {
@@ -79,7 +80,9 @@ class PlanExecutor(private val context: Context) {
                             }
                         }
                     }
-                    spaceSavedBytes += sourceFile.length().coerceAtLeast(0L) - target.length()
+                    val sourceBytes = sourceFile.length().coerceAtLeast(0L)
+                    originalBytes += sourceBytes
+                    spaceSavedBytes += sourceBytes - target.length()
                     if (!sourceFile.delete()) {
                         error("Failed to remove original file: ${operation.sourcePath}")
                     }
@@ -104,6 +107,7 @@ class PlanExecutor(private val context: Context) {
                                     sourcePath == operation.sourcePath
                             }
                             .sumOf { sourceSize(root, it) }
+                        originalBytes += sourceBytesBefore
                         spaceSavedBytes += sourceBytesBefore - target.length()
                         if (operation.deleteOriginalFiles) {
                             conversion.originalSourcePaths.forEach { sourcePath ->
@@ -125,6 +129,7 @@ class PlanExecutor(private val context: Context) {
                         cancellation = cancellation,
                         onProgress = onCurrentOperationProgress,
                     )
+                    originalBytes += sourceBytesBefore
                     spaceSavedBytes += sourceBytesBefore - outputBytes
                 } else {
                     val conversion = nativeConverterRunner.convert(
@@ -139,7 +144,9 @@ class PlanExecutor(private val context: Context) {
                             requireNotNull(output) { "Unable to write ${operation.targetPath}" }
                             conversion.output.inputStream().use { input -> input.copyTo(output) }
                         }
-                        spaceSavedBytes += sourceSize(root, operation.sourcePath) - target.length()
+                        val sourceBytes = sourceSize(root, operation.sourcePath)
+                        originalBytes += sourceBytes
+                        spaceSavedBytes += sourceBytes - target.length()
                         // Only once the output is fully written, so a failed conversion keeps its source.
                         if (operation.deleteOriginalFile) {
                             val source = root.findRelative(operation.sourcePath)
@@ -151,9 +158,9 @@ class PlanExecutor(private val context: Context) {
                     }
                 }
             }
-            onProgress?.invoke(index + 1, plan.operations.size, spaceSavedBytes)
+            onProgress?.invoke(index + 1, plan.operations.size, spaceSavedBytes, originalBytes)
         }
-        ExecutionResult(completedOperations = plan.operations.size, stopped = false, spaceSavedBytes = spaceSavedBytes)
+        ExecutionResult(completedOperations = plan.operations.size, stopped = false, spaceSavedBytes = spaceSavedBytes, originalBytes = originalBytes)
     }
 
     fun deleteOutputFile(rootUri: Uri, relativePath: String): Result<Unit> = runCatching {

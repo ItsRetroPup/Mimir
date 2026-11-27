@@ -271,4 +271,11 @@
     <!-- CHDMan PS2 disc type, asked in the convert dialog. -->
     <string name="chd_ps2_use_dvd">使用 DVD 轉換器（適用於 ARMSX2）</string>
     <string name="chd_ps2_use_dvd_detail">NetherSX2 需要 CD CHD，請保持關閉。</string>
+
+    <!-- Scan result sorting and conversion report totals. -->
+    <string name="sort_size">大小</string>
+    <string name="report_original_total">原始總大小</string>
+    <string name="report_new_total">新的總大小</string>
+    <string name="report_space_saved_label">節省的空間</string>
+    <string name="report_size_increase_label">增加的大小</string>
 </resources>
