@@ -173,7 +173,9 @@ private fun ToolStatsRow(tool: ToolEntry, stats: UsageStats, largestSaving: Long
         }
         if (used) {
             val saved = usage.spaceSavedBytes.coerceAtLeast(0L)
-            Column(Modifier.widthIn(min = 160.dp), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            // A fixed width: the block meter fills its parent, so a column that is only given a
+            // minimum width would grow to take the whole row and squeeze the tool's name out.
+            Column(Modifier.width(STATS_METER_WIDTH), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
                     stringResource(R.string.stats_saved_value, formatBytes(saved)),
                     style = MaterialTheme.typography.labelLarge.copy(fontFeatureSettings = "tnum"),
@@ -185,5 +187,7 @@ private fun ToolStatsRow(tool: ToolEntry, stats: UsageStats, largestSaving: Long
         }
     }
 }
+
+private val STATS_METER_WIDTH = 180.dp
 
 private val ToolEntry.statsKey: String get() = UsageStats.keyFor(mode, converter)
