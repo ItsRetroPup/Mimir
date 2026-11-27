@@ -60,6 +60,7 @@
     <string name="apply_body_cannot_undo">Mimir는 이 작업을 되돌릴 수 없습니다.</string>
     <string name="apply_delete_originals">원본 파일 삭제</string>
     <string name="apply_delete_originals_detail">변환이 성공하면 .cue 또는 .gdi 파일이 참조하는 같은 폴더의 트랙도 삭제합니다.</string>
+    <string name="apply_delete_originals_detail_single">변환에 성공한 %1$s 파일을 삭제합니다.</string>
     <string name="action_start_conversions">변환 시작</string>
     <string name="action_apply_changes">변경 사항 적용</string>
     <string name="esde_install_title">사용자 지정 시스템을 설치할까요?</string>

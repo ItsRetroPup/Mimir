@@ -60,6 +60,7 @@
     <string name="apply_body_cannot_undo">Mimir はこの操作を元に戻せません。</string>
     <string name="apply_delete_originals">元のファイルを削除</string>
     <string name="apply_delete_originals_detail">変換が成功した後、.cue または .gdi ファイルが参照している同じフォルダー内のトラックも削除します。</string>
+    <string name="apply_delete_originals_detail_single">変換に成功した %1$s ファイルを削除します。</string>
     <string name="action_start_conversions">変換を開始</string>
     <string name="action_apply_changes">変更を適用</string>
     <string name="esde_install_title">カスタムシステムをインストールしますか？</string>

@@ -70,6 +70,7 @@
     <string name="apply_body_cannot_undo">Mimir non può annullare questa azione.</string>
     <string name="apply_delete_originals">Elimina file originali</string>
     <string name="apply_delete_originals_detail">Rimuove anche le tracce nella stessa cartella a cui fa riferimento un file .cue o .gdi dopo la conversione riuscita.</string>
+    <string name="apply_delete_originals_detail_single">Rimuove ogni file %1$s quando la sua conversione riesce.</string>
     <string name="action_start_conversions">Avvia conversioni</string>
     <string name="action_apply_changes">Applica modifiche</string>
     <string name="esde_install_title">Installare i sistemi personalizzati?</string>

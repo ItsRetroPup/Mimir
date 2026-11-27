@@ -65,6 +65,7 @@
     <string name="apply_body_cannot_undo">Mimir kann dies nicht rückgängig machen.</string>
     <string name="apply_delete_originals">Originaldateien löschen</string>
     <string name="apply_delete_originals_detail">Entfernt nach erfolgreicher Konvertierung auch Tracks im selben Ordner, auf die eine .cue- oder .gdi-Datei verweist.</string>
+    <string name="apply_delete_originals_detail_single">Entfernt jede %1$s-Datei, sobald ihre Konvertierung erfolgreich war.</string>
     <string name="action_start_conversions">Konvertierungen starten</string>
     <string name="action_apply_changes">Änderungen anwenden</string>
     <string name="esde_install_title">Benutzerdefinierte Systeme installieren?</string>

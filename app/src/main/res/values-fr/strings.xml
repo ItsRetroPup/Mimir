@@ -101,6 +101,7 @@
     <string name="apply_body_cannot_undo">Mimir ne peut pas annuler cette action.</string>
     <string name="apply_delete_originals">Supprimer les fichiers d\'origine</string>
     <string name="apply_delete_originals_detail">Supprime également les pistes du même dossier référencées par un fichier .cue ou .gdi une fois la conversion réussie.</string>
+    <string name="apply_delete_originals_detail_single">Supprime chaque fichier %1$s une fois sa conversion réussie.</string>
     <string name="action_start_conversions">Lancer les conversions</string>
     <string name="action_apply_changes">Appliquer les modifications</string>
     <string name="esde_install_title">Installer les systèmes personnalisés ?</string>

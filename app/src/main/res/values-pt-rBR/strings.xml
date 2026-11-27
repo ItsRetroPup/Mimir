@@ -70,6 +70,7 @@
     <string name="apply_body_cannot_undo">O Mimir não pode desfazer esta ação.</string>
     <string name="apply_delete_originals">Excluir arquivos originais</string>
     <string name="apply_delete_originals_detail">Também remove faixas da mesma pasta referenciadas por um arquivo .cue ou .gdi após a conversão bem-sucedida.</string>
+    <string name="apply_delete_originals_detail_single">Remove cada arquivo %1$s depois que a conversão dele termina.</string>
     <string name="action_start_conversions">Iniciar conversões</string>
     <string name="action_apply_changes">Aplicar alterações</string>
     <string name="esde_install_title">Instalar sistemas personalizados?</string>

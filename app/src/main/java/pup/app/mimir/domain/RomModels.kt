@@ -111,6 +111,9 @@ enum class ConverterTool(
     /** True when the converted image replaces its source under the same name. */
     val replacesSource: Boolean get() = backend == ConverterBackend.InPlaceKotlin
 
+    /** Every converter can delete its originals except Xbox XISO, which already rewrites the image in place. */
+    val canDeleteOriginals: Boolean get() = !replacesSource
+
     /** True when the tool needs the user's imported prod.keys: both Switch NSZ converters do. */
     val needsProdKeys: Boolean get() = this == NszNsp || this == NspNsz
 }
@@ -203,6 +206,8 @@ sealed interface FileOperation {
         val sourcePath: String,
         val targetPath: String,
         val tool: ConverterTool,
+        /** Remove the source once the converted file is written. */
+        val deleteOriginalFile: Boolean = false,
     ) : FileOperation
 }
 

@@ -75,6 +75,7 @@
     <string name="apply_body_cannot_undo">Mimir nie może cofnąć tej operacji.</string>
     <string name="apply_delete_originals">Usuń pliki oryginalne</string>
     <string name="apply_delete_originals_detail">Po udanej konwersji usuwa też ścieżki z tego samego folderu, do których odwołuje się plik .cue lub .gdi.</string>
+    <string name="apply_delete_originals_detail_single">Usuwa każdy plik %1$s po udanej konwersji.</string>
     <string name="action_start_conversions">Rozpocznij konwersje</string>
     <string name="action_apply_changes">Zastosuj zmiany</string>
     <string name="esde_install_title">Zainstalować systemy niestandardowe?</string>

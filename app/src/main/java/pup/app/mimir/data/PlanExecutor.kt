@@ -140,6 +140,12 @@ class PlanExecutor(private val context: Context) {
                             conversion.output.inputStream().use { input -> input.copyTo(output) }
                         }
                         spaceSavedBytes += sourceSize(root, operation.sourcePath) - target.length()
+                        // Only once the output is fully written, so a failed conversion keeps its source.
+                        if (operation.deleteOriginalFile) {
+                            val source = root.findRelative(operation.sourcePath)
+                                ?: error("Missing original source file: ${operation.sourcePath}")
+                            require(source.delete()) { "Failed to delete original source file: ${operation.sourcePath}" }
+                        }
                     } finally {
                         conversion.output.delete()
                     }

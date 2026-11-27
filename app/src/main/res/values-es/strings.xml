@@ -70,6 +70,7 @@
     <string name="apply_body_cannot_undo">Mimir no puede deshacer esta acción.</string>
     <string name="apply_delete_originals">Eliminar archivos originales</string>
     <string name="apply_delete_originals_detail">También elimina las pistas de la misma carpeta referenciadas por un archivo .cue o .gdi cuando la conversión se completa.</string>
+    <string name="apply_delete_originals_detail_single">Elimina cada archivo %1$s cuando su conversión termina correctamente.</string>
     <string name="action_start_conversions">Iniciar conversiones</string>
     <string name="action_apply_changes">Aplicar cambios</string>
     <string name="esde_install_title">¿Instalar sistemas personalizados?</string>

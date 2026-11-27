@@ -58,7 +58,8 @@ data class MimirUiState(
     val esDeRootUri: Uri? = null,
     val esDeRootName: String = "",
     val esDeSystems: List<EsDeSystem> = emptyList(),
-    val deleteOriginalChdFiles: Boolean = false,
+    /** Converters set to delete each source file once its conversion succeeds. */
+    val deleteOriginalTools: Set<ConverterTool> = emptySet(),
     val scanHiddenFolders: Boolean = false,
     val useDarkMode: Boolean = true,
     /** Home lists the tools as rows instead of the memory-card grid. */
@@ -134,7 +135,9 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
             esDeRootUri = prefs.getString(KEY_ESDE_URI, null)?.let(Uri::parse),
             esDeRootName = prefs.getString(KEY_ESDE_LABEL, null) ?: strings.text(R.string.no_esde_folder_selected),
             scanHiddenFolders = prefs.getBoolean(KEY_SCAN_HIDDEN_FOLDERS, false),
-            deleteOriginalChdFiles = prefs.getBoolean(KEY_DELETE_ORIGINAL_CHD_FILES, false),
+            deleteOriginalTools = ConverterTool.entries
+                .filter { it.canDeleteOriginals && prefs.getBoolean(deleteOriginalsKey(it), false) }
+                .toSet(),
             useDarkMode = prefs.getBoolean(KEY_DARK_MODE, true),
             homeListView = prefs.getBoolean(KEY_HOME_LIST_VIEW, false),
             usageStats = statsStore.load(),
@@ -347,14 +350,21 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun updateDeleteOriginalChdFiles(enabled: Boolean) {
-        prefs.edit().putBoolean(KEY_DELETE_ORIGINAL_CHD_FILES, enabled).apply()
+    /** Remembers each converter's "Delete original files" choice separately. */
+    fun updateDeleteOriginals(tool: ConverterTool, enabled: Boolean) {
+        if (!tool.canDeleteOriginals) return
+        prefs.edit().putBoolean(deleteOriginalsKey(tool), enabled).apply()
         _uiState.update {
             // This choice is made in the final conversion dialog, so keep the current scan and
-            // selection intact. applyChanges applies the value to the queued CHD operations.
-            it.copy(deleteOriginalChdFiles = enabled, message = null)
+            // selection intact. applyChanges applies the value to the queued operations.
+            val tools = if (enabled) it.deleteOriginalTools + tool else it.deleteOriginalTools - tool
+            it.copy(deleteOriginalTools = tools, message = null)
         }
     }
+
+    /** CHDMan keeps its original key, so the choice made before 1.2.0 carries over. */
+    private fun deleteOriginalsKey(tool: ConverterTool): String =
+        if (tool == ConverterTool.Chd) KEY_DELETE_ORIGINAL_CHD_FILES else "delete_original_files_${tool.name}"
 
     fun stopNow() {
         activeCancellation?.stopNow()
@@ -748,7 +758,7 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
         val current = _uiState.value
         val plan = current.previewPlan
             ?.forSelectedChanges(current.selectedChangePaths)
-            ?.withChdDeleteOriginalFiles(current.deleteOriginalChdFiles)
+            ?.withDeleteOriginalFiles(current.deleteOriginalTools)
             ?.takeIf { it.operations.isNotEmpty() }
             ?: return
         val uri = when (plan.mode) {
@@ -953,10 +963,13 @@ class MimirViewModel(application: Application) : AndroidViewModel(application) {
     private fun treeLabel(uri: Uri): String =
         DocumentsContract.getTreeDocumentId(uri).substringAfterLast(':')
 
-    private fun OperationPlan.withChdDeleteOriginalFiles(deleteOriginalFiles: Boolean): OperationPlan {
+    private fun OperationPlan.withDeleteOriginalFiles(tools: Set<ConverterTool>): OperationPlan {
         if (mode != ToolMode.Converter) return this
         fun update(operation: FileOperation): FileOperation = when (operation) {
-            is FileOperation.ConvertToChd -> operation.copy(deleteOriginalFiles = deleteOriginalFiles)
+            is FileOperation.ConvertToChd -> operation.copy(deleteOriginalFiles = ConverterTool.Chd in tools)
+            is FileOperation.ConvertWithTool -> operation.copy(
+                deleteOriginalFile = operation.tool.canDeleteOriginals && operation.tool in tools,
+            )
             else -> operation
         }
         return copy(

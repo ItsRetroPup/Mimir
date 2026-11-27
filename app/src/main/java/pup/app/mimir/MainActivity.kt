@@ -139,7 +139,7 @@ class MainActivity : AppCompatActivity() {
                         onChdSystemSelected = viewModel::updateChdSystem,
                         onChdDiscTypeSelected = viewModel::updateChdDiscType,
                         onConverterToolSelected = viewModel::updateConverterTool,
-                        onDeleteOriginalChdFilesChanged = viewModel::updateDeleteOriginalChdFiles,
+                        onDeleteOriginalsChanged = viewModel::updateDeleteOriginals,
                         onScanHiddenFoldersChanged = viewModel::updateScanHiddenFolders,
                         onDarkModeToggled = viewModel::updateDarkMode,
                         onHomeListViewToggled = viewModel::updateHomeListView,

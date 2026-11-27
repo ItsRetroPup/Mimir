@@ -57,15 +57,15 @@ internal fun ApplyConfirmationDialog(
     converterTool: ConverterTool,
     changeCount: Int,
     existingOutputCount: Int,
-    deleteOriginalChdFiles: Boolean,
+    deleteOriginalFiles: Boolean,
     enabled: Boolean,
     onDismiss: () -> Unit,
-    onConfirm: (deleteOriginalChdFiles: Boolean) -> Unit,
+    onConfirm: (deleteOriginalFiles: Boolean) -> Unit,
 ) {
     val palette = LocalMimirPalette.current
     val isConversion = mode == ToolMode.Converter
-    val offersDeleteOriginals = isConversion && converterTool == ConverterTool.Chd
-    var deleteOriginals by rememberSaveable { mutableStateOf(deleteOriginalChdFiles) }
+    val offersDeleteOriginals = isConversion && converterTool.canDeleteOriginals
+    var deleteOriginals by rememberSaveable { mutableStateOf(deleteOriginalFiles) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
@@ -94,7 +94,14 @@ internal fun ApplyConfirmationDialog(
                         Column(modifier = Modifier.weight(1f)) {
                             Text(stringResource(R.string.apply_delete_originals), style = MaterialTheme.typography.bodyLarge)
                             Text(
-                                stringResource(R.string.apply_delete_originals_detail),
+                                stringResource(
+                                    if (converterTool == ConverterTool.Chd) {
+                                        R.string.apply_delete_originals_detail
+                                    } else {
+                                        R.string.apply_delete_originals_detail_single
+                                    },
+                                    converterTool.sourceExtensions.sorted().joinToString(" / ") { ".$it" },
+                                ),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
                             )

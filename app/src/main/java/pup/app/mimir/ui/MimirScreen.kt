@@ -101,7 +101,7 @@ internal fun MimirScreen(
     onChdSystemSelected: (ChdSystem) -> Unit,
     onChdDiscTypeSelected: (ChdDiscType) -> Unit,
     onConverterToolSelected: (ConverterTool) -> Unit,
-    onDeleteOriginalChdFilesChanged: (Boolean) -> Unit,
+    onDeleteOriginalsChanged: (ConverterTool, Boolean) -> Unit,
     onScanHiddenFoldersChanged: (Boolean) -> Unit,
     onDarkModeToggled: (Boolean) -> Unit,
     onHomeListViewToggled: (Boolean) -> Unit,
@@ -303,8 +303,8 @@ internal fun MimirScreen(
         }
 
         if (showApplyConfirmation) {
-            val isChdConversion = uiState.selectedMode == ToolMode.Converter &&
-                uiState.selectedConverterTool == ConverterTool.Chd
+            val converterTool = uiState.selectedConverterTool
+            val offersDeleteOriginals = uiState.selectedMode == ToolMode.Converter && converterTool.canDeleteOriginals
             ApplyConfirmationDialog(
                 mode = uiState.selectedMode,
                 converterTool = uiState.selectedConverterTool,
@@ -312,11 +312,11 @@ internal fun MimirScreen(
                 existingOutputCount = uiState.previewPlan?.changes
                     ?.count { it.targetAlreadyExists && it.detailPath in uiState.selectedChangePaths }
                     ?: 0,
-                deleteOriginalChdFiles = uiState.deleteOriginalChdFiles,
+                deleteOriginalFiles = converterTool in uiState.deleteOriginalTools,
                 enabled = !uiState.isBusy,
                 onDismiss = { showApplyConfirmation = false },
                 onConfirm = { deleteOriginals ->
-                    if (isChdConversion) onDeleteOriginalChdFilesChanged(deleteOriginals)
+                    if (offersDeleteOriginals) onDeleteOriginalsChanged(converterTool, deleteOriginals)
                     showApplyConfirmation = false
                     onApply()
                 },

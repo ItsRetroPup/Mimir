@@ -78,7 +78,7 @@ class ToolPlanBuilder(
                     entries = entries,
                     system = system,
                     discType = state.selectedChdDiscType,
-                    deleteOriginalFiles = state.deleteOriginalChdFiles,
+                    deleteOriginalFiles = ConverterTool.Chd in state.deleteOriginalTools,
                 )
             } else {
                 val tool = state.selectedConverterTool

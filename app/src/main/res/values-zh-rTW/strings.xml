@@ -60,6 +60,7 @@
     <string name="apply_body_cannot_undo">Mimir 無法復原此操作。</string>
     <string name="apply_delete_originals">刪除原始檔案</string>
     <string name="apply_delete_originals_detail">轉換成功後，一併刪除 .cue 或 .gdi 檔案所參照、位於同一資料夾的音軌。</string>
+    <string name="apply_delete_originals_detail_single">轉換成功後刪除對應的 %1$s 檔案。</string>
     <string name="action_start_conversions">開始轉換</string>
     <string name="action_apply_changes">套用變更</string>
     <string name="esde_install_title">要安裝自訂系統嗎？</string>

@@ -99,6 +99,7 @@
     <string name="apply_body_cannot_undo">Mimir cannot undo this action.</string>
     <string name="apply_delete_originals">Delete original files</string>
     <string name="apply_delete_originals_detail">Also removes same-folder tracks referenced by a .cue or .gdi file after conversion succeeds.</string>
+    <string name="apply_delete_originals_detail_single">Removes each %1$s file once its conversion succeeds.</string>
     <string name="action_start_conversions">Start conversions</string>
     <string name="action_apply_changes">Apply changes</string>
     <string name="esde_install_title">Install custom systems?</string>
